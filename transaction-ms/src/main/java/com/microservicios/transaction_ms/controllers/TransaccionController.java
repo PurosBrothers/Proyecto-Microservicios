@@ -23,9 +23,6 @@ public class TransaccionController {
     @Autowired
     private TransaccionService transaccionService;
 
-    @Autowired
-    private ItemTransaccionMapper itemTransaccionMapper;
-
     @GetMapping("/list/{uid}")
     public ResponseEntity<?> getAllTransacciones(@PathVariable String uid) {
         List<ItemTransaccionDTO> items = transaccionService.getItemsTransaccion(uid).stream()

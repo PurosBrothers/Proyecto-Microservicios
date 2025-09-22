@@ -9,6 +9,16 @@
             "projectName": "transaction-ms",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-PaymentMsApplication<payment-ms>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.microservicios.payment_ms.PaymentMsApplication",
+            "projectName": "payment-ms",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }
