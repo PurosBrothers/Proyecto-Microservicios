@@ -28,6 +28,10 @@ spring:
         web-allow-others: true
         trace: false
 
+  graphql:
+    graphiql:
+      enabled: true
+
 server:
   port: 8085
 

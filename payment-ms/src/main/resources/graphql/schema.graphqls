@@ -1,8 +1,8 @@
 type Pago {
   id: ID!
   uid: String!
-  reservaId: Long!
-  monto: BigDecimal!
+  reservaId: Int!
+  monto: Float!
   fechaPago: String!
   estadoPago: EstadoPago!
   referencia: String!
@@ -25,7 +25,7 @@ type Query {
   pagos: [Pago!]!
   pago(id: ID!): Pago
   pagoByUid(uid: String!): Pago
-  pagosByReserva(reservaId: Long!): [Pago!]!
+  pagosByReserva(reservaId: Int!): [Pago!]!
   clienteBancos: [ClienteBanco!]!
   clienteBanco(id: ID!): ClienteBanco
   clienteBancoByUid(uid: String!): ClienteBanco
@@ -34,8 +34,8 @@ type Query {
 type Mutation {
   createPago(
     uid: String!
-    reservaId: Long!
-    monto: BigDecimal!
+    reservaId: Int!
+    monto: Float!
     fechaPago: String!
     estadoPago: EstadoPago!
     referencia: String!
@@ -50,5 +50,3 @@ type Mutation {
   updateCuentaBancaria(id: ID!, cuentaBancariaEncrypted: String!): ClienteBanco
   deleteClienteBanco(id: ID!): Boolean!
 }
-
-scalar BigDecimal

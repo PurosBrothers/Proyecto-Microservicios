@@ -58,8 +58,16 @@ public class TransaccionService {
     }
 
     // Crear una transacción a partir de un carrito de compra
-    public Transaccion createTransactionFromCarrito(String uid) {
-        List<ItemCarrito> cartItems = carritoCompraService.getCarritoItems(uid);
+    public Transaccion createTransactionFromCarrito(String uid, List<Long> itemIds) {
+        List<ItemCarrito> allCartItems = carritoCompraService.getCarritoItems(uid);
+        List<ItemCarrito> cartItems;
+        if (itemIds == null || itemIds.isEmpty()) {
+            cartItems = allCartItems; // procesar todos si no se especifica
+        } else {
+            cartItems = allCartItems.stream()
+                    .filter(item -> itemIds.contains(item.getId()))
+                    .collect(Collectors.toList());
+        }
         if (cartItems.isEmpty()) {
             return null;
         }
@@ -75,13 +83,8 @@ public class TransaccionService {
             return it;
         }).collect(Collectors.toList());
 
-        // Guardar items de transacción
-        List<ItemTransaccion> savedItems = itemsTransaccion.stream()
-                .map(itemTransaccionService::create)
-                .collect(Collectors.toList());
-
         // calcular total
-        BigDecimal total = savedItems.stream()
+        BigDecimal total = itemsTransaccion.stream()
                 .map(it -> it.getPrecioUnitario().multiply(BigDecimal.valueOf(it.getCantidad())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -91,7 +94,7 @@ public class TransaccionService {
         trans.setEstado("PENDING");
         trans.setFechaTransaccion(LocalDate.now());
         trans.setMontoTotal(total);
-        trans.setItemsPagados(savedItems);
+        trans.setItemsPagados(itemsTransaccion); // items nuevos, cascada los guardará
         trans.setItemsPorPagar(List.of());
 
         Transaccion savedTrans = repository.save(trans);

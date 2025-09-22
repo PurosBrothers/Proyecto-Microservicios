@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.microservicios.transaction_ms.dtos.ItemTransaccionDTO;
@@ -32,12 +33,13 @@ public class TransaccionController {
     }
 
     @PostMapping("/create/{uid}")
-    public ResponseEntity<?> createTransaccion(@PathVariable String uid) {
-        Transaccion transaccion = transaccionService.createTransactionFromCarrito(uid);
+    public ResponseEntity<?> createTransaccion(@PathVariable String uid,
+            @RequestBody(required = false) List<Long> itemIds) {
+        Transaccion transaccion = transaccionService.createTransactionFromCarrito(uid, itemIds);
         if (transaccion != null) {
             return ResponseEntity.ok(transaccion);
         } else {
-            return ResponseEntity.badRequest().body("No hay items en el carrito");
+            return ResponseEntity.badRequest().body("No hay items válidos en el carrito para procesar");
         }
     }
 
