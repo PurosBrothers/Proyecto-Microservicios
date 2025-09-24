@@ -19,6 +19,16 @@
             "projectName": "payment-ms",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-MarketplaceMsApplication<marketplace-ms>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.microservicios.marketplace_ms.MarketplaceMsApplication",
+            "projectName": "marketplace-ms",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }

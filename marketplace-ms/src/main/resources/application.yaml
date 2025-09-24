@@ -1,0 +1,10 @@
+server:
+    port: 7777
+
+spring:
+    application:
+        name: marketplace-ms
+    
+    cloud:
+        config:
+            enabled: false
