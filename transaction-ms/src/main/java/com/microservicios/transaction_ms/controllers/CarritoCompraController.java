@@ -34,8 +34,8 @@ public class CarritoCompraController {
     }
 
     @DeleteMapping("/delete-item-carrito")
-    public ResponseEntity<?> deleteItemFromCarrito(@RequestBody String uid,
-            @RequestBody Long itemId) {
+    public ResponseEntity<?> deleteItemFromCarrito(@RequestParam String uid,
+            @RequestParam Long itemId) {
         boolean deleted = carritoCompraService.removeItemFromCarrito(uid, itemId) != null;
         if (deleted) {
             return ResponseEntity.ok().build();
@@ -45,7 +45,7 @@ public class CarritoCompraController {
     }
 
     @PutMapping("agregar-item-carrito")
-    public ResponseEntity<?> addItemCarrito(@RequestBody String uid, @RequestBody ItemCarritoDTO itemCarritoDTO) {
+    public ResponseEntity<?> addItemCarrito(@RequestParam String uid, @RequestBody ItemCarritoDTO itemCarritoDTO) {
         var itemCarrito = ItemCarritoMapper.toModel(itemCarritoDTO);
         var carritoActualizado = carritoCompraService.addItemToCarrito(uid, itemCarrito);
         return ResponseEntity.ok(CarritoCompraMapper.toDTO(carritoActualizado));

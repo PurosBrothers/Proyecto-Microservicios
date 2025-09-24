@@ -2,39 +2,5 @@ spring:
   application:
     name: payment-ms
 
-  cloud:
-    config:
-      enabled: false
-      import-check:
-        enabled: false
-
-  datasource:
-    url: jdbc:h2:file:./data/paymentDB;DB_CLOSE_DELAY=-1;AUTO_SERVER=TRUE
-    driverClassName: org.h2.Driver
-    username: farito
-    password: 123
-
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: create-drop
-    show-sql: true
-
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-      settings:
-        web-allow-others: true
-        trace: false
-
-  graphql:
-    graphiql:
-      enabled: true
-
-server:
-  port: 8085
-
-eureka:
-  client:
-    enabled: false
+  config:
+    import: configserver:http://localhost:8888

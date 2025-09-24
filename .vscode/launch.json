@@ -2,6 +2,20 @@
     "configurations": [
         {
             "type": "java",
+            "name": "ConfigServerApplication",
+            "request": "launch",
+            "mainClass": "com.microservicios.config_server.ConfigServerApplication",
+            "projectName": ""
+        },
+        {
+            "type": "java",
+            "name": "EurekaServerApplication",
+            "request": "launch",
+            "mainClass": "com.microservicios.eureka_server.EurekaServerApplication",
+            "projectName": ""
+        },
+        {
+            "type": "java",
             "name": "Spring Boot-TransactionMsApplication<transaction-ms>",
             "request": "launch",
             "cwd": "${workspaceFolder}",
@@ -17,6 +31,27 @@
             "cwd": "${workspaceFolder}",
             "mainClass": "com.microservicios.payment_ms.PaymentMsApplication",
             "projectName": "payment-ms",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-EurekaServerApplication<eureka_server>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.microservicios.eureka_server.EurekaServerApplication",
+            "projectName": "eureka_server",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=49218 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=eureka_server"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-ConfigServerApplication<config-server>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.microservicios.config_server.ConfigServerApplication",
+            "projectName": "config-server",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
         },
