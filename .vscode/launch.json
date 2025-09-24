@@ -64,6 +64,16 @@
             "projectName": "marketplace-ms",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-GatewayServerApplication<com.microservicios-gateway_server>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.microservicios.gateway_server.GatewayServerApplication",
+            "projectName": "com.microservicios-gateway_server",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }
