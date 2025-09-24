@@ -3,6 +3,7 @@ package com.microservicios.payment_ms.services;
 import com.microservicios.payment_ms.models.ClienteBanco;
 import com.microservicios.payment_ms.repository.ClienteBancoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,7 +32,8 @@ public class ClienteBancoService {
     }
 
     public ClienteBanco createClienteBanco(String uid, String cuentaBancariaEncrypted, String claveBancariaEncrypted) {
-        ClienteBanco clienteBanco = new ClienteBanco(uid, cuentaBancariaEncrypted, claveBancariaEncrypted);
+        String claveHashed = new BCryptPasswordEncoder().encode(claveBancariaEncrypted);
+        ClienteBanco clienteBanco = new ClienteBanco(uid, cuentaBancariaEncrypted, claveHashed);
         return clienteBancoRepository.save(clienteBanco);
     }
 
