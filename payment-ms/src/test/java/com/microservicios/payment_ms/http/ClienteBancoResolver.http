@@ -1,0 +1,51 @@
+@host=http://localhost:8085
+
+POST {{host}}/graphql
+Content-Type: application/json
+
+{
+  "query": "query { clienteBancos { id uid cuentaBancariaEncrypted } }"
+}
+
+###
+POST {{host}}/graphql
+Content-Type: application/json
+
+{
+  "query": "query { clienteBanco(id: 1) { id uid cuentaBancariaEncrypted } }"
+}
+
+###
+POST {{host}}/graphql
+Content-Type: application/json
+
+{
+  "query": "query { clienteBancoByUid(uid: \"1\") { id uid cuentaBancariaEncrypted } }"
+}
+
+###
+POST {{host}}/graphql
+Content-Type: application/json
+
+{
+  "query": "mutation { createClienteBanco(uid: \"1\", cuentaBancariaEncrypted: \"encrypted_account\", claveBancariaEncrypted: \"encrypted_key\") { id uid } }"
+}
+
+###
+POST {{host}}/graphql
+Content-Type: application/json
+
+{
+  "query": "mutation { updateCuentaBancaria(id: 1, cuentaBancariaEncrypted: \"new_encrypted_account\") { id uid cuentaBancariaEncrypted } }"
+}
+
+###
+POST {{host}}/graphql
+Content-Type: application/json
+
+{
+  "query": "mutation { deleteClienteBanco(id: 1) }"
+}
+
+###
+GET {{host}}/actuator/info

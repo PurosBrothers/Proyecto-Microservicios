@@ -1,0 +1,30 @@
+@host=http://localhost:8082
+
+GET {{host}}/carrito-compra/list-items-carrito/1
+
+
+
+###
+DELETE {{host}}/carrito-compra/delete-item-carrito
+Content-Type: application/json
+
+{
+  "uid": "1",
+  "itemId": 1
+}
+
+###
+PUT {{host}}/carrito-compra/agregar-item-carrito
+Content-Type: application/json
+
+{
+  "uid": "1",
+  "itemCarritoDTO": {
+    "id": 1,
+    "productId": 123,
+    "quantity": 2
+  }
+}
+
+###
+GET {{host}}/actuator/info
