@@ -13,6 +13,12 @@
 #       # simple-microservice's host and port
 #       - targets: ['localhost:8081'] 
 
+
+# To run prometheus with this config file
+#wsl ./prometheus --config.file=prometheus.yml
+
+
+
 global:
   # Set the update interval to 15 seconds
   scrape_interval: 15s  
