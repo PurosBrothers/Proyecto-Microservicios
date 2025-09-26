@@ -3,7 +3,7 @@
 ### Test Case 1: Item with Alojamiento classification
 
 ### Create an Alojamiento first
-POST {{baseUrl}}/alojamientos
+POST {{baseUrl}}/clasificaciones
 Content-Type: application/json
 
 {
@@ -32,15 +32,16 @@ Content-Type: application/json
   "stock": 50,
   "visualizaciones": 0,
   "calificacionPromedio": 0,
-  "clasificationType": "alojamiento",
-  "clasificacionId": 2
-  
+  "clasificacion": {
+    "id": 1
+  }
+
 }
 
 ### Test Case 2: Item with Alimentacion classification
 
 ### Create an Alimentacion
-POST {{baseUrl}}/alimentaciones
+POST {{baseUrl}}/clasificaciones
 Content-Type: application/json
 
 {
@@ -68,14 +69,15 @@ Content-Type: application/json
   "stock": 30,
   "visualizaciones": 0,
   "calificacionPromedio": 0,
-  "clasificationType": "alimentacion",
-  "clasificacionId": 2
+  "clasificacion": {
+    "id": 2
+  }
 }
 
 ### Test Case 3: Item with Transporte classification
 
 ### Create a Transporte
-POST {{baseUrl}}/transportes
+POST {{baseUrl}}/clasificaciones
 Content-Type: application/json
 
 {
@@ -103,14 +105,15 @@ Content-Type: application/json
   "stock": 20,
   "visualizaciones": 0,
   "calificacionPromedio": 0,
-  "clasificationType": "transporte",
-  "clasificacionId": 3
+  "clasificacion": {
+    "id": 3
+  }
 }
 
 ### Test Case 4: Item with PaseosEcologicos classification
 
 ### Create PaseosEcologicos
-POST {{baseUrl}}/paseos-ecologicos
+POST {{baseUrl}}/clasificaciones
 Content-Type: application/json
 
 {
@@ -139,11 +142,12 @@ Content-Type: application/json
   "stock": 15,
   "visualizaciones": 0,
   "calificacionPromedio": 0,
-  "clasificationType": "paseos-ecologicos",
-  "clasificacionId": 4
+  "clasificacion": {
+    "id": 4
+  }
 }
 
 ### Test Case 5: Get Item Classification
 
 ### Get the classification data for an Item - assuming item ID is 1
-GET {{baseUrl}}/items/1553/clasificacion
+GET {{baseUrl}}/items/1/clasificacion

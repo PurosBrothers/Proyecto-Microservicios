@@ -23,26 +23,22 @@ import com.microservicios.marketplace_ms.entities.RequisitosEspeciales;
 import com.microservicios.marketplace_ms.entities.RestriccionesDieteticas;
 import com.microservicios.marketplace_ms.entities.ServiciosIncluidos;
 import com.microservicios.marketplace_ms.entities.Transporte;
-import com.microservicios.marketplace_ms.repositories.AlojamientoRepository;
-import com.microservicios.marketplace_ms.repositories.AlimentacionRepository;
 import com.microservicios.marketplace_ms.repositories.CalificacionRepository;
+import com.microservicios.marketplace_ms.repositories.ClasificacionRepository;
 import com.microservicios.marketplace_ms.repositories.ComentarioRepository;
 import com.microservicios.marketplace_ms.repositories.ItemFotoRepository;
 import com.microservicios.marketplace_ms.repositories.ItemLinkRepository;
 import com.microservicios.marketplace_ms.repositories.ItemRepository;
 import com.microservicios.marketplace_ms.repositories.ItemTagRepository;
 import com.microservicios.marketplace_ms.repositories.ItemVideoRepository;
-import com.microservicios.marketplace_ms.repositories.PaseosEcologicosRepository;
 import com.microservicios.marketplace_ms.repositories.RequisitosEspecialesRepository;
 import com.microservicios.marketplace_ms.repositories.RestriccionesDieteticasRepository;
 import com.microservicios.marketplace_ms.repositories.ServiciosIncluidosRepository;
-import com.microservicios.marketplace_ms.repositories.TransporteRepository;
 
 @Component
 public class DbInitializer implements CommandLineRunner {
 
-    private final AlojamientoRepository alojamientoRepository;
-    private final AlimentacionRepository alimentacionRepository;
+    private final ClasificacionRepository clasificacionRepository;
     private final CalificacionRepository calificacionRepository;
     private final ComentarioRepository comentarioRepository;
     private final ItemFotoRepository itemFotoRepository;
@@ -50,28 +46,22 @@ public class DbInitializer implements CommandLineRunner {
     private final ItemRepository itemRepository;
     private final ItemTagRepository itemTagRepository;
     private final ItemVideoRepository itemVideoRepository;
-    private final PaseosEcologicosRepository paseosEcologicosRepository;
     private final RequisitosEspecialesRepository requisitosEspecialesRepository;
     private final RestriccionesDieteticasRepository restriccionesDieteticasRepository;
     private final ServiciosIncluidosRepository serviciosIncluidosRepository;
-    private final TransporteRepository transporteRepository;
 
-    public DbInitializer(AlojamientoRepository alojamientoRepository,
-                          AlimentacionRepository alimentacionRepository,
-                          CalificacionRepository calificacionRepository,
-                          ComentarioRepository comentarioRepository,
-                          ItemFotoRepository itemFotoRepository,
-                          ItemLinkRepository itemLinkRepository,
-                          ItemRepository itemRepository,
-                          ItemTagRepository itemTagRepository,
-                          ItemVideoRepository itemVideoRepository,
-                          PaseosEcologicosRepository paseosEcologicosRepository,
-                          RequisitosEspecialesRepository requisitosEspecialesRepository,
-                          RestriccionesDieteticasRepository restriccionesDieteticasRepository,
-                          ServiciosIncluidosRepository serviciosIncluidosRepository,
-                          TransporteRepository transporteRepository) {
-        this.alojamientoRepository = alojamientoRepository;
-        this.alimentacionRepository = alimentacionRepository;
+    public DbInitializer(ClasificacionRepository clasificacionRepository,
+            CalificacionRepository calificacionRepository,
+            ComentarioRepository comentarioRepository,
+            ItemFotoRepository itemFotoRepository,
+            ItemLinkRepository itemLinkRepository,
+            ItemRepository itemRepository,
+            ItemTagRepository itemTagRepository,
+            ItemVideoRepository itemVideoRepository,
+            RequisitosEspecialesRepository requisitosEspecialesRepository,
+            RestriccionesDieteticasRepository restriccionesDieteticasRepository,
+            ServiciosIncluidosRepository serviciosIncluidosRepository) {
+        this.clasificacionRepository = clasificacionRepository;
         this.calificacionRepository = calificacionRepository;
         this.comentarioRepository = comentarioRepository;
         this.itemFotoRepository = itemFotoRepository;
@@ -79,11 +69,9 @@ public class DbInitializer implements CommandLineRunner {
         this.itemRepository = itemRepository;
         this.itemTagRepository = itemTagRepository;
         this.itemVideoRepository = itemVideoRepository;
-        this.paseosEcologicosRepository = paseosEcologicosRepository;
         this.requisitosEspecialesRepository = requisitosEspecialesRepository;
         this.restriccionesDieteticasRepository = restriccionesDieteticasRepository;
         this.serviciosIncluidosRepository = serviciosIncluidosRepository;
-        this.transporteRepository = transporteRepository;
     }
 
     @Override
@@ -108,7 +96,7 @@ public class DbInitializer implements CommandLineRunner {
         alojamiento.setLat(new BigDecimal("4.7110"));
         alojamiento.setLng(new BigDecimal("-74.0721"));
 
-        alojamiento = alojamientoRepository.save(alojamiento);
+        alojamiento = (Alojamiento) clasificacionRepository.save(alojamiento);
 
         // Create Alimentacion
         Alimentacion alimentacion = new Alimentacion();
@@ -124,7 +112,7 @@ public class DbInitializer implements CommandLineRunner {
         alimentacion.setLatitud(new BigDecimal("6.2442"));
         alimentacion.setLongitud(new BigDecimal("-75.5812"));
 
-        alimentacion = alimentacionRepository.save(alimentacion);
+        alimentacion = (Alimentacion) clasificacionRepository.save(alimentacion);
 
         // Create Transporte
         Transporte transporte = new Transporte();
@@ -140,7 +128,7 @@ public class DbInitializer implements CommandLineRunner {
         transporte.setDuracionViaje(120);
         transporte.setRutaGps("Route 1");
 
-        transporte = transporteRepository.save(transporte);
+        transporte = (Transporte) clasificacionRepository.save(transporte);
 
         // Create PaseosEcologicos
         PaseosEcologicos paseos = new PaseosEcologicos();
@@ -157,7 +145,7 @@ public class DbInitializer implements CommandLineRunner {
         paseos.setPuntoEncuentro("Central Park");
         paseos.setRutaEncuentro("Street 123");
 
-        paseos = paseosEcologicosRepository.save(paseos);
+        paseos = (PaseosEcologicos) clasificacionRepository.save(paseos);
 
         // Now create Items
 
@@ -174,8 +162,7 @@ public class DbInitializer implements CommandLineRunner {
         itemAlojamiento.setFechaDisponibilidadInicio(alojamiento.getFechaDisponibilidadInicio());
         itemAlojamiento.setFechaDisponibilidadFin(alojamiento.getFechaDisponibilidadFin());
         itemAlojamiento.setCapacidadMaxima(alojamiento.getCapacidadMaxima());
-        itemAlojamiento.setClasificationType("alojamiento");
-        itemAlojamiento.setClasificacionId(alojamiento.getId());
+        itemAlojamiento.setClasificacion(alojamiento);
 
         itemAlojamiento = itemRepository.save(itemAlojamiento);
 
@@ -236,8 +223,7 @@ public class DbInitializer implements CommandLineRunner {
         itemAlimentacion.setFechaDisponibilidadInicio(alimentacion.getFechaDisponibilidadInicio());
         itemAlimentacion.setFechaDisponibilidadFin(alimentacion.getFechaDisponibilidadFin());
         itemAlimentacion.setCapacidadMaxima(alimentacion.getCapacidadMaxima());
-        itemAlimentacion.setClasificationType("alimentacion");
-        itemAlimentacion.setClasificacionId(alimentacion.getId());
+        itemAlimentacion.setClasificacion(alimentacion);
 
         itemRepository.save(itemAlimentacion);
 
@@ -254,8 +240,7 @@ public class DbInitializer implements CommandLineRunner {
         itemTransporte.setFechaDisponibilidadInicio(transporte.getFechaDisponibilidadInicio());
         itemTransporte.setFechaDisponibilidadFin(transporte.getFechaDisponibilidadFin());
         itemTransporte.setCapacidadMaxima(transporte.getCapacidadMaxima());
-        itemTransporte.setClasificationType("transporte");
-        itemTransporte.setClasificacionId(transporte.getId());
+        itemTransporte.setClasificacion(transporte);
 
         itemRepository.save(itemTransporte);
 
@@ -272,8 +257,7 @@ public class DbInitializer implements CommandLineRunner {
         itemPaseos.setFechaDisponibilidadInicio(paseos.getFechaDisponibilidadInicio());
         itemPaseos.setFechaDisponibilidadFin(paseos.getFechaDisponibilidadFin());
         itemPaseos.setCapacidadMaxima(paseos.getCapacidadMaxima());
-        itemPaseos.setClasificationType("paseos-ecologicos");
-        itemPaseos.setClasificacionId(paseos.getId());
+        itemPaseos.setClasificacion(paseos);
 
         itemRepository.save(itemPaseos);
 
@@ -312,10 +296,10 @@ public class DbInitializer implements CommandLineRunner {
         requisitosEspecialesRepository.saveAll(Arrays.asList(req1, req2));
 
         alojamiento.setRequisitosEspeciales(Arrays.asList(req1, req2));
-        alojamientoRepository.save(alojamiento);
+        clasificacionRepository.save(alojamiento);
 
         alimentacion.setRequisitosEspeciales(Arrays.asList(req1, req2));
-        alimentacionRepository.save(alimentacion);
+        clasificacionRepository.save(alimentacion);
 
         // Create RestriccionesDieteticas
         RestriccionesDieteticas restriccion = new RestriccionesDieteticas();

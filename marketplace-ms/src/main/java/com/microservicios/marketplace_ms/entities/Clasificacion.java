@@ -2,24 +2,46 @@ package com.microservicios.marketplace_ms.entities;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+import jakarta.persistence.DiscriminatorColumn;
+import jakarta.persistence.DiscriminatorType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.ManyToMany;
 
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "tipo", discriminatorType = DiscriminatorType.STRING)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "tipo")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = Alojamiento.class, name = "Alojamiento"),
+        @JsonSubTypes.Type(value = Alimentacion.class, name = "Alimentacion"),
+        @JsonSubTypes.Type(value = Transporte.class, name = "Transporte"),
+        @JsonSubTypes.Type(value = PaseosEcologicos.class, name = "PaseosEcologicos")
+})
 public abstract class Clasificacion {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    protected Long id;
 
-    private String lugarInicio;
-    private BigDecimal precio;
-    private LocalDateTime fechaDisponibilidadInicio;
-    private LocalDateTime fechaDisponibilidadFin;
-    private Integer capacidadMaxima;
+    protected String lugarInicio;
+    protected BigDecimal precio;
+    protected LocalDateTime fechaDisponibilidadInicio;
+    protected LocalDateTime fechaDisponibilidadFin;
+    protected Integer capacidadMaxima;
+
+    @ManyToMany
+    protected List<RequisitosEspeciales> requisitosEspeciales = new ArrayList<>();
 
     // Getters and Setters
     public Long getId() {
@@ -68,5 +90,13 @@ public abstract class Clasificacion {
 
     public void setCapacidadMaxima(Integer capacidadMaxima) {
         this.capacidadMaxima = capacidadMaxima;
+    }
+
+    public List<RequisitosEspeciales> getRequisitosEspeciales() {
+        return requisitosEspeciales;
+    }
+
+    public void setRequisitosEspeciales(List<RequisitosEspeciales> requisitosEspeciales) {
+        this.requisitosEspeciales = requisitosEspeciales;
     }
 }

@@ -4,10 +4,11 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.microservicios.marketplace_ms.entities.Clasificacion;
+
 public class ItemDTO {
     private Long id;
-    private String clasificationType;
-    private Long clasificacionId;
+    private Clasificacion clasificacion;
     private String titulo;
     private String descripcion;
     private LocalDate fechaPublicacion;
@@ -24,12 +25,12 @@ public class ItemDTO {
         this.id = id;
     }
 
-    public Long getClasificacionId() {
-        return clasificacionId;
+    public Clasificacion getClasificacion() {
+        return clasificacion;
     }
 
-    public void setClasificacionId(Long clasificacionId) {
-        this.clasificacionId = clasificacionId;
+    public void setClasificacion(Clasificacion clasificacion) {
+        this.clasificacion = clasificacion;
     }
 
     public String getTitulo() {
@@ -78,13 +79,5 @@ public class ItemDTO {
 
     public void setCalificacionPromedio(Long calificacionPromedio) {
         this.calificacionPromedio = calificacionPromedio;
-    }
-
-    public String getClasificationType() {
-        return clasificationType;
-    }
-
-    public void setClasificationType(String clasificationType) {
-        this.clasificationType = clasificationType;
     }
 }

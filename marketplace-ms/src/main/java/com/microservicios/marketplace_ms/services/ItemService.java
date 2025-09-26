@@ -14,29 +14,13 @@ import com.microservicios.marketplace_ms.entities.Item;
 import com.microservicios.marketplace_ms.entities.PaseosEcologicos;
 import com.microservicios.marketplace_ms.entities.Transporte;
 import com.microservicios.marketplace_ms.mappers.ItemMapper;
-import com.microservicios.marketplace_ms.repositories.AlojamientoRepository;
-import com.microservicios.marketplace_ms.repositories.AlimentacionRepository;
 import com.microservicios.marketplace_ms.repositories.ItemRepository;
-import com.microservicios.marketplace_ms.repositories.PaseosEcologicosRepository;
-import com.microservicios.marketplace_ms.repositories.TransporteRepository;
 
 @Service
 public class ItemService {
 
     @Autowired
     private ItemRepository itemRepository;
-
-    @Autowired
-    private AlojamientoRepository alojamientoRepository;
-
-    @Autowired
-    private AlimentacionRepository alimentacionRepository;
-
-    @Autowired
-    private TransporteRepository transporteRepository;
-
-    @Autowired
-    private PaseosEcologicosRepository paseosEcologicosRepository;
 
     @Autowired
     private ItemMapper itemMapper;
@@ -57,23 +41,7 @@ public class ItemService {
         ItemResponseDTO response = new ItemResponseDTO();
         response.setItem(itemDTO);
 
-        // Fetch classification data based on type
-        Object clasificacionData = null;
-        if ("alojamiento".equals(item.getClasificationType()) && item.getClasificacionId() != null) {
-            Optional<Alojamiento> alojamiento = alojamientoRepository.findById(item.getClasificacionId());
-            clasificacionData = alojamiento.orElse(null);
-        } else if ("alimentacion".equals(item.getClasificationType()) && item.getClasificacionId() != null) {
-            Optional<Alimentacion> alimentacion = alimentacionRepository.findById(item.getClasificacionId());
-            clasificacionData = alimentacion.orElse(null);
-        } else if ("transporte".equals(item.getClasificationType()) && item.getClasificacionId() != null) {
-            Optional<Transporte> transporte = transporteRepository.findById(item.getClasificacionId());
-            clasificacionData = transporte.orElse(null);
-        } else if ("paseos-ecologicos".equals(item.getClasificationType()) && item.getClasificacionId() != null) {
-            Optional<PaseosEcologicos> paseos = paseosEcologicosRepository.findById(item.getClasificacionId());
-            clasificacionData = paseos.orElse(null);
-        }
-
-        response.setClasificacionData(clasificacionData);
+        response.setClasificacionData(item.getClasificacion());
         return ResponseEntity.ok(response);
     }
 
