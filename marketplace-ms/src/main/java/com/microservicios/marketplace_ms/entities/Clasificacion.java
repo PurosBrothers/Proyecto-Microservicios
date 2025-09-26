@@ -10,9 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 
-@Entity
-@Inheritance(strategy = InheritanceType.JOINED)
-public class Clasificacion {
+public abstract class Clasificacion {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

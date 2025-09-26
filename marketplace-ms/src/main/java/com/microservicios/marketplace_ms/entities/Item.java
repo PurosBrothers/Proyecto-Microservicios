@@ -21,9 +21,14 @@ public class Item {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "clasificacion_id")
-    private Clasificacion clasificacion;
+    private String lugarInicio;
+    private BigDecimal precio;
+    private LocalDateTime fechaDisponibilidadInicio;
+    private LocalDateTime fechaDisponibilidadFin;
+    private Integer capacidadMaxima;
+
+    private String clasificationType;
+    private Long clasificacionId;
 
     private String titulo;
     private String descripcion;
@@ -59,62 +64,60 @@ public class Item {
         this.id = id;
     }
 
-    public Clasificacion getClasificacion() {
-        return clasificacion;
-    }
-
-    public void setClasificacion(Clasificacion clasificacion) {
-        this.clasificacion = clasificacion;
-    }
-
     public String getLugarInicio() {
-        return clasificacion != null ? clasificacion.getLugarInicio() : null;
+        return lugarInicio;
     }
 
     public void setLugarInicio(String lugarInicio) {
-        if (clasificacion != null) {
-            clasificacion.setLugarInicio(lugarInicio);
-        }
+        this.lugarInicio = lugarInicio;
     }
 
     public BigDecimal getPrecio() {
-        return clasificacion != null ? clasificacion.getPrecio() : null;
+        return precio;
     }
 
     public void setPrecio(BigDecimal precio) {
-        if (clasificacion != null) {
-            clasificacion.setPrecio(precio);
-        }
+        this.precio = precio;
     }
 
     public LocalDateTime getFechaDisponibilidadInicio() {
-        return clasificacion != null ? clasificacion.getFechaDisponibilidadInicio() : null;
+        return fechaDisponibilidadInicio;
     }
 
     public void setFechaDisponibilidadInicio(LocalDateTime fechaDisponibilidadInicio) {
-        if (clasificacion != null) {
-            clasificacion.setFechaDisponibilidadInicio(fechaDisponibilidadInicio);
-        }
+        this.fechaDisponibilidadInicio = fechaDisponibilidadInicio;
     }
 
     public LocalDateTime getFechaDisponibilidadFin() {
-        return clasificacion != null ? clasificacion.getFechaDisponibilidadFin() : null;
+        return fechaDisponibilidadFin;
     }
 
     public void setFechaDisponibilidadFin(LocalDateTime fechaDisponibilidadFin) {
-        if (clasificacion != null) {
-            clasificacion.setFechaDisponibilidadFin(fechaDisponibilidadFin);
-        }
+        this.fechaDisponibilidadFin = fechaDisponibilidadFin;
     }
 
     public Integer getCapacidadMaxima() {
-        return clasificacion != null ? clasificacion.getCapacidadMaxima() : null;
+        return capacidadMaxima;
     }
 
     public void setCapacidadMaxima(Integer capacidadMaxima) {
-        if (clasificacion != null) {
-            clasificacion.setCapacidadMaxima(capacidadMaxima);
-        }
+        this.capacidadMaxima = capacidadMaxima;
+    }
+
+    public String getClasificationType() {
+        return clasificationType;
+    }
+
+    public void setClasificationType(String clasificationType) {
+        this.clasificationType = clasificationType;
+    }
+
+    public Long getClasificacionId() {
+        return clasificacionId;
+    }
+
+    public void setClasificacionId(Long clasificacionId) {
+        this.clasificacionId = clasificacionId;
     }
 
     public String getTitulo() {

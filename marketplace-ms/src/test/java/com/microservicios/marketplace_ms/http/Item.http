@@ -1,7 +1,9 @@
 @baseUrl = http://localhost:7777
 
-### Create a Clasificacion first
-POST {{baseUrl}}/clasificaciones
+### Test Case 1: Item with Alojamiento classification
+
+### Create an Alojamiento first
+POST {{baseUrl}}/alojamientos
 Content-Type: application/json
 
 {
@@ -9,10 +11,17 @@ Content-Type: application/json
   "precio": 500,
   "fechaDisponibilidadInicio": "2025-10-05T10:00:00",
   "fechaDisponibilidadFin": "2025-12-20T20:00:00",
-  "capacidadMaxima": 100
+  "capacidadMaxima": 100,
+  "fechaCheckin": "2025-10-05T15:00:00",
+  "fechaCheckout": "2025-10-10T11:00:00",
+  "tipoInmueble": "Hotel",
+  "numeroBanos": 2,
+  "numeroHabitaciones": 2,
+  "lat": 10.3997,
+  "lng": -75.5144
 }
 
-### Create an Item (valid) - assuming clasificacion ID is 1
+### Create an Item with Alojamiento classification - assuming alojamiento ID is 1
 POST {{baseUrl}}/items
 Content-Type: application/json
 
@@ -23,38 +32,118 @@ Content-Type: application/json
   "stock": 50,
   "visualizaciones": 0,
   "calificacionPromedio": 0,
-  "clasificacionId": 56
+  "clasificationType": "alojamiento",
+  "clasificacionId": 2
+  
 }
 
-###
+### Test Case 2: Item with Alimentacion classification
 
-### Get the Item by ID
-GET {{baseUrl}}/items/53
-Accept: application/json
-
-###
-
-### Update the Item
-PUT {{baseUrl}}/items/53
+### Create an Alimentacion
+POST {{baseUrl}}/alimentaciones
 Content-Type: application/json
 
 {
-  "titulo": "Hotel en San Andrés",
-  "descripcion": "Un hotel lujoso en San Andrés",
-  "fechaPublicacion": "2025-09-26",
-  "stock": 30,
-  "visualizaciones": 100,
-  "calificacionPromedio": 4,
-  "clasificacionId": 1
+  "lugarInicio": "Medellin",
+  "precio": 25,
+  "fechaDisponibilidadInicio": "2025-09-26T12:00:00",
+  "fechaDisponibilidadFin": "2025-09-26T15:00:00",
+  "capacidadMaxima": 50,
+  "horaInicio": "12:00",
+  "horaFinal": "15:00",
+  "tipoComida": "Lunch",
+  "menuIncluido": "Pasta, Salad, Dessert",
+  "latitud": 6.2442,
+  "longitud": -75.5812
 }
 
-###
+### Create an Item with Alimentacion classification - assuming alimentacion ID is 2
+POST {{baseUrl}}/items
+Content-Type: application/json
 
-### Delete the Item
-DELETE {{baseUrl}}/items/53
+{
+  "titulo": "Lunch in Medellin",
+  "descripcion": "Delicious lunch in Medellin",
+  "fechaPublicacion": "2025-09-26",
+  "stock": 30,
+  "visualizaciones": 0,
+  "calificacionPromedio": 0,
+  "clasificationType": "alimentacion",
+  "clasificacionId": 2
+}
 
-###
+### Test Case 3: Item with Transporte classification
 
-### Try to get deleted Item (should return 404 or equivalent)
-GET {{baseUrl}}/items/53
-Accept: application/json
+### Create a Transporte
+POST {{baseUrl}}/transportes
+Content-Type: application/json
+
+{
+  "lugarInicio": "Cali",
+  "precio": 50,
+  "fechaDisponibilidadInicio": "2025-09-27T08:00:00",
+  "fechaDisponibilidadFin": "2025-09-27T12:00:00",
+  "capacidadMaxima": 20,
+  "lugarDestino": "Bogota",
+  "horaSalida": "2025-09-27T08:00:00",
+  "horaLlegada": "2025-09-27T10:00:00",
+  "tipoTransporte": "Bus",
+  "duracionViaje": 120,
+  "rutaGps": "Route 1"
+}
+
+### Create an Item with Transporte classification - assuming transporte ID is 3
+POST {{baseUrl}}/items
+Content-Type: application/json
+
+{
+  "titulo": "Bus from Cali to Bogota",
+  "descripcion": "Comfortable bus ride",
+  "fechaPublicacion": "2025-09-26",
+  "stock": 20,
+  "visualizaciones": 0,
+  "calificacionPromedio": 0,
+  "clasificationType": "transporte",
+  "clasificacionId": 3
+}
+
+### Test Case 4: Item with PaseosEcologicos classification
+
+### Create PaseosEcologicos
+POST {{baseUrl}}/paseos-ecologicos
+Content-Type: application/json
+
+{
+  "lugarInicio": "Cartagena",
+  "precio": 75,
+  "fechaDisponibilidadInicio": "2025-09-28T09:00:00",
+  "fechaDisponibilidadFin": "2025-09-28T13:00:00",
+  "capacidadMaxima": 15,
+  "duracionHoras": 4,
+  "nivelDificultad": "Medium",
+  "equipoIncluido": true,
+  "guiaIncluido": true,
+  "edadMinima": 12,
+  "puntoEncuentro": "Central Park",
+  "rutaEncuentro": "Street 123"
+}
+
+### Create an Item with PaseosEcologicos classification - assuming paseos ID is 4
+POST {{baseUrl}}/items
+Content-Type: application/json
+
+{
+  "titulo": "Ecological Tour in Cartagena",
+  "descripcion": "Guided ecological tour",
+  "fechaPublicacion": "2025-09-26",
+  "stock": 15,
+  "visualizaciones": 0,
+  "calificacionPromedio": 0,
+  "clasificationType": "paseos-ecologicos",
+  "clasificacionId": 4
+}
+
+### Test Case 5: Get Item Classification
+
+### Get the classification data for an Item - assuming item ID is 1
+GET {{baseUrl}}/items/1553/clasificacion

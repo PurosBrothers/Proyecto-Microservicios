@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 public class ItemDTO {
     private Long id;
+    private String clasificationType;
     private Long clasificacionId;
     private String titulo;
     private String descripcion;
@@ -77,5 +78,13 @@ public class ItemDTO {
 
     public void setCalificacionPromedio(Long calificacionPromedio) {
         this.calificacionPromedio = calificacionPromedio;
+    }
+
+    public String getClasificationType() {
+        return clasificationType;
+    }
+
+    public void setClasificationType(String clasificationType) {
+        this.clasificationType = clasificationType;
     }
 }

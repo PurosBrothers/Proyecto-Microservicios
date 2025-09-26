@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.microservicios.marketplace_ms.dtos.ItemDTO;
+import com.microservicios.marketplace_ms.dtos.ItemResponseDTO;
 import com.microservicios.marketplace_ms.entities.Item;
 import com.microservicios.marketplace_ms.mappers.ItemMapper;
 import com.microservicios.marketplace_ms.services.ItemService;
@@ -37,13 +38,9 @@ public class ItemController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ItemDTO> getItem(@PathVariable Long id) {
-        ResponseEntity<Item> response = itemService.getItem(id);
-        if (response.getStatusCode().is2xxSuccessful()) {
-            ItemDTO dto = itemMapper.entityToDto(response.getBody());
-            return ResponseEntity.ok(dto);
-        }
-        return ResponseEntity.status(response.getStatusCode()).build();
+    public ResponseEntity<ItemResponseDTO> getItem(@PathVariable Long id) {
+        ResponseEntity<ItemResponseDTO> response = itemService.getItem(id);
+        return response;
     }
 
     @PutMapping("/{id}")
@@ -53,6 +50,15 @@ public class ItemController {
         if (response.getStatusCode().is2xxSuccessful()) {
             ItemDTO dto = itemMapper.entityToDto(response.getBody());
             return ResponseEntity.ok(dto);
+        }
+        return ResponseEntity.status(response.getStatusCode()).build();
+    }
+
+    @GetMapping("/{id}/clasificacion")
+    public ResponseEntity<Object> getItemClasificacion(@PathVariable Long id) {
+        ResponseEntity<ItemResponseDTO> response = itemService.getItem(id);
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.ok(response.getBody().getClasificacionData());
         }
         return ResponseEntity.status(response.getStatusCode()).build();
     }

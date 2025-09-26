@@ -6,15 +6,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.microservicios.marketplace_ms.dtos.ItemDTO;
+import com.microservicios.marketplace_ms.entities.Alojamiento;
+import com.microservicios.marketplace_ms.entities.Alimentacion;
 import com.microservicios.marketplace_ms.entities.Clasificacion;
 import com.microservicios.marketplace_ms.entities.Item;
-import com.microservicios.marketplace_ms.repositories.ClasificacionRepository;
+import com.microservicios.marketplace_ms.entities.PaseosEcologicos;
+import com.microservicios.marketplace_ms.entities.Transporte;
+import com.microservicios.marketplace_ms.repositories.AlojamientoRepository;
+import com.microservicios.marketplace_ms.repositories.AlimentacionRepository;
+import com.microservicios.marketplace_ms.repositories.PaseosEcologicosRepository;
+import com.microservicios.marketplace_ms.repositories.TransporteRepository;
 
 @Component
 public class ItemMapper {
 
     @Autowired
-    private ClasificacionRepository clasificacionRepository;
+    private AlojamientoRepository alojamientoRepository;
+
+    @Autowired
+    private AlimentacionRepository alimentacionRepository;
+
+    @Autowired
+    private TransporteRepository transporteRepository;
+
+    @Autowired
+    private PaseosEcologicosRepository paseosEcologicosRepository;
 
     public Item dtoToEntity(ItemDTO itemDTO) {
         if (itemDTO == null) {
@@ -28,10 +44,8 @@ public class ItemMapper {
         item.setStock(itemDTO.getStock());
         item.setVisualizaciones(itemDTO.getVisualizaciones());
         item.setCalificacionPromedio(itemDTO.getCalificacionPromedio());
-        if (itemDTO.getClasificacionId() != null) {
-            Optional<Clasificacion> clasificacion = clasificacionRepository.findById(itemDTO.getClasificacionId());
-            clasificacion.ifPresent(item::setClasificacion);
-        }
+        item.setClasificationType(itemDTO.getClasificationType());
+        item.setClasificacionId(itemDTO.getClasificacionId());
         return item;
     }
 
@@ -47,9 +61,8 @@ public class ItemMapper {
         itemDTO.setStock(item.getStock());
         itemDTO.setVisualizaciones(item.getVisualizaciones());
         itemDTO.setCalificacionPromedio(item.getCalificacionPromedio());
-        if (item.getClasificacion() != null) {
-            itemDTO.setClasificacionId(item.getClasificacion().getId());
-        }
+        itemDTO.setClasificationType(item.getClasificationType());
+        itemDTO.setClasificacionId(item.getClasificacionId());
         return itemDTO;
     }
 }

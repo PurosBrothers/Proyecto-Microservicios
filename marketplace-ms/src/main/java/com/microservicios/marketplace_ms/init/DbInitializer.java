@@ -110,61 +110,6 @@ public class DbInitializer implements CommandLineRunner {
 
         alojamiento = alojamientoRepository.save(alojamiento);
 
-        // Create Item for Alojamiento
-        Item itemAlojamiento = new Item();
-        itemAlojamiento.setClasificacion(alojamiento);
-        itemAlojamiento.setTitulo("Hotel en Bogota");
-        itemAlojamiento.setDescripcion("Un hotel cómodo en el centro de Bogota");
-        itemAlojamiento.setFechaPublicacion(LocalDate.now());
-        itemAlojamiento.setStock(10);
-        itemAlojamiento.setVisualizaciones(0);
-        itemAlojamiento.setCalificacionPromedio(0L);
-        itemAlojamiento = itemRepository.save(itemAlojamiento);
-
-        // Create ItemFoto for the Item
-        ItemFoto foto1 = new ItemFoto();
-        foto1.setUrl("https://example.com/hotel1.jpg");
-        foto1.setItem(itemAlojamiento);
-        itemFotoRepository.save(foto1);
-
-        ItemFoto foto2 = new ItemFoto();
-        foto2.setUrl("https://example.com/hotel2.jpg");
-        foto2.setItem(itemAlojamiento);
-        itemFotoRepository.save(foto2);
-
-        // Create ItemTag for the Item
-        ItemTag tag1 = new ItemTag();
-        tag1.setTag("Luxury");
-        tag1.setItem(itemAlojamiento);
-        itemTagRepository.save(tag1);
-
-        ItemTag tag2 = new ItemTag();
-        tag2.setTag("City Center");
-        tag2.setItem(itemAlojamiento);
-        itemTagRepository.save(tag2);
-
-        // Create ItemVideo for the Item
-        ItemVideo video1 = new ItemVideo();
-        video1.setUrl("https://example.com/hotel-video1.mp4");
-        video1.setItem(itemAlojamiento);
-        itemVideoRepository.save(video1);
-
-        ItemVideo video2 = new ItemVideo();
-        video2.setUrl("https://example.com/hotel-video2.mp4");
-        video2.setItem(itemAlojamiento);
-        itemVideoRepository.save(video2);
-
-        // Create ItemLink for the Item
-        ItemLink link1 = new ItemLink();
-        link1.setTag("https://example.com/hotel-booking");
-        link1.setItem(itemAlojamiento);
-        itemLinkRepository.save(link1);
-
-        ItemLink link2 = new ItemLink();
-        link2.setTag("https://example.com/hotel-reviews");
-        link2.setItem(itemAlojamiento);
-        itemLinkRepository.save(link2);
-
         // Create Alimentacion
         Alimentacion alimentacion = new Alimentacion();
         alimentacion.setLugarInicio("Medellin");
@@ -213,6 +158,124 @@ public class DbInitializer implements CommandLineRunner {
         paseos.setRutaEncuentro("Street 123");
 
         paseos = paseosEcologicosRepository.save(paseos);
+
+        // Now create Items
+
+        // Create Item with Alojamiento classification
+        Item itemAlojamiento = new Item();
+        itemAlojamiento.setTitulo("Hotel en Bogota");
+        itemAlojamiento.setDescripcion("Un hotel cómodo en el centro de Bogota");
+        itemAlojamiento.setFechaPublicacion(LocalDate.now());
+        itemAlojamiento.setStock(10);
+        itemAlojamiento.setVisualizaciones(0);
+        itemAlojamiento.setCalificacionPromedio(0L);
+        itemAlojamiento.setLugarInicio(alojamiento.getLugarInicio());
+        itemAlojamiento.setPrecio(alojamiento.getPrecio());
+        itemAlojamiento.setFechaDisponibilidadInicio(alojamiento.getFechaDisponibilidadInicio());
+        itemAlojamiento.setFechaDisponibilidadFin(alojamiento.getFechaDisponibilidadFin());
+        itemAlojamiento.setCapacidadMaxima(alojamiento.getCapacidadMaxima());
+        itemAlojamiento.setClasificationType("alojamiento");
+        itemAlojamiento.setClasificacionId(alojamiento.getId());
+
+        itemAlojamiento = itemRepository.save(itemAlojamiento);
+
+        // Create ItemFoto for the Item
+        ItemFoto foto1 = new ItemFoto();
+        foto1.setUrl("https://example.com/hotel1.jpg");
+        foto1.setItem(itemAlojamiento);
+        itemFotoRepository.save(foto1);
+
+        ItemFoto foto2 = new ItemFoto();
+        foto2.setUrl("https://example.com/hotel2.jpg");
+        foto2.setItem(itemAlojamiento);
+        itemFotoRepository.save(foto2);
+
+        // Create ItemTag for the Item
+        ItemTag tag1 = new ItemTag();
+        tag1.setTag("Luxury");
+        tag1.setItem(itemAlojamiento);
+        itemTagRepository.save(tag1);
+
+        ItemTag tag2 = new ItemTag();
+        tag2.setTag("City Center");
+        tag2.setItem(itemAlojamiento);
+        itemTagRepository.save(tag2);
+
+        // Create ItemVideo for the Item
+        ItemVideo video1 = new ItemVideo();
+        video1.setUrl("https://example.com/hotel-video1.mp4");
+        video1.setItem(itemAlojamiento);
+        itemVideoRepository.save(video1);
+
+        ItemVideo video2 = new ItemVideo();
+        video2.setUrl("https://example.com/hotel-video2.mp4");
+        video2.setItem(itemAlojamiento);
+        itemVideoRepository.save(video2);
+
+        // Create ItemLink for the Item
+        ItemLink link1 = new ItemLink();
+        link1.setTag("https://example.com/hotel-booking");
+        link1.setItem(itemAlojamiento);
+        itemLinkRepository.save(link1);
+
+        ItemLink link2 = new ItemLink();
+        link2.setTag("https://example.com/hotel-reviews");
+        link2.setItem(itemAlojamiento);
+        itemLinkRepository.save(link2);
+
+        // Create Item with Alimentacion classification
+        Item itemAlimentacion = new Item();
+        itemAlimentacion.setTitulo("Almuerzo en Medellín");
+        itemAlimentacion.setDescripcion("Delicioso almuerzo en Medellín");
+        itemAlimentacion.setFechaPublicacion(LocalDate.now());
+        itemAlimentacion.setStock(30);
+        itemAlimentacion.setVisualizaciones(0);
+        itemAlimentacion.setCalificacionPromedio(0L);
+        itemAlimentacion.setLugarInicio(alimentacion.getLugarInicio());
+        itemAlimentacion.setPrecio(alimentacion.getPrecio());
+        itemAlimentacion.setFechaDisponibilidadInicio(alimentacion.getFechaDisponibilidadInicio());
+        itemAlimentacion.setFechaDisponibilidadFin(alimentacion.getFechaDisponibilidadFin());
+        itemAlimentacion.setCapacidadMaxima(alimentacion.getCapacidadMaxima());
+        itemAlimentacion.setClasificationType("alimentacion");
+        itemAlimentacion.setClasificacionId(alimentacion.getId());
+
+        itemRepository.save(itemAlimentacion);
+
+        // Create Item with Transporte classification
+        Item itemTransporte = new Item();
+        itemTransporte.setTitulo("Bus Cali-Bogotá");
+        itemTransporte.setDescripcion("Viaje cómodo en bus");
+        itemTransporte.setFechaPublicacion(LocalDate.now());
+        itemTransporte.setStock(20);
+        itemTransporte.setVisualizaciones(0);
+        itemTransporte.setCalificacionPromedio(0L);
+        itemTransporte.setLugarInicio(transporte.getLugarInicio());
+        itemTransporte.setPrecio(transporte.getPrecio());
+        itemTransporte.setFechaDisponibilidadInicio(transporte.getFechaDisponibilidadInicio());
+        itemTransporte.setFechaDisponibilidadFin(transporte.getFechaDisponibilidadFin());
+        itemTransporte.setCapacidadMaxima(transporte.getCapacidadMaxima());
+        itemTransporte.setClasificationType("transporte");
+        itemTransporte.setClasificacionId(transporte.getId());
+
+        itemRepository.save(itemTransporte);
+
+        // Create Item with PaseosEcologicos classification
+        Item itemPaseos = new Item();
+        itemPaseos.setTitulo("Tour Ecológico Cartagena");
+        itemPaseos.setDescripcion("Tour guiado ecológico");
+        itemPaseos.setFechaPublicacion(LocalDate.now());
+        itemPaseos.setStock(15);
+        itemPaseos.setVisualizaciones(0);
+        itemPaseos.setCalificacionPromedio(0L);
+        itemPaseos.setLugarInicio(paseos.getLugarInicio());
+        itemPaseos.setPrecio(paseos.getPrecio());
+        itemPaseos.setFechaDisponibilidadInicio(paseos.getFechaDisponibilidadInicio());
+        itemPaseos.setFechaDisponibilidadFin(paseos.getFechaDisponibilidadFin());
+        itemPaseos.setCapacidadMaxima(paseos.getCapacidadMaxima());
+        itemPaseos.setClasificationType("paseos-ecologicos");
+        itemPaseos.setClasificacionId(paseos.getId());
+
+        itemRepository.save(itemPaseos);
 
         // Create Comentario
         Comentario comentario = new Comentario();
