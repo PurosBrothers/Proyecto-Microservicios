@@ -1,0 +1,17 @@
+{
+	"ulid": "01K620KS76XFHMJ1VC5HMAWC6W",
+	"minTime": 1756930083597,
+	"maxTime": 1756936800000,
+	"stats": {
+		"numSamples": 8627,
+		"numSeries": 285,
+		"numChunks": 285
+	},
+	"compaction": {
+		"level": 1,
+		"sources": [
+			"01K620KS76XFHMJ1VC5HMAWC6W"
+		]
+	},
+	"version": 1
+}
