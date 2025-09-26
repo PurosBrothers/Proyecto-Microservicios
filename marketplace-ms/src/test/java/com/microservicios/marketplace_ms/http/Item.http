@@ -1,0 +1,60 @@
+@baseUrl = http://localhost:7777
+
+### Create a Clasificacion first
+POST {{baseUrl}}/clasificaciones
+Content-Type: application/json
+
+{
+  "lugarInicio": "Cartagena",
+  "precio": 500,
+  "fechaDisponibilidadInicio": "2025-10-05T10:00:00",
+  "fechaDisponibilidadFin": "2025-12-20T20:00:00",
+  "capacidadMaxima": 100
+}
+
+### Create an Item (valid) - assuming clasificacion ID is 1
+POST {{baseUrl}}/items
+Content-Type: application/json
+
+{
+  "titulo": "Hotel en Cartagena",
+  "descripcion": "Un hotel cómodo en Cartagena",
+  "fechaPublicacion": "2025-09-26",
+  "stock": 50,
+  "visualizaciones": 0,
+  "calificacionPromedio": 0,
+  "clasificacionId": 56
+}
+
+###
+
+### Get the Item by ID
+GET {{baseUrl}}/items/53
+Accept: application/json
+
+###
+
+### Update the Item
+PUT {{baseUrl}}/items/53
+Content-Type: application/json
+
+{
+  "titulo": "Hotel en San Andrés",
+  "descripcion": "Un hotel lujoso en San Andrés",
+  "fechaPublicacion": "2025-09-26",
+  "stock": 30,
+  "visualizaciones": 100,
+  "calificacionPromedio": 4,
+  "clasificacionId": 1
+}
+
+###
+
+### Delete the Item
+DELETE {{baseUrl}}/items/53
+
+###
+
+### Try to get deleted Item (should return 404 or equivalent)
+GET {{baseUrl}}/items/53
+Accept: application/json

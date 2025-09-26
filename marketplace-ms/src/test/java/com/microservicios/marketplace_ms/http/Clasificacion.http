@@ -1,0 +1,46 @@
+@baseUrl = http://localhost:7777/clasificaciones
+
+### Create a Clasificacion (valid)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "id": 6,
+  "lugarInicio": "Bogotá",
+  "precio": 100,
+  "fechaDisponibilidadInicio": "2025-10-01T09:00:00",
+  "fechaDisponibilidadFin": "2025-12-01T18:00:00",
+  "capacidadMaxima": 200
+}
+
+###
+
+### Get the Clasificacion by ID
+GET {{baseUrl}}/6
+Accept: application/json
+
+###
+
+### Update the Clasificacion
+PUT {{baseUrl}}/6
+Content-Type: application/json
+
+{
+  "id": 6,
+  "lugarInicio": "Medellín",
+  "precio": 150,
+  "fechaDisponibilidadInicio": "2025-11-01T08:00:00",
+  "fechaDisponibilidadFin": "2026-01-15T18:00:00",
+  "capacidadMaxima": 300
+}
+
+###
+
+### Delete the Clasificacion
+DELETE {{baseUrl}}/6
+
+###
+
+### Try to get deleted Clasificacion (should return 404 or equivalent)
+GET {{baseUrl}}/6
+Accept: application/json

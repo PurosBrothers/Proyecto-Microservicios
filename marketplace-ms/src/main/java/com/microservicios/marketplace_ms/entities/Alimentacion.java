@@ -11,7 +11,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 
 @Entity
-public class Alimentacion extends Item {
+public class Alimentacion extends Clasificacion {
 
     private LocalTime horaInicio;
     private LocalTime horaFinal;

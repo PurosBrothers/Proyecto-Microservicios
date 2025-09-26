@@ -1,6 +1,7 @@
 package com.microservicios.marketplace_ms.init;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
@@ -12,7 +13,11 @@ import com.microservicios.marketplace_ms.entities.Alojamiento;
 import com.microservicios.marketplace_ms.entities.Alimentacion;
 import com.microservicios.marketplace_ms.entities.Calificacion;
 import com.microservicios.marketplace_ms.entities.Comentario;
+import com.microservicios.marketplace_ms.entities.Item;
+import com.microservicios.marketplace_ms.entities.ItemFoto;
+import com.microservicios.marketplace_ms.entities.ItemLink;
 import com.microservicios.marketplace_ms.entities.ItemTag;
+import com.microservicios.marketplace_ms.entities.ItemVideo;
 import com.microservicios.marketplace_ms.entities.PaseosEcologicos;
 import com.microservicios.marketplace_ms.entities.RequisitosEspeciales;
 import com.microservicios.marketplace_ms.entities.RestriccionesDieteticas;
@@ -22,7 +27,11 @@ import com.microservicios.marketplace_ms.repositories.AlojamientoRepository;
 import com.microservicios.marketplace_ms.repositories.AlimentacionRepository;
 import com.microservicios.marketplace_ms.repositories.CalificacionRepository;
 import com.microservicios.marketplace_ms.repositories.ComentarioRepository;
+import com.microservicios.marketplace_ms.repositories.ItemFotoRepository;
+import com.microservicios.marketplace_ms.repositories.ItemLinkRepository;
+import com.microservicios.marketplace_ms.repositories.ItemRepository;
 import com.microservicios.marketplace_ms.repositories.ItemTagRepository;
+import com.microservicios.marketplace_ms.repositories.ItemVideoRepository;
 import com.microservicios.marketplace_ms.repositories.PaseosEcologicosRepository;
 import com.microservicios.marketplace_ms.repositories.RequisitosEspecialesRepository;
 import com.microservicios.marketplace_ms.repositories.RestriccionesDieteticasRepository;
@@ -36,7 +45,11 @@ public class DbInitializer implements CommandLineRunner {
     private final AlimentacionRepository alimentacionRepository;
     private final CalificacionRepository calificacionRepository;
     private final ComentarioRepository comentarioRepository;
+    private final ItemFotoRepository itemFotoRepository;
+    private final ItemLinkRepository itemLinkRepository;
+    private final ItemRepository itemRepository;
     private final ItemTagRepository itemTagRepository;
+    private final ItemVideoRepository itemVideoRepository;
     private final PaseosEcologicosRepository paseosEcologicosRepository;
     private final RequisitosEspecialesRepository requisitosEspecialesRepository;
     private final RestriccionesDieteticasRepository restriccionesDieteticasRepository;
@@ -44,20 +57,28 @@ public class DbInitializer implements CommandLineRunner {
     private final TransporteRepository transporteRepository;
 
     public DbInitializer(AlojamientoRepository alojamientoRepository,
-                         AlimentacionRepository alimentacionRepository,
-                         CalificacionRepository calificacionRepository,
-                         ComentarioRepository comentarioRepository,
-                         ItemTagRepository itemTagRepository,
-                         PaseosEcologicosRepository paseosEcologicosRepository,
-                         RequisitosEspecialesRepository requisitosEspecialesRepository,
-                         RestriccionesDieteticasRepository restriccionesDieteticasRepository,
-                         ServiciosIncluidosRepository serviciosIncluidosRepository,
-                         TransporteRepository transporteRepository) {
+                          AlimentacionRepository alimentacionRepository,
+                          CalificacionRepository calificacionRepository,
+                          ComentarioRepository comentarioRepository,
+                          ItemFotoRepository itemFotoRepository,
+                          ItemLinkRepository itemLinkRepository,
+                          ItemRepository itemRepository,
+                          ItemTagRepository itemTagRepository,
+                          ItemVideoRepository itemVideoRepository,
+                          PaseosEcologicosRepository paseosEcologicosRepository,
+                          RequisitosEspecialesRepository requisitosEspecialesRepository,
+                          RestriccionesDieteticasRepository restriccionesDieteticasRepository,
+                          ServiciosIncluidosRepository serviciosIncluidosRepository,
+                          TransporteRepository transporteRepository) {
         this.alojamientoRepository = alojamientoRepository;
         this.alimentacionRepository = alimentacionRepository;
         this.calificacionRepository = calificacionRepository;
         this.comentarioRepository = comentarioRepository;
+        this.itemFotoRepository = itemFotoRepository;
+        this.itemLinkRepository = itemLinkRepository;
+        this.itemRepository = itemRepository;
         this.itemTagRepository = itemTagRepository;
+        this.itemVideoRepository = itemVideoRepository;
         this.paseosEcologicosRepository = paseosEcologicosRepository;
         this.requisitosEspecialesRepository = requisitosEspecialesRepository;
         this.restriccionesDieteticasRepository = restriccionesDieteticasRepository;
@@ -88,6 +109,61 @@ public class DbInitializer implements CommandLineRunner {
         alojamiento.setLng(new BigDecimal("-74.0721"));
 
         alojamiento = alojamientoRepository.save(alojamiento);
+
+        // Create Item for Alojamiento
+        Item itemAlojamiento = new Item();
+        itemAlojamiento.setClasificacion(alojamiento);
+        itemAlojamiento.setTitulo("Hotel en Bogota");
+        itemAlojamiento.setDescripcion("Un hotel cómodo en el centro de Bogota");
+        itemAlojamiento.setFechaPublicacion(LocalDate.now());
+        itemAlojamiento.setStock(10);
+        itemAlojamiento.setVisualizaciones(0);
+        itemAlojamiento.setCalificacionPromedio(0L);
+        itemAlojamiento = itemRepository.save(itemAlojamiento);
+
+        // Create ItemFoto for the Item
+        ItemFoto foto1 = new ItemFoto();
+        foto1.setUrl("https://example.com/hotel1.jpg");
+        foto1.setItem(itemAlojamiento);
+        itemFotoRepository.save(foto1);
+
+        ItemFoto foto2 = new ItemFoto();
+        foto2.setUrl("https://example.com/hotel2.jpg");
+        foto2.setItem(itemAlojamiento);
+        itemFotoRepository.save(foto2);
+
+        // Create ItemTag for the Item
+        ItemTag tag1 = new ItemTag();
+        tag1.setTag("Luxury");
+        tag1.setItem(itemAlojamiento);
+        itemTagRepository.save(tag1);
+
+        ItemTag tag2 = new ItemTag();
+        tag2.setTag("City Center");
+        tag2.setItem(itemAlojamiento);
+        itemTagRepository.save(tag2);
+
+        // Create ItemVideo for the Item
+        ItemVideo video1 = new ItemVideo();
+        video1.setUrl("https://example.com/hotel-video1.mp4");
+        video1.setItem(itemAlojamiento);
+        itemVideoRepository.save(video1);
+
+        ItemVideo video2 = new ItemVideo();
+        video2.setUrl("https://example.com/hotel-video2.mp4");
+        video2.setItem(itemAlojamiento);
+        itemVideoRepository.save(video2);
+
+        // Create ItemLink for the Item
+        ItemLink link1 = new ItemLink();
+        link1.setTag("https://example.com/hotel-booking");
+        link1.setItem(itemAlojamiento);
+        itemLinkRepository.save(link1);
+
+        ItemLink link2 = new ItemLink();
+        link2.setTag("https://example.com/hotel-reviews");
+        link2.setItem(itemAlojamiento);
+        itemLinkRepository.save(link2);
 
         // Create Alimentacion
         Alimentacion alimentacion = new Alimentacion();
@@ -153,14 +229,14 @@ public class DbInitializer implements CommandLineRunner {
         calificacion.setPuntuacion(5);
         calificacion.setComentario(comentario);
         calificacion.setFechaCalificacion(LocalDateTime.now());
-        calificacion.setItem(alojamiento);
+        calificacion.setItem(itemAlojamiento);
 
         calificacionRepository.save(calificacion);
 
         // Create ItemTag
         ItemTag tag = new ItemTag();
         tag.setTag("Luxury");
-        tag.setItem(alojamiento);
+        tag.setItem(itemAlojamiento);
 
         itemTagRepository.save(tag);
 
@@ -188,11 +264,11 @@ public class DbInitializer implements CommandLineRunner {
         // Create ServiciosIncluidos
         ServiciosIncluidos servicio1 = new ServiciosIncluidos();
         servicio1.setServicios("WiFi");
-        servicio1.setItem(alojamiento);
+        servicio1.setItem(itemAlojamiento);
 
         ServiciosIncluidos servicio2 = new ServiciosIncluidos();
         servicio2.setServicios("Breakfast");
-        servicio2.setItem(alojamiento);
+        servicio2.setItem(itemAlojamiento);
 
         serviciosIncluidosRepository.saveAll(Arrays.asList(servicio1, servicio2));
     }

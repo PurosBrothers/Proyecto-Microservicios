@@ -1,6 +1,7 @@
 package com.microservicios.marketplace_ms.entities;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,22 +11,26 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
 public class Item {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
 
-    private String lugarInicio;
-    private BigDecimal precio;
-    private LocalDateTime fechaDisponibilidadInicio;
-    private LocalDateTime fechaDisponibilidadFin;
-    private Integer capacidadMaxima;
+    @ManyToOne
+    @JoinColumn(name = "clasificacion_id")
+    private Clasificacion clasificacion;
+
+    private String titulo;
+    private String descripcion;
+    private LocalDate fechaPublicacion;
+    private Integer stock;
+    private Integer visualizaciones;
+    private Long calificacionPromedio;
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
     private List<ItemTag> tags = new ArrayList<>();
@@ -54,44 +59,110 @@ public class Item {
         this.id = id;
     }
 
+    public Clasificacion getClasificacion() {
+        return clasificacion;
+    }
+
+    public void setClasificacion(Clasificacion clasificacion) {
+        this.clasificacion = clasificacion;
+    }
+
     public String getLugarInicio() {
-        return lugarInicio;
+        return clasificacion != null ? clasificacion.getLugarInicio() : null;
     }
 
     public void setLugarInicio(String lugarInicio) {
-        this.lugarInicio = lugarInicio;
+        if (clasificacion != null) {
+            clasificacion.setLugarInicio(lugarInicio);
+        }
     }
 
     public BigDecimal getPrecio() {
-        return precio;
+        return clasificacion != null ? clasificacion.getPrecio() : null;
     }
 
     public void setPrecio(BigDecimal precio) {
-        this.precio = precio;
+        if (clasificacion != null) {
+            clasificacion.setPrecio(precio);
+        }
     }
 
     public LocalDateTime getFechaDisponibilidadInicio() {
-        return fechaDisponibilidadInicio;
+        return clasificacion != null ? clasificacion.getFechaDisponibilidadInicio() : null;
     }
 
     public void setFechaDisponibilidadInicio(LocalDateTime fechaDisponibilidadInicio) {
-        this.fechaDisponibilidadInicio = fechaDisponibilidadInicio;
+        if (clasificacion != null) {
+            clasificacion.setFechaDisponibilidadInicio(fechaDisponibilidadInicio);
+        }
     }
 
     public LocalDateTime getFechaDisponibilidadFin() {
-        return fechaDisponibilidadFin;
+        return clasificacion != null ? clasificacion.getFechaDisponibilidadFin() : null;
     }
 
     public void setFechaDisponibilidadFin(LocalDateTime fechaDisponibilidadFin) {
-        this.fechaDisponibilidadFin = fechaDisponibilidadFin;
+        if (clasificacion != null) {
+            clasificacion.setFechaDisponibilidadFin(fechaDisponibilidadFin);
+        }
     }
 
     public Integer getCapacidadMaxima() {
-        return capacidadMaxima;
+        return clasificacion != null ? clasificacion.getCapacidadMaxima() : null;
     }
 
     public void setCapacidadMaxima(Integer capacidadMaxima) {
-        this.capacidadMaxima = capacidadMaxima;
+        if (clasificacion != null) {
+            clasificacion.setCapacidadMaxima(capacidadMaxima);
+        }
+    }
+
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public LocalDate getFechaPublicacion() {
+        return fechaPublicacion;
+    }
+
+    public void setFechaPublicacion(LocalDate fechaPublicacion) {
+        this.fechaPublicacion = fechaPublicacion;
+    }
+
+    public Integer getStock() {
+        return stock;
+    }
+
+    public void setStock(Integer stock) {
+        this.stock = stock;
+    }
+
+    public Integer getVisualizaciones() {
+        return visualizaciones;
+    }
+
+    public void setVisualizaciones(Integer visualizaciones) {
+        this.visualizaciones = visualizaciones;
+    }
+
+    public Long getCalificacionPromedio() {
+        return calificacionPromedio;
+    }
+
+    public void setCalificacionPromedio(Long calificacionPromedio) {
+        this.calificacionPromedio = calificacionPromedio;
     }
 
     public List<ItemTag> getTags() {

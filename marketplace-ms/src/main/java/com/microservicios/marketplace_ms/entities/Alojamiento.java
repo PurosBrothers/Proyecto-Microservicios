@@ -9,7 +9,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
 
 @Entity
-public class Alojamiento extends Item {
+public class Alojamiento extends Clasificacion {
 
     private LocalDateTime fechaCheckin;
     private LocalDateTime fechaCheckout;

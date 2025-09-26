@@ -1,3 +1,0 @@
-2025-09-25 13:41:40.141213-05:00 jdbc[13]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]ALIMENTACION_REQUISITOS_ESPECIALES"; expected "ALTER, ANALYZE"; SQL statement:
-ALIMENTACION_REQUISITOS_ESPECIALES [42001-232]

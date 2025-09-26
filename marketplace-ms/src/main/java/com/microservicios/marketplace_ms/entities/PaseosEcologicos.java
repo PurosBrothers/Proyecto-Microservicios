@@ -7,7 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
 
 @Entity
-public class PaseosEcologicos extends Item {
+public class PaseosEcologicos extends Clasificacion {
 
     private Integer duracionHoras;
     private String nivelDificultad;

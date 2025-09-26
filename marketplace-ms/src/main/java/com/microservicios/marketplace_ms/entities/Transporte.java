@@ -8,7 +8,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
 
 @Entity
-public class Transporte extends Item {
+public class Transporte extends Clasificacion {
 
     private String lugarDestino;
     private LocalDateTime horaSalida;

@@ -1,22 +1,10 @@
-package com.microservicios.marketplace_ms.entities;
+package com.microservicios.marketplace_ms.dtos;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
-
-@Entity
-@Inheritance(strategy = InheritanceType.JOINED)
-public class Clasificacion {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+public class ClasificacionDTO {
     private Long id;
-
     private String lugarInicio;
     private BigDecimal precio;
     private LocalDateTime fechaDisponibilidadInicio;
