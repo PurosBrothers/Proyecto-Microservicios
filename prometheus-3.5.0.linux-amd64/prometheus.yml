@@ -26,7 +26,7 @@ global:
 scrape_configs:
   - job_name: 'eureka-discovery'
     eureka_sd_configs:
-      - server: 'http://localhost:9989/eureka'
+      - server: 'http://192.168.48.1:9989/eureka'
         refresh_interval: 30s
     # To let prometheus use the correct endpoint
     # To scrap each microservice        
