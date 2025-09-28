@@ -1,24 +1,13 @@
-server:
-  port: 8080
-
 spring:
   application:
     name: user-ms
   cloud:
     config:
-      enabled: false
-  datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://localhost:8081/realms/mi-realm
+      uri: http://localhost:8888
+      enabled: true
+      fail-fast: false
+      retry:
+        initial-interval: 1000
+        max-attempts: 6
+  config:
+    import: "optional:configserver:http://localhost:8888"

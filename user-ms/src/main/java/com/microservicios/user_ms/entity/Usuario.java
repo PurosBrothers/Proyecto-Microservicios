@@ -16,7 +16,6 @@ import java.util.UUID;
 public abstract class Usuario {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     private String nombre;
