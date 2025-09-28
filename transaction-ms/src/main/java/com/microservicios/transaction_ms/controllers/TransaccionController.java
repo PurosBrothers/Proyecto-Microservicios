@@ -43,4 +43,10 @@ public class TransaccionController {
         }
     }
 
+    @PostMapping("/process-payment/{transactionId}")
+    public ResponseEntity<?> processPayment(@PathVariable Long transactionId) {
+        transaccionService.processPayment(transactionId);
+        return ResponseEntity.ok("Mensaje de procesamiento de pago enviado");
+    }
+
 }

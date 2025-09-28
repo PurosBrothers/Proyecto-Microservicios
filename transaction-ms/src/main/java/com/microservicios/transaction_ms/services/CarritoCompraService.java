@@ -54,7 +54,23 @@ public class CarritoCompraService {
             cart.setFechaCreacion(LocalDate.now());
             cart.setActivo(true);
         }
-        cart.getItems().add(item);
+        // Verificar si el item ya existe en el carrito (por idItem)
+        Optional<ItemCarrito> existingItem = cart.getItems().stream()
+                .filter(i -> i.getIdItem().equals(item.getIdItem()))
+                .findFirst();
+        if (existingItem.isPresent()) {
+            // Incrementar cantidad
+            existingItem.get().setCantidad(existingItem.get().getCantidad() + item.getCantidad());
+        } else {
+            // Agregar nuevo item, creando uno nuevo para evitar conflictos de detached
+            // entities
+            ItemCarrito newItem = new ItemCarrito();
+            newItem.setIdItem(item.getIdItem());
+            newItem.setCantidad(item.getCantidad());
+            newItem.setPrecioUnitario(item.getPrecioUnitario());
+            newItem.setFechaAgregado(item.getFechaAgregado());
+            cart.getItems().add(newItem);
+        }
         cart.setFechaUltimaModificacion(LocalDate.now());
         return repository.save(cart);
     }

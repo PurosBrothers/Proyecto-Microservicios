@@ -1,5 +1,8 @@
 package com.microservicios.transaction_ms.services;
 
+import com.microservicios.transaction_ms.dtos.ItemPaymentDTO;
+import com.microservicios.transaction_ms.dtos.ProcessPaymentMessageDTO;
+import com.microservicios.transaction_ms.messagingrabbitmq.components.RabbitMQSender;
 import com.microservicios.transaction_ms.models.ItemCarrito;
 import com.microservicios.transaction_ms.models.ItemTransaccion;
 import com.microservicios.transaction_ms.models.Transaccion;
@@ -24,6 +27,9 @@ public class TransaccionService {
 
     @Autowired
     private ItemTransaccionService itemTransaccionService;
+
+    @Autowired
+    private RabbitMQSender rabbitMQSender;
 
     public Transaccion create(Transaccion transaccion) {
         return repository.save(transaccion);
@@ -65,7 +71,7 @@ public class TransaccionService {
             cartItems = allCartItems; // procesar todos si no se especifica
         } else {
             cartItems = allCartItems.stream()
-                    .filter(item -> itemIds.contains(item.getId()))
+                    .filter(item -> itemIds.contains(item.getIdItem()))
                     .collect(Collectors.toList());
         }
         if (cartItems.isEmpty()) {
@@ -75,7 +81,8 @@ public class TransaccionService {
         // Convertir items de carrito (por pagar) a items de transacción (pagados)
         List<ItemTransaccion> itemsTransaccion = cartItems.stream().map(item -> {
             ItemTransaccion it = new ItemTransaccion();
-            it.setReservaId(item.getIdItem());
+            it.setReservaId(null); // se seteará después
+            it.setOfertaId(item.getIdItem());
             it.setCantidad(item.getCantidad());
             it.setPrecioUnitario(item.getPrecioUnitario());
             it.setFechaIncioServicio(LocalDate.now()); // assuming
@@ -99,11 +106,36 @@ public class TransaccionService {
 
         Transaccion savedTrans = repository.save(trans);
 
+        // setear reservaId a id de transacción
+        for (ItemTransaccion it : savedTrans.getItemsPagados()) {
+            it.setReservaId(savedTrans.getId());
+        }
+        repository.save(savedTrans);
+
         // remover items del carrito
         for (ItemCarrito item : cartItems) {
             carritoCompraService.removeItemFromCarrito(uid, item.getIdItem());
         }
 
         return savedTrans;
+    }
+
+    // Procesar pago enviando mensaje a payment-ms
+    public void processPayment(Long transactionId) {
+        Optional<Transaccion> transOpt = repository.findById(transactionId);
+        if (transOpt.isPresent()) {
+            Transaccion trans = transOpt.get();
+            List<ItemPaymentDTO> items = trans.getItemsPagados().stream()
+                    .map(it -> new ItemPaymentDTO(it.getOfertaId(), it.getCantidad(), it.getPrecioUnitario()))
+                    .collect(Collectors.toList());
+
+            ProcessPaymentMessageDTO messageDTO = new ProcessPaymentMessageDTO(
+                    trans.getUID(),
+                    trans.getId(),
+                    trans.getMontoTotal(),
+                    items);
+
+            rabbitMQSender.sendProcessPaymentMessage(messageDTO);
+        }
     }
 }

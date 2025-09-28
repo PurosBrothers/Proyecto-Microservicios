@@ -6,7 +6,10 @@ GET {{host}}/transaccion/list/1
 POST {{host}}/transaccion/create/1
 Content-Type: application/json
 
-[1, 2, 3]
+[101.102]
+
+###
+POST {{host}}/transaccion/process-payment/1
 
 ###
 GET {{host}}/actuator/info
