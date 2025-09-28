@@ -1,5 +1,5 @@
 server:
-  port: 7777
+  port: 8084
 
 spring:
   application:
@@ -30,3 +30,9 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:9989/eureka/
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
