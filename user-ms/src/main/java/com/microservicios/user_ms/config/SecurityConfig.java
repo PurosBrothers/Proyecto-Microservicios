@@ -16,10 +16,24 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authz -> authz
+                // Endpoints públicos (no requieren autenticación)
+                .requestMatchers("/users/authenticate", "/users/info", "/users", "/h2-console/**").permitAll()
+                .requestMatchers("/users/{id}").permitAll() // GET usuario por ID - público para facilitar pruebas
+                .requestMatchers("POST", "/users").permitAll() // Crear usuario - público
+                // Endpoints protegidos (requieren JWT)
+                .requestMatchers("PUT", "/users/**").authenticated()
+                .requestMatchers("DELETE", "/users/**").authenticated()
+                // Cualquier otra petición requiere autenticación
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2
-                .jwt()
+                .jwt(jwt -> jwt.jwkSetUri("http://localhost:8081/realms/proyect-ms-realm/protocol/openid-connect/certs"))
+            )
+            .csrf(csrf -> csrf
+                .ignoringRequestMatchers("/h2-console/**", "/users/**") // Deshabilitar CSRF para H2 y users
+            )
+            .headers(headers -> headers
+                .frameOptions(frameOptions -> frameOptions.sameOrigin()) // Permitir frames para H2 console
             );
         return http.build();
     }

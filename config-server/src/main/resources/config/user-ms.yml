@@ -1,0 +1,45 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: user-ms
+  cloud:
+    config:
+      enabled: true
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8081/realms/proyect-ms-realm
+
+# Configuración de Keycloak Admin
+keycloak:
+  auth-server-url: http://localhost:8081
+  realm: proyect-ms-realm
+  admin:
+    username: admin
+    password: admin123
+    client-id: admin-cli
+  client:
+    id: user-ms-client
+    secret: Aq3vK9EfTGwoWpK3j48RkN6Q0yCUZqGd
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:9989/eureka/

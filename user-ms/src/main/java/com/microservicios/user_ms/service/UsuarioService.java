@@ -5,6 +5,9 @@ import com.microservicios.user_ms.entity.Usuario;
 import com.microservicios.user_ms.mapper.UsuarioMapper;
 import com.microservicios.user_ms.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +23,7 @@ public class UsuarioService {
     @Transactional
     public UsuarioDTO createUsuario(UsuarioDTO usuarioDTO) {
         Usuario usuario = usuarioMapper.toEntity(usuarioDTO);
+        usuario.setId(getCurrentUserId());
         Usuario savedUsuario = usuarioRepository.save(usuario);
         return usuarioMapper.toDTO(savedUsuario);
     }
@@ -67,5 +71,14 @@ public class UsuarioService {
             return dto;
         }
         return null;
+    }
+
+    private String getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof Jwt) {
+            Jwt jwt = (Jwt) authentication.getPrincipal();
+            return jwt.getSubject();
+        }
+        throw new RuntimeException("Usuario no autenticado");
     }
 }
