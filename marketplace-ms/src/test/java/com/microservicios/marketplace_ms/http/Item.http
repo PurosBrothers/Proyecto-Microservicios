@@ -154,7 +154,7 @@ GET {{baseUrl}}/items/1/clasificacion
 
 ### Test Case 6: Add to Cart
 
-### Add item to cart - assuming item ID is 1
+### item a carrito
 POST {{baseUrl}}/items/1/add-to-cart
 Content-Type: application/json
 
@@ -164,5 +164,5 @@ Content-Type: application/json
   "precioUnitario": 500.00
 }
 
-### Search items
+### buscar item por palabra
 GET {{baseUrl}}/items/search?query=Cartagena
