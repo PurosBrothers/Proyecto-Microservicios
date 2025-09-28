@@ -51,6 +51,12 @@ public class ItemController {
         return response;
     }
 
+    @GetMapping()
+    public ResponseEntity<List<ItemResponseDTO>> getAllItems() {
+        ResponseEntity<List<ItemResponseDTO>> response = itemService.getAllItems();
+        return response;
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<ItemDTO> updateItem(@PathVariable Long id, @RequestBody ItemDTO item) {
         Item entity = itemMapper.dtoToEntity(item);

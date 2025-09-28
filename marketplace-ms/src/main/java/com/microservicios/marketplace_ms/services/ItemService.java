@@ -2,6 +2,8 @@ package com.microservicios.marketplace_ms.services;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -62,9 +64,22 @@ public class ItemService {
         return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<List<Item>> getAllItems() {
+    public ResponseEntity<List<ItemResponseDTO>> getAllItems() {
         List<Item> items = itemRepository.findAll();
-        return ResponseEntity.ok(items);
+
+        List<ItemResponseDTO> responseList = items.stream()
+                .map(item -> {
+                    ItemDTO itemDTO = itemMapper.entityToDto(item);
+
+                    ItemResponseDTO response = new ItemResponseDTO();
+                    response.setItem(itemDTO);
+                    response.setClasificacionData(item.getClasificacion());
+
+                    return response;
+                })
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(responseList);
     }
 
     public ResponseEntity<List<ItemResponseDTO>> searchItems(String query) {
@@ -84,4 +99,5 @@ public class ItemService {
                 .toList();
         return ResponseEntity.ok(results);
     }
+
 }
