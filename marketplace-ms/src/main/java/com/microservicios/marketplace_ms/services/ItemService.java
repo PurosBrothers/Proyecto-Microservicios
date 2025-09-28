@@ -65,21 +65,17 @@ public class ItemService {
     }
 
     public ResponseEntity<List<ItemResponseDTO>> getAllItems() {
-        List<Item> items = itemRepository.findAll();
-
-        List<ItemResponseDTO> responseList = items.stream()
+        List<Item> allItems = itemRepository.findAll();
+        List<ItemResponseDTO> results = allItems.stream()
                 .map(item -> {
                     ItemDTO itemDTO = itemMapper.entityToDto(item);
-
                     ItemResponseDTO response = new ItemResponseDTO();
                     response.setItem(itemDTO);
                     response.setClasificacionData(item.getClasificacion());
-
                     return response;
                 })
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(responseList);
+                .toList();
+        return ResponseEntity.ok(results);
     }
 
     public ResponseEntity<List<ItemResponseDTO>> searchItems(String query) {

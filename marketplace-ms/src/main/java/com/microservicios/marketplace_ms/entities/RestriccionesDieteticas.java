@@ -1,5 +1,7 @@
 package com.microservicios.marketplace_ms.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,6 +20,7 @@ public class RestriccionesDieteticas {
 
     @ManyToOne
     @JoinColumn(name = "alimentacion_id")
+    @JsonIgnore
     private Alimentacion alimentacion;
 
     // Getters and Setters

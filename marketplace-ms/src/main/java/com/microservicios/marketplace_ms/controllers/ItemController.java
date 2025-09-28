@@ -51,12 +51,6 @@ public class ItemController {
         return response;
     }
 
-    @GetMapping()
-    public ResponseEntity<List<ItemResponseDTO>> getAllItems() {
-        ResponseEntity<List<ItemResponseDTO>> response = itemService.getAllItems();
-        return response;
-    }
-
     @PutMapping("/{id}")
     public ResponseEntity<ItemDTO> updateItem(@PathVariable Long id, @RequestBody ItemDTO item) {
         Item entity = itemMapper.dtoToEntity(item);
@@ -106,6 +100,12 @@ public class ItemController {
     @GetMapping("/search")
     public ResponseEntity<List<ItemResponseDTO>> searchItems(@RequestParam String query) {
         ResponseEntity<List<ItemResponseDTO>> response = itemService.searchItems(query);
+        return response;
+    }
+
+    @GetMapping()
+    public ResponseEntity<List<ItemResponseDTO>> getAllItems() {
+        ResponseEntity<List<ItemResponseDTO>> response = itemService.getAllItems();
         return response;
     }
 }

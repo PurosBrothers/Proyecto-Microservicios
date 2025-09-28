@@ -166,3 +166,6 @@ Content-Type: application/json
 
 ### buscar item por palabra
 GET {{baseUrl}}/items/search?query=Cartagena
+
+### Get all items
+GET {{baseUrl}}/items
