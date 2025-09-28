@@ -1,37 +1,5 @@
 spring:
   application:
-    name: gateway_server
-
-  cloud:
-    gateway:
-      server:
-        webflux:
-          ## Integration with eureka to discover all the routes
-          discovery:
-            locator:
-              enabled: true
-              lower-case-service-id: true
-
-server:
-  port: 8080
-
-eureka:
-  client:
-    register-with-eureka: true
-    service-url:
-      defaultZone: ${EUREKA_SERVER_URL:http://localhost:9989/eureka/}
-  instance:
-    prefer-ip-address: true
-
-## Actuator config
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-
-  endpoint:
-    health:
-      show-details: always
-    gateway:
-      access: read-only
+    name: gateway-server
+  config:
+    import: "optional:configserver:http://localhost:8888"

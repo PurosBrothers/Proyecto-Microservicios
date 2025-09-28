@@ -1,0 +1,114 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway-server
+  cloud:
+    config:
+      enabled: true
+    gateway:
+      # Configuración de rutas específicas
+      routes:
+        # Ruta para user-ms
+        - id: user-ms-route
+          uri: lb://user-ms  # Load balancer hacia el servicio user-ms
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - StripPrefix=1  # Quita /api del path antes de enviar al microservicio
+            
+        # Ruta para payment-ms
+        - id: payment-ms-route
+          uri: lb://payment-ms
+          predicates:
+            - Path=/api/payments/**
+          filters:
+            - StripPrefix=1
+            
+        # Ruta para transaction-ms  
+        - id: transaction-ms-route
+          uri: lb://transaction-ms
+          predicates:
+            - Path=/api/transactions/**
+          filters:
+            - StripPrefix=1
+            
+        # Ruta para marketplace-ms
+        - id: marketplace-ms-route
+          uri: lb://marketplace-ms
+          predicates:
+            - Path=/api/marketplace/**
+          filters:
+            - StripPrefix=1
+      
+      # Configuración global de CORS
+      server:
+        webflux:
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedOrigins: 
+                  - "http://localhost:3000"  # React
+                  - "http://localhost:4200"  # Angular
+                  - "http://localhost:8080"  # Vue
+                  - "http://localhost:5173"  # Vite
+                allowedMethods:
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+                  - OPTIONS
+                allowedHeaders: "*"
+                allowCredentials: true
+                maxAge: 3600
+          
+          # Descubrimiento automático como fallback
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+              url-expression: "'http://'+serviceId+':'+getPort()"
+
+# Configuración OAuth2 para JWT (opcional)
+# Descomenta si quieres validar JWT en el gateway
+# security:
+#   oauth2:
+#     resourceserver:
+#       jwt:
+#         issuer-uri: http://localhost:8081/realms/proyect-ms-realm
+
+# Configuración de Eureka
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:9989/eureka/
+  instance:
+    prefer-ip-address: true
+    hostname: localhost
+
+# Configuración de logging
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.web.reactive: DEBUG
+    org.springframework.cloud.loadbalancer: DEBUG
+
+# Actuator endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: 
+          - health
+          - info  
+          - gateway
+          - routes
+          - refresh
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      access: read-only
