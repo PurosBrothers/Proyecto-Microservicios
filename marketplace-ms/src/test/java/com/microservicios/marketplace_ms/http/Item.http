@@ -163,3 +163,6 @@ Content-Type: application/json
   "cantidad": 2,
   "precioUnitario": 500.00
 }
+
+### Search items
+GET {{baseUrl}}/items/search?query=Cartagena

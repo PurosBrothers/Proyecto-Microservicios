@@ -66,4 +66,22 @@ public class ItemService {
         List<Item> items = itemRepository.findAll();
         return ResponseEntity.ok(items);
     }
+
+    public ResponseEntity<List<ItemResponseDTO>> searchItems(String query) {
+        List<Item> allItems = itemRepository.findAll();
+        List<ItemResponseDTO> results = allItems.stream()
+                .filter(item -> item.getTitulo().toLowerCase().contains(query.toLowerCase()) ||
+                        item.getDescripcion().toLowerCase().contains(query.toLowerCase()) ||
+                        item.getTags().stream()
+                                .anyMatch(tag -> tag.getTag().toLowerCase().contains(query.toLowerCase())))
+                .map(item -> {
+                    ItemDTO itemDTO = itemMapper.entityToDto(item);
+                    ItemResponseDTO response = new ItemResponseDTO();
+                    response.setItem(itemDTO);
+                    response.setClasificacionData(item.getClasificacion());
+                    return response;
+                })
+                .toList();
+        return ResponseEntity.ok(results);
+    }
 }

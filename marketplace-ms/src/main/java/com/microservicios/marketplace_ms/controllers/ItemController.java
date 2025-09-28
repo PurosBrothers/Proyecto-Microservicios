@@ -9,7 +9,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 import com.microservicios.marketplace_ms.dtos.AddToCartMessageDTO;
 import com.microservicios.marketplace_ms.dtos.ItemDTO;
 import com.microservicios.marketplace_ms.dtos.ItemResponseDTO;
@@ -92,5 +95,11 @@ public class ItemController {
         rabbitMQSender.sendAddToCartMessage(message);
 
         return ResponseEntity.ok("Mensaje enviado para agregar al carrito");
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ItemResponseDTO>> searchItems(@RequestParam String query) {
+        ResponseEntity<List<ItemResponseDTO>> response = itemService.searchItems(query);
+        return response;
     }
 }
