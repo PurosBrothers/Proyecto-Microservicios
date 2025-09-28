@@ -18,6 +18,14 @@ spring:
           filters:
             - StripPrefix=1  # Quita /api del path antes de enviar al microservicio
             
+        # Ruta para imágenes de usuarios
+        - id: user-images-route
+          uri: lb://user-ms
+          predicates:
+            - Path=/api/images/**
+          filters:
+            - StripPrefix=1  # Quita /api del path antes de enviar al microservicio
+            
         # Ruta para payment-ms
         - id: payment-ms-route
           uri: lb://payment-ms

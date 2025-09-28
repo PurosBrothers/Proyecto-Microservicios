@@ -1,0 +1,10 @@
+{
+  "nombre": "Juan Test Cliente",
+  "correo": "juan.test.cliente@gmail.com",
+  "password": "password123",
+  "tipoUsuario": "CLIENTE",
+  "edad": 28,
+  "descripcion": "Cliente de prueba",
+  "telefono": "+57 300 123 4567",
+  "direccion": "Calle 123, Bogota"
+}

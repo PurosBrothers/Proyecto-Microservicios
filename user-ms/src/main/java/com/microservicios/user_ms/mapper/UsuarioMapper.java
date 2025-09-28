@@ -18,7 +18,18 @@ public class UsuarioMapper {
         usuarioDTO.setId(usuario.getId());
         usuarioDTO.setNombre(usuario.getNombre());
         usuarioDTO.setEdad(usuario.getEdad());
-        usuarioDTO.setFotoUrl(usuario.getFotoUrl());
+        
+        // Manejo de imagen - generar URL si no existe pero hay datos de imagen
+        if (usuario.getFotoUrl() != null) {
+            usuarioDTO.setFotoUrl(usuario.getFotoUrl());
+        } else if (usuario.getFotoData() != null && usuario.getFotoData().length > 0) {
+            usuarioDTO.setFotoUrl("http://localhost:8083/images/" + usuario.getId());
+        }
+        
+        usuarioDTO.setFotoNombre(usuario.getFotoNombre());
+        usuarioDTO.setFotoTipo(usuario.getFotoTipo());
+        usuarioDTO.setTieneImagen(usuario.getFotoData() != null && usuario.getFotoData().length > 0);
+        
         usuarioDTO.setDescripcion(usuario.getDescripcion());
         usuarioDTO.setCorreo(usuario.getCorreo());
         usuarioDTO.setFechaRegistro(usuario.getFechaRegistro());

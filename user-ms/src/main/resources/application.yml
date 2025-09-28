@@ -11,3 +11,8 @@ spring:
         max-attempts: 6
   config:
     import: "optional:configserver:http://localhost:8888"
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+      enabled: true

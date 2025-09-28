@@ -11,9 +11,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.microservicios.user_ms.dto.KeycloakAuthResponse;
+import com.microservicios.user_ms.enums.TipoUsuario;
+import org.keycloak.representations.idm.RoleRepresentation;
 import jakarta.annotation.PostConstruct;
 import java.util.Collections;
 import java.util.List;
+import java.util.Arrays;
 
 @Service
 @Slf4j
@@ -333,5 +336,178 @@ public class KeycloakService {
         }
     }
 
+    /**
+     * Crea un usuario en Keycloak con rol específico
+     */
+    public String createKeycloakUserWithRole(String email, String firstName, String lastName, String password, TipoUsuario tipoUsuario) {
+        try {
+            // 1. Crear usuario normal
+            String userId = createKeycloakUser(email, firstName, lastName, password);
+            if (userId == null) {
+                log.error("No se pudo crear usuario en Keycloak");
+                return null;
+            }
+
+            // 2. Crear roles si no existen
+            initializeRoles();
+
+            // 3. Asignar rol según tipo de usuario
+            boolean roleAssigned = assignRoleToUser(userId, tipoUsuario);
+            if (!roleAssigned) {
+                log.warn("Usuario creado pero no se pudo asignar el rol {}", tipoUsuario);
+            }
+
+            log.info("✅ Usuario {} creado en Keycloak con rol {}", email, tipoUsuario);
+            return userId;
+
+        } catch (Exception e) {
+            log.error("❌ Error creando usuario con rol en Keycloak: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Inicializa los roles CLIENTE y PROVEEDOR en Keycloak si no existen
+     */
+    private void initializeRoles() {
+        try {
+            if (keycloak == null || realmResource == null) {
+                log.warn("Keycloak no disponible para inicializar roles");
+                return;
+            }
+
+            // Crear rol CLIENTE
+            createRoleIfNotExists("CLIENTE", "Usuario que consume servicios");
+            
+            // Crear rol PROVEEDOR
+            createRoleIfNotExists("PROVEEDOR", "Usuario que ofrece servicios");
+
+        } catch (Exception e) {
+            log.error("❌ Error inicializando roles: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * Crea un rol en Keycloak si no existe
+     */
+    private void createRoleIfNotExists(String roleName, String description) {
+        try {
+            var rolesResource = realmResource.roles();
+            
+            // Verificar si el rol ya existe
+            try {
+                rolesResource.get(roleName).toRepresentation();
+                log.debug("Rol {} ya existe en Keycloak", roleName);
+                return;
+            } catch (Exception e) {
+                // El rol no existe, lo creamos
+            }
+
+            // Crear el rol
+            RoleRepresentation role = new RoleRepresentation();
+            role.setName(roleName);
+            role.setDescription(description);
+            
+            rolesResource.create(role);
+            log.info("✅ Rol {} creado en Keycloak", roleName);
+
+        } catch (Exception e) {
+            log.error("❌ Error creando rol {}: {}", roleName, e.getMessage());
+        }
+    }
+
+    /**
+     * Asigna un rol a un usuario
+     */
+    private boolean assignRoleToUser(String userId, TipoUsuario tipoUsuario) {
+        try {
+            if (keycloak == null || realmResource == null) {
+                log.warn("Keycloak no disponible para asignar roles");
+                return false;
+            }
+
+            String roleName = tipoUsuario.getNombre();
+            
+            // Obtener representación del rol
+            RoleRepresentation role = realmResource.roles().get(roleName).toRepresentation();
+            
+            // Asignar rol al usuario
+            realmResource.users().get(userId).roles().realmLevel().add(Arrays.asList(role));
+            
+            log.info("✅ Rol {} asignado al usuario {}", roleName, userId);
+            return true;
+
+        } catch (Exception e) {
+            log.error("❌ Error asignando rol {} al usuario {}: {}", 
+                     tipoUsuario.getNombre(), userId, e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Obtiene los roles de un usuario
+     */
+    public List<String> getUserRoles(String userId) {
+        try {
+            if (keycloak == null || realmResource == null) {
+                log.warn("Keycloak no disponible para obtener roles");
+                return Collections.emptyList();
+            }
+
+            var roles = realmResource.users().get(userId).roles().realmLevel().listAll();
+            return roles.stream()
+                       .map(RoleRepresentation::getName)
+                       .filter(name -> name.equals("CLIENTE") || name.equals("PROVEEDOR"))
+                       .toList();
+
+        } catch (Exception e) {
+            log.error("❌ Error obteniendo roles del usuario {}: {}", userId, e.getMessage());
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Verifica si un usuario tiene un rol específico
+     */
+    public boolean userHasRole(String userId, TipoUsuario tipoUsuario) {
+        try {
+            List<String> userRoles = getUserRoles(userId);
+            return userRoles.contains(tipoUsuario.getNombre());
+        } catch (Exception e) {
+            log.error("❌ Error verificando rol {} para usuario {}: {}", 
+                     tipoUsuario.getNombre(), userId, e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Asigna un rol a un usuario existente en Keycloak
+     * Método público para uso desde DbInitializer
+     */
+    public boolean assignRoleToExistingUser(String userId, TipoUsuario tipoUsuario) {
+        try {
+            // Verificar si el usuario ya tiene el rol
+            if (userHasRole(userId, tipoUsuario)) {
+                log.info("Usuario {} ya tiene el rol {}", userId, tipoUsuario.getNombre());
+                return true;
+            }
+            
+            // Crear roles si no existen
+            initializeRoles();
+            
+            // Asignar el rol
+            boolean result = assignRoleToUser(userId, tipoUsuario);
+            if (result) {
+                log.info("✅ Rol {} asignado correctamente a usuario existente {}", 
+                        tipoUsuario.getNombre(), userId);
+            }
+            return result;
+            
+        } catch (Exception e) {
+            log.error("❌ Error asignando rol {} a usuario existente {}: {}", 
+                     tipoUsuario.getNombre(), userId, e.getMessage());
+            return false;
+        }
+    }
 
 }

@@ -2,6 +2,7 @@ package com.microservicios.user_ms.init;
 
 import com.microservicios.user_ms.entity.Cliente;
 import com.microservicios.user_ms.entity.Proveedor;
+import com.microservicios.user_ms.enums.TipoUsuario;
 import com.microservicios.user_ms.repository.UsuarioRepository;
 import com.microservicios.user_ms.service.KeycloakService;
 import lombok.RequiredArgsConstructor;
@@ -70,10 +71,12 @@ public class DbInitializer implements CommandLineRunner {
         String keycloakId1 = null;
         
         if (keycloakService.userExistsInKeycloak(email1)) {
-            log.info("Usuario {} ya existe en Keycloak, obteniendo ID...", email1);
+            log.info("Usuario {} ya existe en Keycloak, obteniendo ID y verificando rol...", email1);
             keycloakId1 = keycloakService.getUserKeycloakId(email1);
+            // Asegurarse de que tenga el rol correcto
+            keycloakService.assignRoleToExistingUser(keycloakId1, TipoUsuario.CLIENTE);
         } else {
-            keycloakId1 = keycloakService.createKeycloakUser(email1, "Laura", "Martínez", "password123");
+            keycloakId1 = keycloakService.createKeycloakUserWithRole(email1, "Laura", "Martínez", "password123", TipoUsuario.CLIENTE);
         }
         
         if (keycloakId1 != null) {
@@ -86,6 +89,7 @@ public class DbInitializer implements CommandLineRunner {
             cliente1.setCorreo("laura.martinez@gmail.com");
             cliente1.setDireccion("Carrera 15 #45-20, Bogotá, Colombia");
             cliente1.setTelefono("+57 301 456 7890");
+            cliente1.setTipoUsuario(TipoUsuario.CLIENTE); // CAMPO OBLIGATORIO
             usuarioRepository.save(cliente1);
             log.info("Cliente Laura Martínez creado/actualizado con ID de Keycloak: {}", keycloakId1);
         }
@@ -95,10 +99,12 @@ public class DbInitializer implements CommandLineRunner {
         String keycloakId2 = null;
         
         if (keycloakService.userExistsInKeycloak(email2)) {
-            log.info("Usuario {} ya existe en Keycloak, obteniendo ID...", email2);
+            log.info("Usuario {} ya existe en Keycloak, obteniendo ID y verificando rol...", email2);
             keycloakId2 = keycloakService.getUserKeycloakId(email2);
+            // Asegurarse de que tenga el rol correcto
+            keycloakService.assignRoleToExistingUser(keycloakId2, TipoUsuario.CLIENTE);
         } else {
-            keycloakId2 = keycloakService.createKeycloakUser(email2, "Andrés", "Silva", "password123");
+            keycloakId2 = keycloakService.createKeycloakUserWithRole(email2, "Andrés", "Silva", "password123", TipoUsuario.CLIENTE);
         }
         
         if (keycloakId2 != null) {
@@ -111,6 +117,7 @@ public class DbInitializer implements CommandLineRunner {
             cliente2.setCorreo("andres.silva@hotmail.com");
             cliente2.setDireccion("Calle 72 #11-35, Medellín, Colombia");
             cliente2.setTelefono("+57 312 789 0123");
+            cliente2.setTipoUsuario(TipoUsuario.CLIENTE); // CAMPO OBLIGATORIO
             usuarioRepository.save(cliente2);
             log.info("Cliente Andrés Silva creado/actualizado con ID de Keycloak: {}", keycloakId2);
         }
@@ -120,10 +127,12 @@ public class DbInitializer implements CommandLineRunner {
         String keycloakId3 = null;
         
         if (keycloakService.userExistsInKeycloak(email3)) {
-            log.info("Usuario {} ya existe en Keycloak, obteniendo ID...", email3);
+            log.info("Usuario {} ya existe en Keycloak, obteniendo ID y verificando rol...", email3);
             keycloakId3 = keycloakService.getUserKeycloakId(email3);
+            // Asegurarse de que tenga el rol correcto
+            keycloakService.assignRoleToExistingUser(keycloakId3, TipoUsuario.CLIENTE);
         } else {
-            keycloakId3 = keycloakService.createKeycloakUser(email3, "Carmen", "Rodríguez", "password123");
+            keycloakId3 = keycloakService.createKeycloakUserWithRole(email3, "Carmen", "Rodríguez", "password123", TipoUsuario.CLIENTE);
         }
         
         if (keycloakId3 != null) {
@@ -136,6 +145,7 @@ public class DbInitializer implements CommandLineRunner {
             cliente3.setCorreo("carmen.rodriguez@yahoo.com");
             cliente3.setDireccion("Transversal 45 #123-67, Cartagena, Colombia");
             cliente3.setTelefono("+57 318 234 5678");
+            cliente3.setTipoUsuario(TipoUsuario.CLIENTE); // CAMPO OBLIGATORIO
             usuarioRepository.save(cliente3);
             log.info("Cliente Carmen Rodríguez creado/actualizado con ID de Keycloak: {}", keycloakId3);
         }
@@ -149,10 +159,12 @@ public class DbInitializer implements CommandLineRunner {
         String keycloakId1 = null;
         
         if (keycloakService.userExistsInKeycloak(emailP1)) {
-            log.info("Usuario {} ya existe en Keycloak, obteniendo ID...", emailP1);
+            log.info("Usuario {} ya existe en Keycloak, obteniendo ID y verificando rol...", emailP1);
             keycloakId1 = keycloakService.getUserKeycloakId(emailP1);
+            // Asegurarse de que tenga el rol correcto
+            keycloakService.assignRoleToExistingUser(keycloakId1, TipoUsuario.PROVEEDOR);
         } else {
-            keycloakId1 = keycloakService.createKeycloakUser(emailP1, "Casa Verde", "Hotel", "password123");
+            keycloakId1 = keycloakService.createKeycloakUserWithRole(emailP1, "Casa Verde", "Hotel", "password123", TipoUsuario.PROVEEDOR);
         }
         
         if (keycloakId1 != null) {
@@ -163,7 +175,9 @@ public class DbInitializer implements CommandLineRunner {
             proveedor1.setFotoUrl("https://randomuser.me/api/portraits/women/4.jpg");
             proveedor1.setDescripcion("Hotel boutique ecológico en el corazón del Eje Cafetero. Alojamiento sostenible con vista a las montañas");
             proveedor1.setCorreo("reservas@casaverde.com");
+            proveedor1.setDireccion("Km 7 Vía Armenia-Salento, Quindío, Colombia"); // CAMPO REQUERIDO
             proveedor1.setTelefono("+57 6 789 4561");
+            proveedor1.setTipoUsuario(TipoUsuario.PROVEEDOR); // CAMPO OBLIGATORIO
             proveedor1.setPaginaWeb("https://casaverdehotel.com");
             proveedor1.setRedesSociales(Arrays.asList("@casaverdehotel", "casaverde_colombia", "Casa Verde Hotel"));
             proveedor1.setCalificacionPromedio(4.7f);
@@ -176,10 +190,12 @@ public class DbInitializer implements CommandLineRunner {
         String keycloakId2 = null;
         
         if (keycloakService.userExistsInKeycloak(emailP2)) {
-            log.info("Usuario {} ya existe en Keycloak, obteniendo ID...", emailP2);
+            log.info("Usuario {} ya existe en Keycloak, obteniendo ID y verificando rol...", emailP2);
             keycloakId2 = keycloakService.getUserKeycloakId(emailP2);
+            // Asegurarse de que tenga el rol correcto
+            keycloakService.assignRoleToExistingUser(keycloakId2, TipoUsuario.PROVEEDOR);
         } else {
-            keycloakId2 = keycloakService.createKeycloakUser(emailP2, "Sabor Caribe", "Restaurante", "password123");
+            keycloakId2 = keycloakService.createKeycloakUserWithRole(emailP2, "Sabor Caribe", "Restaurante", "password123", TipoUsuario.PROVEEDOR);
         }
         
         if (keycloakId2 != null) {
@@ -190,7 +206,9 @@ public class DbInitializer implements CommandLineRunner {
             proveedor2.setFotoUrl("https://randomuser.me/api/portraits/men/5.jpg");
             proveedor2.setDescripcion("Auténtica cocina caribeña colombiana. Especialistas en pescados frescos, patacones y ceviche costeño");
             proveedor2.setCorreo("info@saborcaribe.com");
+            proveedor2.setDireccion("Calle del Arsenal #8-19, Centro Histórico, Cartagena, Colombia"); // CAMPO REQUERIDO
             proveedor2.setTelefono("+57 5 312 7890");
+            proveedor2.setTipoUsuario(TipoUsuario.PROVEEDOR); // CAMPO OBLIGATORIO
             proveedor2.setPaginaWeb("https://saborcaribe.com");
             proveedor2.setRedesSociales(Arrays.asList("@saborcaribe_oficial", "saborcaribe_ctg"));
             proveedor2.setCalificacionPromedio(4.5f);
@@ -203,10 +221,12 @@ public class DbInitializer implements CommandLineRunner {
         String keycloakId3 = null;
         
         if (keycloakService.userExistsInKeycloak(emailP3)) {
-            log.info("Usuario {} ya existe en Keycloak, obteniendo ID...", emailP3);
+            log.info("Usuario {} ya existe en Keycloak, obteniendo ID y verificando rol...", emailP3);
             keycloakId3 = keycloakService.getUserKeycloakId(emailP3);
+            // Asegurarse de que tenga el rol correcto
+            keycloakService.assignRoleToExistingUser(keycloakId3, TipoUsuario.PROVEEDOR);
         } else {
-            keycloakId3 = keycloakService.createKeycloakUser(emailP3, "Eco Aventuras", "Colombia", "password123");
+            keycloakId3 = keycloakService.createKeycloakUserWithRole(emailP3, "Eco Aventuras", "Colombia", "password123", TipoUsuario.PROVEEDOR);
         }
         
         if (keycloakId3 != null) {
@@ -217,7 +237,9 @@ public class DbInitializer implements CommandLineRunner {
             proveedor3.setFotoUrl("https://randomuser.me/api/portraits/men/6.jpg");
             proveedor3.setDescripcion("Tours ecológicos y senderismo en parques nacionales. Especialistas en avistamiento de aves y fotografía de naturaleza");
             proveedor3.setCorreo("contacto@ecoaventuras.com");
+            proveedor3.setDireccion("Carrera 11 #93-15, Zona Rosa, Bogotá, Colombia"); // CAMPO REQUERIDO
             proveedor3.setTelefono("+57 1 456 7890");
+            proveedor3.setTipoUsuario(TipoUsuario.PROVEEDOR); // CAMPO OBLIGATORIO
             proveedor3.setPaginaWeb("https://ecoaventurascolombia.com");
             proveedor3.setRedesSociales(Arrays.asList("@ecoaventuras_co", "ecoaventuras_colombia"));
             proveedor3.setCalificacionPromedio(4.9f);
@@ -230,10 +252,12 @@ public class DbInitializer implements CommandLineRunner {
         String keycloakId4 = null;
         
         if (keycloakService.userExistsInKeycloak(emailP4)) {
-            log.info("Usuario {} ya existe en Keycloak, obteniendo ID...", emailP4);
+            log.info("Usuario {} ya existe en Keycloak, obteniendo ID y verificando rol...", emailP4);
             keycloakId4 = keycloakService.getUserKeycloakId(emailP4);
+            // Asegurarse de que tenga el rol correcto
+            keycloakService.assignRoleToExistingUser(keycloakId4, TipoUsuario.PROVEEDOR);
         } else {
-            keycloakId4 = keycloakService.createKeycloakUser(emailP4, "Viajes Fácil", "Transporte", "password123");
+            keycloakId4 = keycloakService.createKeycloakUserWithRole(emailP4, "Viajes Fácil", "Transporte", "password123", TipoUsuario.PROVEEDOR);
         }
         
         if (keycloakId4 != null) {
@@ -244,7 +268,9 @@ public class DbInitializer implements CommandLineRunner {
             proveedor4.setFotoUrl("https://randomuser.me/api/portraits/women/7.jpg");
             proveedor4.setDescripcion("Transporte cómodo y seguro para turistas. Rutas a destinos turísticos con guías especializados y vehículos climatizados");
             proveedor4.setCorreo("reservas@viajesfacil.com");
+            proveedor4.setDireccion("Avenida El Poblado #12-45, Medellín, Colombia"); // CAMPO REQUERIDO
             proveedor4.setTelefono("+57 4 234 5678");
+            proveedor4.setTipoUsuario(TipoUsuario.PROVEEDOR); // CAMPO OBLIGATORIO
             proveedor4.setPaginaWeb("https://viajesfacil.com");
             proveedor4.setRedesSociales(Arrays.asList("@viajesfacil_co", "viajesfacil_colombia"));
             proveedor4.setCalificacionPromedio(4.6f);
@@ -257,40 +283,50 @@ public class DbInitializer implements CommandLineRunner {
 
     private void printTestInformation() {
         log.info("\n" +
-                "=============== INFORMACIÓN PARA PRUEBAS (KEYCLOAK INTEGRADO) ===============\n" +
-                "USUARIOS DE PRUEBA CREADOS EN KEYCLOAK Y LOCAL:\n" +
+                "=============== INFORMACIÓN PARA PRUEBAS (KEYCLOAK CON ROLES) ===============\n" +
+                "USUARIOS DE PRUEBA CREADOS EN KEYCLOAK Y LOCAL CON ROLES AUTOMÁTICOS:\n" +
                 "   Consulta la base de datos H2 para ver los IDs reales generados por Keycloak\n" +
                 "\n" +
-                "CLIENTES:\n" +
-                "   • Juan Pérez - Email: juan.perez@test.com - Password: password123\n" +
-                "   • María García - Email: maria.garcia@test.com - Password: password123\n" +
-                "   • Carlos López - Email: carlos.lopez@test.com - Password: password123\n" +
+                "CLIENTES (ROL: CLIENTE):\n" +
+                "   • Laura Martínez - Email: laura.martinez@gmail.com - Password: password123\n" +
+                "   • Andrés Silva - Email: andres.silva@hotmail.com - Password: password123\n" +
+                "   • Carmen Rodríguez - Email: carmen.rodriguez@yahoo.com - Password: password123\n" +
                 "\n" +
-                "PROVEEDORES:\n" +
-                "   • TechSolutions SAS - Email: contacto@techsolutions.com - Password: password123\n" +
-                "   • Frutas y Verduras El Campo - Email: ventas@elcampo.com - Password: password123\n" +
-                "   • ServiExpress Ltda - Email: info@serviexpress.com - Password: password123\n" +
+                "PROVEEDORES (ROL: PROVEEDOR):\n" +
+                "   • Casa Verde Hotel - Email: reservas@casaverde.com - Password: password123\n" +
+                "   • Sabor Caribe Rest - Email: info@saborcaribe.com - Password: password123\n" +
+                "   • Eco Aventuras - Email: contacto@ecoaventuras.com - Password: password123\n" +
+                "   • Viajes Fácil - Email: reservas@viajesfacil.com - Password: password123\n" +
                 "\n" +
                 "ENDPOINTS PARA PROBAR:\n" +
-                "   GET    /users/{id}           - Obtener usuario por ID (IDs generados por Keycloak)\n" +
-                "   POST   /users               - Crear usuario (requiere JWT, crea automáticamente en Keycloak)\n" +
-                "   PUT    /users/{id}          - Actualizar usuario (requiere JWT del mismo usuario)\n" +
-                "   DELETE /users/{id}          - Eliminar usuario (requiere JWT del mismo usuario)\n" +
+                "   GET    /users/tipos-usuario  - Ver tipos de usuario disponibles\n" +
+                "   GET    /users/verificar-correo?correo=X - Verificar si correo existe\n" +
+                "   POST   /users               - Registrar usuario CON ROL OBLIGATORIO\n" +
+                "   GET    /users/{id}          - Obtener usuario por ID\n" +
+                "   GET    /users               - Listar todos los usuarios\n" +
+                "   PUT    /users/{id}          - Actualizar usuario (requiere JWT)\n" +
+                "   DELETE /users/{id}          - Eliminar usuario (requiere JWT)\n" +
+                "\n" +
+                "ROLES EN KEYCLOAK:\n" +
+                "   • CLIENTE - Para usuarios que consumen servicios\n" +
+                "   • PROVEEDOR - Para usuarios que ofrecen servicios\n" +
+                "   ⚠️  OBLIGATORIO: Todo usuario DEBE tener un rol asignado\n" +
                 "\n" +
                 "AUTENTICACIÓN CON KEYCLOAK:\n" +
-                "   URL Token: http://localhost:8081/realms/proyect-ms-realm/protocol/openid_connect/token\n" +
+                "   URL Token: http://localhost:8081/realms/proyect-ms-realm/protocol/openid-connect/token\n" +
                 "   Realm: proyect-ms-realm\n" +
-                "   Client ID: Configura tu client en Keycloak\n" +
+                "   Client ID: user-ms-client\n" +
+                "   Client Secret: Aq3vK9EfTGwoWpK3j48RkN6Q0yCUZqGd\n" +
                 "   Usuarios y contraseñas: Ver lista arriba\n" +
                 "\n" +
                 "BASE DE DATOS H2:\n" +
                 "   URL: http://localhost:8083/h2-console\n" +
-                "   JDBC URL: jdbc:h2:mem:testdb\n" +
+                "   JDBC URL: jdbc:h2:file:./data/testdb\n" +
                 "   Usuario: sa\n" +
                 "   Contraseña: (vacío)\n" +
                 "\n" +
-                "CONSULTA SQL PARA VER IDs REALES:\n" +
-                "   SELECT id, nombre, correo, tipo_usuario FROM USUARIO;\n" +
+                "CONSULTA SQL PARA VER DATOS COMPLETOS:\n" +
+                "   SELECT id, nombre, correo, tipo_usuario_enum, telefono, direccion FROM USUARIO;\n" +
                 "========================================================");
     }
 }

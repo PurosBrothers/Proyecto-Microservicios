@@ -23,6 +23,12 @@ public class UsuarioDTO {
 
     private String fotoUrl;
 
+    private String fotoNombre; // nombre original del archivo
+
+    private String fotoTipo; // tipo MIME de la imagen
+
+    private boolean tieneImagen; // indica si el usuario tiene imagen guardada
+
     private String descripcion;
 
     @NotBlank

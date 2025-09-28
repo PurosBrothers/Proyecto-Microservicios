@@ -1,9 +1,11 @@
 package com.microservicios.user_ms.controller;
 
-import com.microservicios.user_ms.dto.CreateUserRequestDTO;
+
+import com.microservicios.user_ms.dto.RegistroUsuarioDto;
 import com.microservicios.user_ms.dto.UsuarioDTO;
 import com.microservicios.user_ms.dto.KeycloakAuthResponse;
 import com.microservicios.user_ms.dto.AuthRequest;
+import com.microservicios.user_ms.enums.TipoUsuario;
 import com.microservicios.user_ms.service.UsuarioService;
 import com.microservicios.user_ms.service.KeycloakService;
 import com.microservicios.user_ms.entity.Cliente;
@@ -17,7 +19,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -32,78 +37,146 @@ public class UserController {
     private final UsuarioMapper usuarioMapper;
 
     /**
-     * Crear nuevo usuario - Se crea automáticamente en Keycloak y en la base local
+     * Crear nuevo usuario con rol obligatorio - Se crea automáticamente en Keycloak y en la base local
      */
     @PostMapping
-    public ResponseEntity<?> createUser(@Valid @RequestBody CreateUserRequestDTO request) {
+    public ResponseEntity<Map<String, Object>> createUser(@Valid @RequestBody RegistroUsuarioDto dto) {
+        Map<String, Object> response = new HashMap<>();
+        
         try {
-            log.info("📝 Creando nuevo usuario: {}", request.getCorreo());
-            
-            // Verificar si el usuario ya existe en Keycloak
-            if (keycloakService.userExistsInKeycloak(request.getCorreo())) {
-                return ResponseEntity.badRequest()
-                    .body("❌ El usuario ya existe en Keycloak con email: " + request.getCorreo());
+            // 1. Validación adicional de tipo de usuario (obligatorio)
+            if (dto.getTipoUsuario() == null) {
+                response.put("error", "El tipo de usuario es obligatorio. Debe especificar CLIENTE o PROVEEDOR");
+                response.put("field", "tipoUsuario");
+                return ResponseEntity.badRequest().body(response);
             }
 
-            // Crear usuario en Keycloak primero
-            String keycloakId = keycloakService.createKeycloakUser(
-                request.getCorreo(),
-                request.getNombre().split(" ")[0], // Primer nombre
-                request.getNombre().contains(" ") ? request.getNombre().substring(request.getNombre().indexOf(" ") + 1) : "", // Apellidos
-                request.getPassword()
-            );
+            log.info("📝 Registrando nuevo usuario: {} como {}", dto.getCorreo(), dto.getTipoUsuario());
 
-            if (keycloakId == null) {
-                return ResponseEntity.badRequest()
-                    .body("❌ Error al crear usuario en Keycloak");
+            // 2. Verificar si el correo ya existe
+            if (usuarioRepository.findByCorreo(dto.getCorreo()).isPresent()) {
+                response.put("error", "El correo ya está registrado");
+                response.put("field", "correo");
+                return ResponseEntity.badRequest().body(response);
             }
 
-            // Crear usuario en base de datos local
-            if ("CLIENTE".equalsIgnoreCase(request.getTipoUsuario())) {
-                Cliente cliente = new Cliente();
-                cliente.setId(keycloakId);
-                cliente.setNombre(request.getNombre());
-                cliente.setEdad(request.getEdad());
-                cliente.setFotoUrl(request.getFotoUrl());
-                cliente.setDescripcion(request.getDescripcion());
-                cliente.setCorreo(request.getCorreo());
-                cliente.setDireccion(request.getDireccion());
-                cliente.setTelefono(request.getTelefono());
+            // 3. Crear usuario en Keycloak con rol específico
+            String keycloakUserId = null;
+            if (keycloakService.isKeycloakAvailable()) {
+                String[] nombres = dto.getNombre().split(" ", 2);
+                String firstName = nombres[0];
+                String lastName = nombres.length > 1 ? nombres[1] : "";
                 
-                Cliente savedCliente = usuarioRepository.save(cliente);
-                UsuarioDTO clienteDTO = usuarioMapper.toDTO(savedCliente);
+                keycloakUserId = keycloakService.createKeycloakUserWithRole(
+                    dto.getCorreo(), 
+                    firstName, 
+                    lastName, 
+                    dto.getPassword(),
+                    dto.getTipoUsuario()
+                );
                 
-                log.info("✅ Cliente creado exitosamente con ID: {}", keycloakId);
-                return ResponseEntity.ok(clienteDTO);
-                
-            } else if ("PROVEEDOR".equalsIgnoreCase(request.getTipoUsuario())) {
-                Proveedor proveedor = new Proveedor();
-                proveedor.setId(keycloakId);
-                proveedor.setNombre(request.getNombre());
-                proveedor.setEdad(request.getEdad());
-                proveedor.setFotoUrl(request.getFotoUrl());
-                proveedor.setDescripcion(request.getDescripcion());
-                proveedor.setCorreo(request.getCorreo());
-                proveedor.setTelefono(request.getTelefono());
-                proveedor.setPaginaWeb(request.getPaginaWeb());
-                proveedor.setRedesSociales(request.getRedesSociales());
-                proveedor.setCalificacionPromedio(request.getCalificacionPromedio());
-                
-                Proveedor savedProveedor = usuarioRepository.save(proveedor);
-                UsuarioDTO proveedorDTO = usuarioMapper.toDTO(savedProveedor);
-                
-                log.info("✅ Proveedor creado exitosamente con ID: {}", keycloakId);
-                return ResponseEntity.ok(proveedorDTO);
+                if (keycloakUserId == null) {
+                    response.put("error", "Error al crear usuario en el sistema de autenticación");
+                    return ResponseEntity.internalServerError().body(response);
+                }
             } else {
-                return ResponseEntity.badRequest()
-                    .body("❌ Tipo de usuario inválido. Debe ser CLIENTE o PROVEEDOR");
+                log.warn("Keycloak no disponible, usuario se creará solo en base de datos local");
             }
+
+            // 4. Crear usuario en base de datos local
+            var usuario = crearUsuarioSegunTipo(dto, keycloakUserId);
+            usuarioRepository.save(usuario);
+
+            // 5. Preparar respuesta exitosa
+            response.put("message", "Usuario registrado exitosamente");
+            response.put("id", usuario.getId());
+            response.put("correo", usuario.getCorreo());
+            response.put("tipoUsuario", usuario.getTipoUsuario());
+            response.put("keycloakId", keycloakUserId);
+            
+            if (keycloakService.isKeycloakAvailable()) {
+                response.put("rolesAsignados", keycloakService.getUserRoles(keycloakUserId));
+            }
+
+            log.info("✅ Usuario {} registrado exitosamente como {}", 
+                    dto.getCorreo(), dto.getTipoUsuario());
+                    
+            return ResponseEntity.ok(response);
 
         } catch (Exception e) {
-            log.error("❌ Error al crear usuario: {}", e.getMessage());
-            return ResponseEntity.badRequest()
-                .body("❌ Error al crear usuario: " + e.getMessage());
+            log.error("❌ Error registrando usuario {}: {}", dto.getCorreo(), e.getMessage());
+            response.put("error", "Error interno del servidor: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
         }
+    }
+
+    /**
+     * Crea la instancia de usuario según el tipo especificado
+     */
+    private com.microservicios.user_ms.entity.Usuario crearUsuarioSegunTipo(RegistroUsuarioDto dto, String keycloakUserId) {
+        // Validación adicional de seguridad
+        if (dto.getTipoUsuario() == null) {
+            throw new IllegalArgumentException("El tipo de usuario es obligatorio y no puede ser nulo");
+        }
+        
+        com.microservicios.user_ms.entity.Usuario usuario;
+        
+        switch (dto.getTipoUsuario()) {
+            case CLIENTE:
+                Cliente cliente = new Cliente();
+                usuario = cliente;
+                break;
+                
+            case PROVEEDOR:
+                Proveedor proveedor = new Proveedor();
+                usuario = proveedor;
+                break;
+                
+            default:
+                throw new IllegalArgumentException("Tipo de usuario no válido: " + dto.getTipoUsuario());
+        }
+
+        // Configurar campos comunes
+        usuario.setId(keycloakUserId != null ? keycloakUserId : UUID.randomUUID().toString());
+        usuario.setNombre(dto.getNombre());
+        usuario.setCorreo(dto.getCorreo());
+        usuario.setEdad(dto.getEdad());
+        usuario.setDescripcion(dto.getDescripcion());
+        usuario.setTelefono(dto.getTelefono());
+        usuario.setDireccion(dto.getDireccion());
+        usuario.setTipoUsuario(dto.getTipoUsuario());
+
+        return usuario;
+    }
+
+    /**
+     * Endpoint para verificar tipos de usuario disponibles
+     */
+    @GetMapping("/tipos-usuario")
+    public ResponseEntity<Map<String, Object>> obtenerTiposUsuario() {
+        Map<String, Object> response = new HashMap<>();
+        
+        Map<String, String> tipos = new HashMap<>();
+        for (TipoUsuario tipo : TipoUsuario.values()) {
+            tipos.put(tipo.name(), tipo.getDescripcion());
+        }
+        
+        response.put("tiposUsuario", tipos);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Endpoint para verificar si un correo ya está registrado
+     */
+    @GetMapping("/verificar-correo")
+    public ResponseEntity<Map<String, Object>> verificarCorreo(@RequestParam String correo) {
+        Map<String, Object> response = new HashMap<>();
+        
+        boolean existe = usuarioRepository.findByCorreo(correo).isPresent();
+        response.put("existe", existe);
+        response.put("correo", correo);
+        
+        return ResponseEntity.ok(response);
     }
 
     /**
