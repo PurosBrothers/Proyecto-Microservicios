@@ -58,3 +58,9 @@ info:
   app:
     name: Microservicios de Transacciones
     description: Servicio para gestionar transacciones
+
+rabbitmq:
+  host: localhost
+  port: 5672
+  username: guest
+  password: guest

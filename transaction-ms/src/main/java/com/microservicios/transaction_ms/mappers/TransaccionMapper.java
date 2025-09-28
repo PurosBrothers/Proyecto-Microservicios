@@ -26,7 +26,7 @@ public class TransaccionMapper {
         }
         if (dto.getItemsPorPagar() != null) {
             model.setItemsPorPagar(
-                    dto.getItemsPorPagar().stream().map(ItemCarritoMapper::toModel).collect(Collectors.toList()));
+                    dto.getItemsPorPagar().stream().map(ItemTransaccionMapper::toModel).collect(Collectors.toList()));
         } else {
             model.setItemsPorPagar(null);
         }
@@ -52,7 +52,7 @@ public class TransaccionMapper {
         }
         if (model.getItemsPorPagar() != null) {
             dto.setItemsPorPagar(
-                    model.getItemsPorPagar().stream().map(ItemCarritoMapper::toDTO).collect(Collectors.toList()));
+                    model.getItemsPorPagar().stream().map(ItemTransaccionMapper::toDTO).collect(Collectors.toList()));
         } else {
             dto.setItemsPorPagar(null);
         }

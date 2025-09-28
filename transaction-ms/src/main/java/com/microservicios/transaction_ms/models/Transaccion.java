@@ -26,14 +26,14 @@ public class Transaccion {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<ItemTransaccion> itemsPagados;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<ItemCarrito> itemsPorPagar;
+    private List<ItemTransaccion> itemsPorPagar;
 
     public Transaccion() {
     }
 
     public Transaccion(Long id, String UID, String estado, LocalDate fechaTransaccion, BigDecimal montoTotal,
             String codigoConfirmacion, String observaciones, List<ItemTransaccion> itemsPagados,
-            List<ItemCarrito> itemsPorPagar) {
+            List<ItemTransaccion> itemsPorPagar) {
         this.id = id;
         this.UID = UID;
         this.estado = estado;
@@ -109,11 +109,11 @@ public class Transaccion {
         this.itemsPagados = itemsPagados;
     }
 
-    public List<ItemCarrito> getItemsPorPagar() {
+    public List<ItemTransaccion> getItemsPorPagar() {
         return itemsPorPagar;
     }
 
-    public void setItemsPorPagar(List<ItemCarrito> itemsPorPagar) {
+    public void setItemsPorPagar(List<ItemTransaccion> itemsPorPagar) {
         this.itemsPorPagar = itemsPorPagar;
     }
 

@@ -21,7 +21,8 @@ public class RabbitMQSender {
             String message = objectMapper.writeValueAsString(messageDTO);
             rabbitTemplate.convertAndSend(RabbitMQConfig.TOPIC_EXCHANGE_NAME, "payment.process", message);
             System.out.println("Mensaje enviado a process-payment: " + message);
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
+            System.out.println("Error enviando mensaje a process-payment: " + e.getMessage());
             e.printStackTrace();
         }
     }

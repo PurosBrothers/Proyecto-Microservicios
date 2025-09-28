@@ -13,14 +13,14 @@ public class TransaccionDTO {
     private String codigoConfirmacion;
     private String observaciones;
     private List<ItemTransaccionDTO> itemsPagados;
-    private List<ItemCarritoDTO> itemsPorPagar;
+    private List<ItemTransaccionDTO> itemsPorPagar;
 
     public TransaccionDTO() {
     }
 
     public TransaccionDTO(Long id, String UID, String estado, LocalDate fechaTransaccion, BigDecimal montoTotal,
             String codigoConfirmacion, String observaciones, List<ItemTransaccionDTO> itemsPagados,
-            List<ItemCarritoDTO> itemsPorPagar) {
+            List<ItemTransaccionDTO> itemsPorPagar) {
         this.id = id;
         this.UID = UID;
         this.estado = estado;
@@ -96,11 +96,11 @@ public class TransaccionDTO {
         this.itemsPagados = itemsPagados;
     }
 
-    public List<ItemCarritoDTO> getItemsPorPagar() {
+    public List<ItemTransaccionDTO> getItemsPorPagar() {
         return itemsPorPagar;
     }
 
-    public void setItemsPorPagar(List<ItemCarritoDTO> itemsPorPagar) {
+    public void setItemsPorPagar(List<ItemTransaccionDTO> itemsPorPagar) {
         this.itemsPorPagar = itemsPorPagar;
     }
 }

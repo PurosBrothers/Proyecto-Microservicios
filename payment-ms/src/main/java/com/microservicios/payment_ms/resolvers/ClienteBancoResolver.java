@@ -8,6 +8,7 @@ import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,8 +37,8 @@ public class ClienteBancoResolver {
 
     @MutationMapping
     public ClienteBanco createClienteBanco(@Argument String uid, @Argument String cuentaBancariaEncrypted,
-            @Argument String claveBancariaEncrypted) {
-        return clienteBancoService.createClienteBanco(uid, cuentaBancariaEncrypted, claveBancariaEncrypted);
+            @Argument String claveBancariaEncrypted, @Argument BigDecimal saldo) {
+        return clienteBancoService.createClienteBanco(uid, cuentaBancariaEncrypted, claveBancariaEncrypted, saldo);
     }
 
     @MutationMapping

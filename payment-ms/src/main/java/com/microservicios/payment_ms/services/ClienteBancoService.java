@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,9 +32,10 @@ public class ClienteBancoService {
         return clienteBancoRepository.save(clienteBanco);
     }
 
-    public ClienteBanco createClienteBanco(String uid, String cuentaBancariaEncrypted, String claveBancariaEncrypted) {
+    public ClienteBanco createClienteBanco(String uid, String cuentaBancariaEncrypted, String claveBancariaEncrypted,
+            BigDecimal saldo) {
         String claveHashed = new BCryptPasswordEncoder().encode(claveBancariaEncrypted);
-        ClienteBanco clienteBanco = new ClienteBanco(uid, cuentaBancariaEncrypted, claveHashed);
+        ClienteBanco clienteBanco = new ClienteBanco(uid, cuentaBancariaEncrypted, claveHashed, saldo);
         return clienteBancoRepository.save(clienteBanco);
     }
 

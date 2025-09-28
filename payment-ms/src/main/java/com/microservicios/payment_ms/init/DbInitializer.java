@@ -24,7 +24,8 @@ public class DbInitializer implements CommandLineRunner {
         // Inicializar datos de ejemplo para pagos
 
         // Crear un cliente de banco
-        clienteBancoService.createClienteBanco("1", "encrypted_account_123", "encrypted_key_123");
+        clienteBancoService.createClienteBanco("1", "encrypted_account_123", "encrypted_key_123",
+                new BigDecimal("3000.00"));
 
         // Crear algunos pagos
         pagoService.createPago("pago1", 1L, new BigDecimal("100.00"), ZonedDateTime.now(), EstadoPago.COMPLETADO,

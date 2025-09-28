@@ -1,5 +1,6 @@
 package com.microservicios.payment_ms.services;
 
+import com.microservicios.payment_ms.models.ClienteBanco;
 import com.microservicios.payment_ms.models.EstadoPago;
 import com.microservicios.payment_ms.models.Pago;
 import com.microservicios.payment_ms.repository.PagoRepository;
@@ -61,8 +62,30 @@ public class PagoService {
         return false;
     }
 
+    @Autowired
+    private ClienteBancoService clienteBancoService;
+
     // Procesar pago desde mensaje
     public Pago processPayment(String uid, Long reservaId, BigDecimal monto) {
+        Optional<ClienteBanco> clienteOpt = clienteBancoService.findByUid(uid);
+        if (clienteOpt.isEmpty()) {
+            throw new RuntimeException("Cliente no encontrado");
+        }
+        ClienteBanco cliente = clienteOpt.get();
+        if (cliente.getSaldo().compareTo(monto) < 0) {
+            // Saldo insuficiente, crear pago CANCELADO
+            Pago pago = new Pago();
+            pago.setUid(uid);
+            pago.setReservaId(reservaId);
+            pago.setMonto(monto);
+            pago.setFechaPago(ZonedDateTime.now());
+            pago.setEstadoPago(EstadoPago.CANCELADO);
+            pago.setReferencia("REF-" + reservaId + "-INSUFICIENTE");
+            return save(pago);
+        }
+        // Saldo suficiente, restar y crear pago COMPLETADO
+        cliente.setSaldo(cliente.getSaldo().subtract(monto));
+        clienteBancoService.save(cliente);
         Pago pago = new Pago();
         pago.setUid(uid);
         pago.setReservaId(reservaId);

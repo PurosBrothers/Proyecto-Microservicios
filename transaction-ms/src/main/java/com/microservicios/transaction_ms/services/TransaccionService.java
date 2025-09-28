@@ -98,13 +98,13 @@ public class TransaccionService {
         trans.setEstado("PENDING");
         trans.setFechaTransaccion(LocalDate.now());
         trans.setMontoTotal(total);
-        trans.setItemsPagados(itemsTransaccion); // items nuevos, cascada los guardará
-        trans.setItemsPorPagar(List.of());
+        trans.setItemsPagados(List.of()); // inicialmente vacío
+        trans.setItemsPorPagar(itemsTransaccion); // items por pagar inicialmente
 
         Transaccion savedTrans = repository.save(trans);
 
         // setear reservaId a id de transacción
-        for (ItemTransaccion it : savedTrans.getItemsPagados()) {
+        for (ItemTransaccion it : savedTrans.getItemsPorPagar()) {
             it.setReservaId(savedTrans.getId());
         }
         repository.save(savedTrans);
@@ -119,20 +119,28 @@ public class TransaccionService {
 
     // Procesar pago enviando mensaje a payment-ms
     public void processPayment(Long transactionId) {
-        Optional<Transaccion> transOpt = repository.findById(transactionId);
-        if (transOpt.isPresent()) {
-            Transaccion trans = transOpt.get();
-            List<ItemPaymentDTO> items = trans.getItemsPagados().stream()
-                    .map(it -> new ItemPaymentDTO(it.getOfertaId(), it.getCantidad(), it.getPrecioUnitario()))
-                    .collect(Collectors.toList());
+        try {
+            Optional<Transaccion> transOpt = repository.findById(transactionId);
+            if (transOpt.isPresent()) {
+                Transaccion trans = transOpt.get();
+                List<ItemPaymentDTO> items = trans.getItemsPorPagar().stream()
+                        .map(it -> new ItemPaymentDTO(it.getOfertaId(), it.getCantidad(), it.getPrecioUnitario()))
+                        .collect(Collectors.toList());
 
-            ProcessPaymentMessageDTO messageDTO = new ProcessPaymentMessageDTO(
-                    trans.getUID(),
-                    trans.getId(),
-                    trans.getMontoTotal(),
-                    items);
+                ProcessPaymentMessageDTO messageDTO = new ProcessPaymentMessageDTO(
+                        trans.getUID(),
+                        trans.getId(),
+                        trans.getMontoTotal(),
+                        items);
 
-            rabbitMQSender.sendProcessPaymentMessage(messageDTO);
+                rabbitMQSender.sendProcessPaymentMessage(messageDTO);
+                System.out.println("Procesando pago para transacción: " + transactionId);
+            } else {
+                System.out.println("Transacción no encontrada: " + transactionId);
+            }
+        } catch (Exception e) {
+            System.out.println("Error procesando pago: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -143,6 +151,23 @@ public class TransaccionService {
             Transaccion trans = transOpt.get();
             trans.setEstado(status);
             repository.save(trans);
+        }
+    }
+
+    // Completar transacción: mover items de por pagar a pagados y cambiar estado
+    public void completeTransaction(Long id) {
+        System.out.println("Completando transacción: " + id);
+        Optional<Transaccion> opt = repository.findById(id);
+        if (opt.isPresent()) {
+            Transaccion trans = opt.get();
+            System.out.println("Items por pagar antes: " + trans.getItemsPorPagar().size());
+            trans.setItemsPagados(trans.getItemsPorPagar());
+            trans.setItemsPorPagar(List.of());
+            trans.setEstado("COMPLETED");
+            repository.save(trans);
+            System.out.println("Transacción completada: " + id);
+        } else {
+            System.out.println("Transacción no encontrada para completar: " + id);
         }
     }
 }

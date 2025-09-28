@@ -1,6 +1,7 @@
 package com.microservicios.payment_ms.models;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "cliente_banco")
@@ -19,6 +20,9 @@ public class ClienteBanco {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String claveBancariaEncrypted;
 
+    @Column(nullable = false, precision = 19, scale = 2)
+    private BigDecimal saldo;
+
     // Constructores
     public ClienteBanco() {
     }
@@ -27,6 +31,14 @@ public class ClienteBanco {
         this.uid = uid;
         this.cuentaBancariaEncrypted = cuentaBancariaEncrypted;
         this.claveBancariaEncrypted = claveBancariaEncrypted;
+        this.saldo = BigDecimal.ZERO;
+    }
+
+    public ClienteBanco(String uid, String cuentaBancariaEncrypted, String claveBancariaEncrypted, BigDecimal saldo) {
+        this.uid = uid;
+        this.cuentaBancariaEncrypted = cuentaBancariaEncrypted;
+        this.claveBancariaEncrypted = claveBancariaEncrypted;
+        this.saldo = saldo;
     }
 
     // Getters y Setters
@@ -60,5 +72,13 @@ public class ClienteBanco {
 
     public void setClaveBancariaEncrypted(String claveBancariaEncrypted) {
         this.claveBancariaEncrypted = claveBancariaEncrypted;
+    }
+
+    public BigDecimal getSaldo() {
+        return saldo;
+    }
+
+    public void setSaldo(BigDecimal saldo) {
+        this.saldo = saldo;
     }
 }

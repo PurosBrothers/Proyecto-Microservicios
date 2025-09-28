@@ -38,7 +38,7 @@ public class Receiver {
             PaymentConfirmationMessageDTO confirmation = new PaymentConfirmationMessageDTO(
                     dto.getUid(),
                     dto.getReservaId(),
-                    EstadoPago.COMPLETADO,
+                    pago.getEstadoPago(),
                     pago.getReferencia());
             rabbitMQSender.sendPaymentConfirmationMessage(confirmation);
 

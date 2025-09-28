@@ -22,8 +22,15 @@ public class RabbitMQReceiver {
         System.out.println("Confirmación de pago recibida: " + message);
         try {
             PaymentConfirmationMessageDTO dto = objectMapper.readValue(message, PaymentConfirmationMessageDTO.class);
-            // Actualizar transacción a COMPLETED
-            transaccionService.updateTransactionStatus(dto.getReservaId(), "COMPLETED");
+            System.out.println("Estado de pago: " + dto.getEstadoPago());
+            if ("COMPLETADO".equals(dto.getEstadoPago())) {
+                // Actualizar transacción a COMPLETED y mover items
+                transaccionService.completeTransaction(dto.getReservaId());
+            } else if ("CANCELADO".equals(dto.getEstadoPago())) {
+                // Saldo insuficiente, marcar como FAILED
+                System.out.println("Pago cancelado por saldo insuficiente: " + dto.getReferencia());
+                transaccionService.updateTransactionStatus(dto.getReservaId(), "FAILED");
+            }
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
