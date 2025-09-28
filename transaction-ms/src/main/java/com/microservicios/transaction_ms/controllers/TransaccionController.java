@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.microservicios.transaction_ms.dtos.ItemTransaccionDTO;
-import com.microservicios.transaction_ms.mappers.ItemTransaccionMapper;
+import com.microservicios.transaction_ms.dtos.TransaccionDTO;
+import com.microservicios.transaction_ms.mappers.TransaccionMapper;
 import com.microservicios.transaction_ms.models.Transaccion;
 import com.microservicios.transaction_ms.services.TransaccionService;
 import com.netflix.discovery.converters.Auto;
@@ -26,10 +26,10 @@ public class TransaccionController {
 
     @GetMapping("/list/{uid}")
     public ResponseEntity<?> getAllTransacciones(@PathVariable String uid) {
-        List<ItemTransaccionDTO> items = transaccionService.getItemsTransaccion(uid).stream()
-                .map(ItemTransaccionMapper::toDTO)
+        List<TransaccionDTO> transacciones = transaccionService.getTransacciones(uid).stream()
+                .map(TransaccionMapper::toDTO)
                 .toList();
-        return ResponseEntity.ok(items);
+        return ResponseEntity.ok(transacciones);
     }
 
     @PostMapping("/create/{uid}")

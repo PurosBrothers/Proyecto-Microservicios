@@ -6,7 +6,7 @@ GET {{host}}/transaccion/list/1
 POST {{host}}/transaccion/create/1
 Content-Type: application/json
 
-[101.102]
+[102]
 
 ###
 POST {{host}}/transaccion/process-payment/1

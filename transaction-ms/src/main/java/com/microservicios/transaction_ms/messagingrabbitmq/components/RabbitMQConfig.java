@@ -9,12 +9,18 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitMQConfig {
-    public static final String TOPIC_EXCHANGE_NAME = "c";
+    public static final String TOPIC_EXCHANGE_NAME = "transaction-exchange";
     public static final String QUEUE_PROCESS_PAYMENT = "process-payment";
+    public static final String QUEUE_PAYMENT_CONFIRMATION = "payment-confirmation";
 
     @Bean
     Queue processPaymentQueue() {
         return new Queue(QUEUE_PROCESS_PAYMENT, false);
+    }
+
+    @Bean
+    Queue paymentConfirmationQueue() {
+        return new Queue(QUEUE_PAYMENT_CONFIRMATION, false);
     }
 
     @Bean
@@ -23,7 +29,12 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    Binding binding(Queue processPaymentQueue, TopicExchange exchange) {
+    Binding bindingProcessPayment(Queue processPaymentQueue, TopicExchange exchange) {
         return BindingBuilder.bind(processPaymentQueue).to(exchange).with("payment.process");
+    }
+
+    @Bean
+    Binding bindingPaymentConfirmation(Queue paymentConfirmationQueue, TopicExchange exchange) {
+        return BindingBuilder.bind(paymentConfirmationQueue).to(exchange).with("transaction.payment-confirmation");
     }
 }

@@ -60,4 +60,16 @@ public class PagoService {
         }
         return false;
     }
+
+    // Procesar pago desde mensaje
+    public Pago processPayment(String uid, Long reservaId, BigDecimal monto) {
+        Pago pago = new Pago();
+        pago.setUid(uid);
+        pago.setReservaId(reservaId);
+        pago.setMonto(monto);
+        pago.setFechaPago(ZonedDateTime.now());
+        pago.setEstadoPago(EstadoPago.COMPLETADO);
+        pago.setReferencia("REF-" + reservaId);
+        return save(pago);
+    }
 }

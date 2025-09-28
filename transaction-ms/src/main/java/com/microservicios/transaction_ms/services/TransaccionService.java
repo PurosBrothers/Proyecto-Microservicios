@@ -56,11 +56,8 @@ public class TransaccionService {
         return repository.findByUID(uid);
     }
 
-    public List<ItemTransaccion> getItemsTransaccion(String uid) {
-        List<Transaccion> transacciones = repository.findByUID(uid);
-        return transacciones.stream()
-                .flatMap(t -> t.getItemsPagados().stream())
-                .collect(Collectors.toList());
+    public List<Transaccion> getTransacciones(String uid) {
+        return repository.findByUID(uid);
     }
 
     // Crear una transacción a partir de un carrito de compra
@@ -136,6 +133,16 @@ public class TransaccionService {
                     items);
 
             rabbitMQSender.sendProcessPaymentMessage(messageDTO);
+        }
+    }
+
+    // Actualizar estado de transacción
+    public void updateTransactionStatus(Long transactionId, String status) {
+        Optional<Transaccion> transOpt = repository.findById(transactionId);
+        if (transOpt.isPresent()) {
+            Transaccion trans = transOpt.get();
+            trans.setEstado(status);
+            repository.save(trans);
         }
     }
 }

@@ -1,0 +1,31 @@
+package com.microservicios.transaction_ms.messagingrabbitmq.components;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.microservicios.transaction_ms.dtos.PaymentConfirmationMessageDTO;
+import com.microservicios.transaction_ms.services.TransaccionService;
+
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
+public class RabbitMQReceiver {
+
+    @Autowired
+    private TransaccionService transaccionService;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @RabbitListener(queues = RabbitMQConfig.QUEUE_PAYMENT_CONFIRMATION)
+    public void receivePaymentConfirmation(String message) {
+        System.out.println("Confirmación de pago recibida: " + message);
+        try {
+            PaymentConfirmationMessageDTO dto = objectMapper.readValue(message, PaymentConfirmationMessageDTO.class);
+            // Actualizar transacción a COMPLETED
+            transaccionService.updateTransactionStatus(dto.getReservaId(), "COMPLETED");
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+}
