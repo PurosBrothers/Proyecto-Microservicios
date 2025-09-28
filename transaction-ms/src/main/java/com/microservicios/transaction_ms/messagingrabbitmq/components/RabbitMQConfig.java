@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQConfig {
     public static final String TOPIC_EXCHANGE_NAME = "transaction-exchange";
     public static final String QUEUE_PROCESS_PAYMENT = "process-payment";
+    public static final String QUEUE_ADD_TO_CART = "add-to-cart";
     public static final String QUEUE_PAYMENT_CONFIRMATION = "payment-confirmation";
 
     @Bean
@@ -24,8 +25,18 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    Queue addToCartQueue() {
+        return new Queue(QUEUE_ADD_TO_CART, false);
+    }
+
+    @Bean
     TopicExchange exchange() {
         return new TopicExchange(TOPIC_EXCHANGE_NAME);
+    }
+
+    @Bean
+    Binding addToCartBinding(Queue addToCartQueue, TopicExchange exchange) {
+        return BindingBuilder.bind(addToCartQueue).to(exchange).with("cart.add");
     }
 
     @Bean

@@ -1,4 +1,4 @@
-@baseUrl = http://localhost:7777/clasificaciones
+@baseUrl = http://localhost:8084/clasificaciones
 
 ### Test Case 1: Create Alojamiento (subclass of Clasificacion)
 POST {{baseUrl}}

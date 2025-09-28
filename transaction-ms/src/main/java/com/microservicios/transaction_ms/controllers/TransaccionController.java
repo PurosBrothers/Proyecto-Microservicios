@@ -43,10 +43,16 @@ public class TransaccionController {
         }
     }
 
-    @PostMapping("/process-payment/{transactionId}")
-    public ResponseEntity<?> processPayment(@PathVariable Long transactionId) {
-        transaccionService.processPayment(transactionId);
-        return ResponseEntity.ok("Mensaje de procesamiento de pago enviado");
+    @PostMapping("/process-payment/{uid}")
+    public ResponseEntity<?> processPayment(@PathVariable String uid, @RequestBody List<Long> itemIds) {
+        // Crear transacción desde carrito
+        Transaccion transaccion = transaccionService.createTransactionFromCarrito(uid, itemIds);
+        if (transaccion == null) {
+            return ResponseEntity.badRequest().body("No hay items válidos en el carrito para procesar");
+        }
+        // Procesar pago
+        transaccionService.processPayment(transaccion.getId());
+        return ResponseEntity.ok("Transacción creada y mensaje de procesamiento de pago enviado");
     }
 
 }

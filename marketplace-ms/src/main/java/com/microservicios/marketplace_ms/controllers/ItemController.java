@@ -10,10 +10,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.microservicios.marketplace_ms.dtos.AddToCartMessageDTO;
 import com.microservicios.marketplace_ms.dtos.ItemDTO;
 import com.microservicios.marketplace_ms.dtos.ItemResponseDTO;
 import com.microservicios.marketplace_ms.entities.Item;
 import com.microservicios.marketplace_ms.mappers.ItemMapper;
+import com.microservicios.marketplace_ms.messagingrabbitmq.components.RabbitMQSender;
 import com.microservicios.marketplace_ms.services.ItemService;
 
 @RestController
@@ -25,6 +27,9 @@ public class ItemController {
 
     @Autowired
     private ItemMapper itemMapper;
+
+    @Autowired
+    private RabbitMQSender rabbitMQSender;
 
     @PostMapping
     public ResponseEntity<ItemDTO> createItem(@RequestBody ItemDTO item) {
@@ -66,5 +71,26 @@ public class ItemController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteItem(@PathVariable Long id) {
         return itemService.deleteItem(id);
+    }
+
+    @PostMapping("/{id}/add-to-cart")
+    public ResponseEntity<String> addToCart(@PathVariable Long id, @RequestBody AddToCartMessageDTO request) {
+        // Validar item existe
+        ResponseEntity<ItemResponseDTO> itemResponse = itemService.getItem(id);
+        if (!itemResponse.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.badRequest().body("Item no encontrado");
+        }
+
+        // Enviar mensaje a transaction-ms
+        String tipoClasificacion = itemResponse.getBody().getItem().getClasificacion().getClass().getSimpleName();
+        AddToCartMessageDTO message = new AddToCartMessageDTO(
+                request.getUid(),
+                id,
+                request.getCantidad(),
+                request.getPrecioUnitario(),
+                tipoClasificacion);
+        rabbitMQSender.sendAddToCartMessage(message);
+
+        return ResponseEntity.ok("Mensaje enviado para agregar al carrito");
     }
 }

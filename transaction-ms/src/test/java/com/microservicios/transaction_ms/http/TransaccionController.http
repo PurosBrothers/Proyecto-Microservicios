@@ -9,7 +9,10 @@ Content-Type: application/json
 [102]
 
 ###
-POST {{host}}/transaccion/process-payment/2
+POST {{host}}/transaccion/process-payment/1
+Content-Type: application/json
+
+[102]
 
 ###
 GET {{host}}/actuator/info

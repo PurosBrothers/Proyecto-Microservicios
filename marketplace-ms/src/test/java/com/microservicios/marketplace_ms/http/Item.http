@@ -1,4 +1,4 @@
-@baseUrl = http://localhost:7777
+@baseUrl = http://localhost:8084
 
 ### Test Case 1: Item with Alojamiento classification
 
@@ -151,3 +151,15 @@ Content-Type: application/json
 
 ### Get the classification data for an Item - assuming item ID is 1
 GET {{baseUrl}}/items/1/clasificacion
+
+### Test Case 6: Add to Cart
+
+### Add item to cart - assuming item ID is 1
+POST {{baseUrl}}/items/1/add-to-cart
+Content-Type: application/json
+
+{
+  "uid": "1",
+  "cantidad": 2,
+  "precioUnitario": 500.00
+}
