@@ -42,7 +42,8 @@ public class Receiver {
                     pago.getReferencia());
             rabbitMQSender.sendPaymentConfirmationMessage(confirmation);
 
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
+            System.out.println("Error procesando mensaje en payment-ms: " + e.getMessage());
             e.printStackTrace();
         }
     }

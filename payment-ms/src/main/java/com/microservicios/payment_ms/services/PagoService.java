@@ -67,12 +67,16 @@ public class PagoService {
 
     // Procesar pago desde mensaje
     public Pago processPayment(String uid, Long reservaId, BigDecimal monto) {
+        System.out.println("Procesando pago para uid: " + uid + ", reservaId: " + reservaId + ", monto: " + monto);
         Optional<ClienteBanco> clienteOpt = clienteBancoService.findByUid(uid);
         if (clienteOpt.isEmpty()) {
+            System.out.println("Cliente no encontrado: " + uid);
             throw new RuntimeException("Cliente no encontrado");
         }
         ClienteBanco cliente = clienteOpt.get();
+        System.out.println("Saldo actual: " + cliente.getSaldo());
         if (cliente.getSaldo().compareTo(monto) < 0) {
+            System.out.println("Saldo insuficiente");
             // Saldo insuficiente, crear pago CANCELADO
             Pago pago = new Pago();
             pago.setUid(uid);
@@ -86,6 +90,7 @@ public class PagoService {
         // Saldo suficiente, restar y crear pago COMPLETADO
         cliente.setSaldo(cliente.getSaldo().subtract(monto));
         clienteBancoService.save(cliente);
+        System.out.println("Pago completado, nuevo saldo: " + cliente.getSaldo());
         Pago pago = new Pago();
         pago.setUid(uid);
         pago.setReservaId(reservaId);
