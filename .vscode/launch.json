@@ -74,6 +74,16 @@
             "projectName": "com.microservicios-gateway_server",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-UserMsApplication<user-ms>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.microservicios.user_ms.UserMsApplication",
+            "projectName": "user-ms",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }

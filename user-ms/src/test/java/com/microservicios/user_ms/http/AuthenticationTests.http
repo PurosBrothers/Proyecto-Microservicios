@@ -1,0 +1,132 @@
+### ENDPOINT DE AUTENTICACIÓN - MARKETPLACE TURÍSTICO
+### Este endpoint permite autenticar usuarios directamente desde el microservicio
+### sin necesidad de comunicación directa entre frontend y Keycloak
+
+@baseUrl = http://localhost:8083
+
+###
+# Test 1: Autenticación de cliente existente (Laura Martínez)
+POST {{baseUrl}}/users/authenticate
+Content-Type: application/json
+
+{
+    "email": "laura.martinez@gmail.com",
+    "password": "password123"
+}
+
+###
+# Test 2: Autenticación de cliente existente (Andrés Silva)
+POST {{baseUrl}}/users/authenticate  
+Content-Type: application/json
+
+{
+    "email": "andres.silva@hotmail.com",
+    "password": "password123"
+}
+
+###
+# Test 3: Autenticación de proveedor existente (Casa Verde Hotel)
+POST {{baseUrl}}/users/authenticate
+Content-Type: application/json
+
+{
+    "email": "reservas@casaverde.com",
+    "password": "password123"
+}
+
+###
+# Test 4: Autenticación de proveedor existente (Sabor Caribe)
+POST {{baseUrl}}/users/authenticate
+Content-Type: application/json
+
+{
+    "email": "info@saborcaribe.com", 
+    "password": "password123"
+}
+
+###
+# Test 5: Autenticación con credenciales incorrectas
+POST {{baseUrl}}/users/authenticate
+Content-Type: application/json
+
+{
+    "email": "usuario.inexistente@email.com",
+    "password": "wrongpassword"
+}
+
+###
+# Test 6: Verificar información del sistema
+GET {{baseUrl}}/users/info
+
+###
+# Test 7: Listar todos los usuarios (para verificar quiénes están disponibles)
+GET {{baseUrl}}/users
+
+###
+# ========== TESTS CON AUTENTICACIÓN JWT ==========
+# Primero autentica con cualquier usuario de arriba para obtener el token
+# Luego copia el accessToken y úsalo en los siguientes tests
+
+@jwtToken = eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTWdvZ0pJN3JPRi1OWlY1anVjRkx6Mjh0TlB3eHNsbVlBbG1ORTZZMDNRIn0.eyJleHAiOjE3NTkwODgyMTcsImlhdCI6MTc1OTA4NzkxNywianRpIjoib25ydHJvOjcyMmVmZDFhLTgyMzktMDJiYi1mMmFmLTI0MDhkYTc1MzY1NiIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MS9yZWFsbXMvcHJveWVjdC1tcy1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyYTM2Y2E4NC0wMTY2LTQ2YjItODBiNC0wODM4OTg3Mzg4YmYiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ1c2VyLW1zLWNsaWVudCIsInNpZCI6IjEzZTE1ZjFhLWY5YzctNGE2MC1iOTc1LTkyYzRlNTU2OGRkZiIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyoiLCJodHRwOi8vbG9jYWxob3N0OjgwODMvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLXByb3llY3QtbXMtcmVhbG0iLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiTGF1cmEgTWFydMOtbmV6IiwicHJlZmVycmVkX3VzZXJuYW1lIjoibGF1cmEubWFydGluZXpAZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6IkxhdXJhIiwiZmFtaWx5X25hbWUiOiJNYXJ0w61uZXoiLCJlbWFpbCI6ImxhdXJhLm1hcnRpbmV6QGdtYWlsLmNvbSJ9.oRPRAqzWdsiMBKgwnG7nQJrIfLmfGp9XLtiCj3JMGsSpBS_Rbd73nys-488_Sw77NceScK4lrqVgKF9qSh9APOMUWiMovURWF895MdT11ofrNx6Vh4OdzYIPH50bbuXyTOEVrVotnwdEWKkcWqyCTmC-N22fXCDVujWj-ApQHDwUqYgyOhz_9uJ5U5BTnxrte1T6ieWYA2R9-EjSYiV5EablPr_WX7Uhy2d3UQM0iHJU8F2xyBVoeDVq4EiDXSSwTall9YXPR3s5yPNqfsBuORUSQzAO4dYqGX3_nur0AcVzdiHxJGRWmipfLncGrKR7p2z4UQ8diRQXFuDdzEalnA
+
+###
+# Test 8: Obtener usuario específico con JWT (Laura Martínez)
+GET {{baseUrl}}/users/2a36ca84-0166-46b2-80b4-0838987388bf
+Authorization: Bearer {{jwtToken}}
+
+###
+# Test 9: Crear nuevo usuario con JWT
+POST {{baseUrl}}/users
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+{
+    "nombre": "Pedro Turista",
+    "edad": 29,
+    "fotoUrl": "https://randomuser.me/api/portraits/men/8.jpg",
+    "descripcion": "Aventurero apasionado por descubrir destinos únicos en Colombia",
+    "correo": "pedro.turista@gmail.com",
+    "direccion": "Avenida 30 #50-25, Cali, Colombia",
+    "telefono": "+57 302 111 2222",
+    "tipoUsuario": "CLIENTE",
+    "password": "password123"
+}
+
+###
+# Test 10: Actualizar usuario con JWT (actualizar Laura Martínez)
+PUT {{baseUrl}}/users/2a36ca84-0166-46b2-80b4-0838987388bf
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+{
+    "nombre": "Laura Martínez Viajera",
+    "edad": 29,
+    "fotoUrl": "https://randomuser.me/api/portraits/women/1.jpg",
+    "descripcion": "Amante de la naturaleza y los viajes en familia. Exploradora de Colombia ✈️🌿🏔️",
+    "correo": "laura.martinez@gmail.com",
+    "direccion": "Carrera 15 #45-20, Bogotá, Colombia",
+    "telefono": "+57 301 456 7890"
+}
+
+###
+# Test 11: Probar acceso sin JWT (debería fallar con 401)
+GET {{baseUrl}}/users/2a36ca84-0166-46b2-80b4-0838987388bf
+
+###
+# Test 12: Probar con JWT inválido (debería fallar con 401)
+GET {{baseUrl}}/users/2a36ca84-0166-46b2-80b4-0838987388bf
+Authorization: Bearer invalid_token_here
+
+### NOTAS:
+# 1. ✅ El endpoint de autenticación funciona perfectamente
+# 2. 🔑 Copia el accessToken de la respuesta de autenticación y úsalo en @jwtToken
+# 3. 🔄 Los tokens expiran en 300 segundos (5 minutos), regenera si es necesario
+# 4. 🛡️ Los endpoints protegidos requieren JWT válido en el header Authorization
+# 5. 🎯 Usa diferentes usuarios para obtener tokens con diferentes permisos
+# 6. 📱 Este patrón es perfecto para aplicaciones frontend (React, Angular, etc.)
+
+### FLUJO TÍPICO DE FRONTEND:
+# 1. POST /users/authenticate → Obtener token
+# 2. Almacenar token en localStorage/sessionStorage
+# 3. Incluir token en todas las peticiones autenticadas
+# 4. Manejar renovación cuando expire (401 response)
