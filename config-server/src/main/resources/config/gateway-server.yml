@@ -8,83 +8,32 @@ spring:
     config:
       enabled: true
     gateway:
-      # Configuración de rutas específicas
-      routes:
-        # Ruta para autenticación (gateway maneja auth)
-        - id: auth-route
-          uri: lb://gateway-server  # El gateway mismo maneja la autenticación
-          predicates:
-            - Path=/auth/**
-          filters:
-            - StripPrefix=0  # No quitar prefijo para rutas del gateway
-
-        # Ruta para user-ms
-        - id: user-ms-route
-          uri: lb://user-ms  # Load balancer hacia el servicio user-ms
-          predicates:
-            - Path=/api/users/**
-          filters:
-            - StripPrefix=1  # Quita /api del path antes de enviar al microservicio
-            
-        # Ruta para imágenes de usuarios
-        - id: user-images-route
-          uri: lb://user-ms
-          predicates:
-            - Path=/api/images/**
-          filters:
-            - StripPrefix=1  # Quita /api del path antes de enviar al microservicio
-            
-        # Ruta para payment-ms
-        - id: payment-ms-route
-          uri: lb://payment-ms
-          predicates:
-            - Path=/api/payments/**
-          filters:
-            - StripPrefix=1
-            
-        # Ruta para transaction-ms  
-        - id: transaction-ms-route
-          uri: lb://transaction-ms
-          predicates:
-            - Path=/api/transactions/**
-          filters:
-            - StripPrefix=1
-            
-        # Ruta para marketplace-ms
-        - id: marketplace-ms-route
-          uri: lb://marketplace-ms
-          predicates:
-            - Path=/api/marketplace/**
-          filters:
-            - StripPrefix=1
       
       # Configuración global de CORS
-      server:
-        webflux:
-          globalcors:
-            cors-configurations:
-              '[/**]':
-                allowedOrigins: 
-                  - "http://localhost:3000"  # React
-                  - "http://localhost:4200"  # Angular
-                  - "http://localhost:8080"  # Vue
-                  - "http://localhost:5173"  # Vite
-                allowedMethods:
-                  - GET
-                  - POST
-                  - PUT
-                  - DELETE
-                  - OPTIONS
-                allowedHeaders: "*"
-                allowCredentials: true
-                maxAge: 3600
-          
-          # Descubrimiento automático como fallback
-          discovery:
-            locator:
-              enabled: true
-              lower-case-service-id: true
-              url-expression: "'http://'+serviceId+':'+getPort()"
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:3000"  # React
+              - "http://localhost:4200"  # Angular
+              - "http://localhost:8080"  # Vue
+              - "http://localhost:5173"  # Vite
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+
+      # Descubrimiento automático de servicios
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+          url-expression: "'lb://' + serviceId"
 
 # Configuración de Keycloak para el gateway
 keycloak:
