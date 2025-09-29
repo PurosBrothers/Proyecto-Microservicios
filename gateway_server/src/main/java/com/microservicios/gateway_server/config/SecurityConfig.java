@@ -7,7 +7,12 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsConfigurationSource;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import org.springframework.beans.factory.annotation.Value;
+
+import java.util.Arrays;
 
 /**
  * Configuración de seguridad para el Gateway
@@ -26,13 +31,26 @@ public class SecurityConfig {
     private String realm;
 
     @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:5173"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+    @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
             // Desactiva CSRF para APIs REST
             .csrf(csrf -> csrf.disable())
 
-            // Desactiva CORS (se maneja en la configuración del gateway)
-            .cors(cors -> cors.disable())
+            // Configura CORS para permitir solicitudes desde el frontend
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
             // Configura autorización
             .authorizeExchange(exchanges -> exchanges
