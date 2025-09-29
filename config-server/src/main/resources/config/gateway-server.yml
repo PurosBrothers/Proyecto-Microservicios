@@ -10,6 +10,14 @@ spring:
     gateway:
       # Configuración de rutas específicas
       routes:
+        # Ruta para autenticación (gateway maneja auth)
+        - id: auth-route
+          uri: lb://gateway-server  # El gateway mismo maneja la autenticación
+          predicates:
+            - Path=/auth/**
+          filters:
+            - StripPrefix=0  # No quitar prefijo para rutas del gateway
+
         # Ruta para user-ms
         - id: user-ms-route
           uri: lb://user-ms  # Load balancer hacia el servicio user-ms
@@ -78,13 +86,27 @@ spring:
               lower-case-service-id: true
               url-expression: "'http://'+serviceId+':'+getPort()"
 
-# Configuración OAuth2 para JWT (opcional)
-# Descomenta si quieres validar JWT en el gateway
-# security:
-#   oauth2:
-#     resourceserver:
-#       jwt:
-#         issuer-uri: http://localhost:8081/realms/proyect-ms-realm
+# Configuración de Keycloak para el gateway
+keycloak:
+  auth-server-url: http://localhost:8081
+  realm: proyect-ms-realm
+  admin:
+    username: admin
+    password: admin123
+    client-id: admin-cli
+  client:
+    secret: Aq3vK9EfTGwoWpK3j48RkN6Q0yCUZqGd
+
+# Configuración de user-ms para comunicación interna
+user-ms:
+  url: http://user-ms:8083
+
+# Configuración OAuth2 para JWT
+security:
+  oauth2:
+    resourceserver:
+      jwt:
+        issuer-uri: http://localhost:8081/realms/proyect-ms-realm
 
 # Configuración de Eureka
 eureka:
