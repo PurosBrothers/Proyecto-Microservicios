@@ -96,4 +96,12 @@ public class ItemService {
         return ResponseEntity.ok(results);
     }
 
+    public List<Item> getItemsPorClasificacion(String clasificacion) {
+        List<Item> allItems = itemRepository.findAll();
+        return allItems.stream()
+                .filter(item -> item.getClasificacion() != null &&
+                        item.getClasificacion().getClass().getSimpleName().equals(clasificacion))
+                .collect(Collectors.toList());
+    }
+
 }
