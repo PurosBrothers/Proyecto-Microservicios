@@ -5,6 +5,7 @@ import com.microservicios.user_ms.entity.Usuario;
 import com.microservicios.user_ms.mapper.UsuarioMapper;
 import com.microservicios.user_ms.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -15,10 +16,12 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final UsuarioMapper usuarioMapper;
+    private final KeycloakService keycloakService;
 
     @Transactional
     public UsuarioDTO createUsuario(UsuarioDTO usuarioDTO) {
@@ -38,12 +41,18 @@ public class UsuarioService {
         Optional<Usuario> existingUsuario = usuarioRepository.findById(id);
         if (existingUsuario.isPresent()) {
             Usuario usuario = existingUsuario.get();
+            
+            // Guardar valores anteriores para Keycloak
+            String oldEmail = usuario.getCorreo();
+            String oldName = usuario.getNombre();
+            
             // Update fields
             usuario.setNombre(usuarioDTO.getNombre());
             usuario.setEdad(usuarioDTO.getEdad());
             usuario.setFotoUrl(usuarioDTO.getFotoUrl());
             usuario.setDescripcion(usuarioDTO.getDescripcion());
             usuario.setCorreo(usuarioDTO.getCorreo());
+            
             // Handle specific fields based on type
             if (usuario instanceof com.microservicios.user_ms.entity.Cliente) {
                 com.microservicios.user_ms.entity.Cliente cliente = (com.microservicios.user_ms.entity.Cliente) usuario;
@@ -56,7 +65,30 @@ public class UsuarioService {
                 proveedor.setRedesSociales(usuarioDTO.getRedesSociales());
                 proveedor.setCalificacionPromedio(usuarioDTO.getCalificacionPromedio());
             }
+            
+            // Actualizar en base de datos primero
             Usuario savedUsuario = usuarioRepository.save(usuario);
+            
+            // Sincronizar con Keycloak si cambió el email o nombre
+            if (!oldEmail.equals(usuarioDTO.getCorreo()) || !oldName.equals(usuarioDTO.getNombre())) {
+                String[] nameParts = usuarioDTO.getNombre().split(" ", 2);
+                String firstName = nameParts[0];
+                String lastName = nameParts.length > 1 ? nameParts[1] : "";
+                
+                boolean keycloakUpdated = keycloakService.updateKeycloakUser(
+                    id, 
+                    usuarioDTO.getCorreo(), 
+                    firstName, 
+                    lastName
+                );
+                
+                if (!keycloakUpdated) {
+                    log.warn("⚠️ Usuario actualizado en BD pero no se pudo sincronizar con Keycloak: {}", id);
+                } else {
+                    log.info("✅ Usuario actualizado en BD y Keycloak: {}", usuarioDTO.getCorreo());
+                }
+            }
+            
             return usuarioMapper.toDTO(savedUsuario);
         }
         return null;
@@ -67,7 +99,20 @@ public class UsuarioService {
         Optional<Usuario> usuario = usuarioRepository.findById(id);
         if (usuario.isPresent()) {
             UsuarioDTO dto = usuarioMapper.toDTO(usuario.get());
+            
+            // Eliminar de base de datos primero
             usuarioRepository.deleteById(id);
+            log.info("✅ Usuario eliminado de BD: {}", dto.getCorreo());
+            
+            // Sincronizar eliminación con Keycloak
+            boolean keycloakDeleted = keycloakService.deleteKeyCloakUser(id);
+            
+            if (!keycloakDeleted) {
+                log.warn("⚠️ Usuario eliminado de BD pero no se pudo eliminar de Keycloak: {}", id);
+            } else {
+                log.info("✅ Usuario eliminado de BD y Keycloak: {}", dto.getCorreo());
+            }
+            
             return dto;
         }
         return null;

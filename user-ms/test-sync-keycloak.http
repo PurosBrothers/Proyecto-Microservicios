@@ -1,0 +1,79 @@
+### PRUEBAS DE SINCRONIZACIÓN KEYCLOAK-USER-MS
+
+@userms_url = http://localhost:8083
+@gateway_url = http://localhost:8080
+
+### 1. Información del sistema
+GET {{userms_url}}/users/info
+
+### 2. Listar todos los usuarios actuales
+GET {{userms_url}}/users
+
+### 3. ✅ REGISTRO COMPLETO - Cliente (para tener datos de prueba)
+POST {{userms_url}}/users
+Content-Type: application/json
+
+{
+    "nombre": "Test Usuario Sincronizacion",
+    "correo": "test.sync@gmail.com",
+    "password": "password123",
+    "tipoUsuario": "CLIENTE",
+    "edad": 30,
+    "descripcion": "Usuario para probar sincronización",
+    "telefono": "+573001234567",
+    "direccion": "Calle Test 123, Bogota"
+}
+
+### 4. 🔄 ACTUALIZAR USUARIO - Cambiar email y nombre (debe sincronizar con Keycloak)
+PUT {{userms_url}}/users/[ID_DEL_USUARIO_CREADO]
+Content-Type: application/json
+Authorization: Bearer [TOKEN_JWT]
+
+{
+    "nombre": "Test Usuario Actualizado",
+    "correo": "test.sync.actualizado@gmail.com",
+    "edad": 31,
+    "descripcion": "Usuario actualizado para probar sincronización",
+    "telefono": "+573001234567",
+    "direccion": "Calle Test 456, Medellin"
+}
+
+### 5. ✅ Verificar usuario actualizado en BD
+GET {{userms_url}}/users/[ID_DEL_USUARIO_CREADO]
+
+### 6. 🔐 Obtener token JWT para el usuario actualizado (verificar Keycloak)
+POST http://localhost:8081/realms/proyect-ms-realm/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password&client_id=user-ms-client&client_secret=Aq3vK9EfTGwoWpK3j48RkN6Q0yCUZqGd&username=test.sync.actualizado@gmail.com&password=password123
+
+### 7. 🗑️ ELIMINAR USUARIO - Debe eliminar de BD y Keycloak
+DELETE {{userms_url}}/users/[ID_DEL_USUARIO_CREADO]
+Authorization: Bearer [TOKEN_JWT]
+
+### 8. ❌ Intentar obtener token del usuario eliminado (debe fallar)
+POST http://localhost:8081/realms/proyect-ms-realm/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password&client_id=user-ms-client&client_secret=Aq3vK9EfTGwoWpK3j48RkN6Q0yCUZqGd&username=test.sync.actualizado@gmail.com&password=password123
+
+### 9. ❌ Verificar que el usuario no existe en BD
+GET {{userms_url}}/users/[ID_DEL_USUARIO_CREADO]
+
+### 10. 📊 Estado final - Listar usuarios
+GET {{userms_url}}/users
+
+### NOTAS DE PRUEBA:
+# 1. Reemplaza [ID_DEL_USUARIO_CREADO] con el ID que devuelve la prueba #3
+# 2. Reemplaza [TOKEN_JWT] con el token que devuelve la prueba #6
+# 3. La prueba #4 debe actualizar tanto BD como Keycloak (check logs)
+# 4. La prueba #6 debe funcionar con el email actualizado
+# 5. La prueba #7 debe eliminar de BD y Keycloak (check logs)
+# 6. La prueba #8 debe fallar (401 Unauthorized)
+# 7. La prueba #9 debe devolver 404 Not Found
+
+### VERIFICACIÓN EN KEYCLOAK ADMIN CONSOLE:
+# - Ve a http://localhost:8081/admin
+# - Login: admin / admin123
+# - Navega a: proyect-ms-realm → Users
+# - Verifica que el usuario se actualiza y elimina correctamente
