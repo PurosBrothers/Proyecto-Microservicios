@@ -1,7 +1,12 @@
 @host=http://localhost:8082
 
 ###
-GET {{host}}/carrito-compra/list-items-carrito/2a36ca84-0166-46b2-80b4-0838987388bf
+GET {{host}}/carrito-compra/list-items-carrito
+Content-Type: application/json
+
+{
+  "uid": "2a36ca84-0166-46b2-80b4-0838987388bf"
+}
 
 
 

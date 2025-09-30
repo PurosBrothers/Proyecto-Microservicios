@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.microservicios.transaction_ms.dtos.ItemCarritoDTO;
+import com.microservicios.transaction_ms.dtos.UidRequestDTO;
 import com.microservicios.transaction_ms.mappers.CarritoCompraMapper;
 import com.microservicios.transaction_ms.mappers.ItemCarritoMapper;
 import com.microservicios.transaction_ms.services.CarritoCompraService;
@@ -25,8 +26,9 @@ public class CarritoCompraController {
     @Autowired
     private CarritoCompraService carritoCompraService;
 
-    @GetMapping("/list-items-carrito/{uid}")
-    public ResponseEntity<?> getAllItems(@PathVariable("uid") String uid) {
+    @GetMapping("/list-items-carrito")
+    public ResponseEntity<?> getAllItems(@RequestBody UidRequestDTO request) {
+        String uid = request.getUid();
         List<ItemCarritoDTO> items = carritoCompraService.getCarritoItems(uid).stream()
                 .map(ItemCarritoMapper::toDTO)
                 .toList();

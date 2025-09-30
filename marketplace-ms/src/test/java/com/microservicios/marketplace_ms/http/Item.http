@@ -159,7 +159,7 @@ POST {{baseUrl}}/items/4755/add-to-cart
 Content-Type: application/json
 
 {
-  "uid": "1",
+  "uid": "2a36ca84-0166-46b2-80b4-0838987388bf",
   "cantidad": 2
 }
 
