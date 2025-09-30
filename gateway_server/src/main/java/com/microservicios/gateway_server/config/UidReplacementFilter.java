@@ -42,6 +42,10 @@ public class UidReplacementFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        ServerHttpRequest request = exchange.getRequest();
+        String path = request.getPath().value();
+        log.info("Gateway Filter: Procesando petición a: {}", path);
+
         return ReactiveSecurityContextHolder.getContext()
                 .map(securityContext -> securityContext.getAuthentication())
                 .filter(authentication -> authentication != null && authentication.isAuthenticated())
@@ -49,19 +53,17 @@ public class UidReplacementFilter implements GlobalFilter, Ordered {
                 .map(authentication -> (Jwt) authentication.getPrincipal())
                 .flatMap(jwt -> {
                     String uid = jwt.getSubject(); // El subject contiene el UID del usuario
+                    log.info("Gateway Filter: UID del usuario: {}", uid);
 
                     if (uid != null && !uid.isEmpty()) {
-                        ServerHttpRequest request = exchange.getRequest();
-                        String originalPath = request.getPath().value();
-
                         // Verificar si la path contiene "/uid"
                         boolean pathModified = false;
                         ServerHttpRequest modifiedRequest = request;
 
-                        if (originalPath.contains("/uid")) {
+                        if (path.contains("/uid")) {
                             // Reemplazar "/uid" con el UID real
-                            String newPath = originalPath.replace("/uid", "/" + uid);
-                            log.info("🔄 Reemplazando UID en ruta: {} -> {}", originalPath, newPath);
+                            String newPath = path.replace("/uid", "/" + uid);
+                            log.info("🔄 Reemplazando UID en ruta: {} -> {}", path, newPath);
 
                             modifiedRequest = request.mutate().path(newPath).build();
                             pathModified = true;
@@ -69,6 +71,7 @@ public class UidReplacementFilter implements GlobalFilter, Ordered {
 
                         // Verificar si el body contiene "uid" (solo para JSON)
                         String contentType = request.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
+                        log.info("Gateway Filter: Content-Type: {}", contentType);
                         if (contentType != null && contentType.contains(MediaType.APPLICATION_JSON_VALUE)) {
                             return modifyRequestBody(exchange, modifiedRequest, uid, pathModified, chain);
                         } else {
@@ -85,14 +88,14 @@ public class UidReplacementFilter implements GlobalFilter, Ordered {
                 })
                 .switchIfEmpty(chain.filter(exchange)) // Si no hay autenticación JWT, continuar sin modificar
                 .onErrorResume(error -> {
-                    log.warn("❌ Error en filtro de reemplazo UID, continuando sin modificación: {}",
-                            error.getMessage());
+                    log.error("❌ Error en filtro de reemplazo UID: {}", error.getMessage(), error);
                     return chain.filter(exchange);
                 });
     }
 
     private Mono<Void> modifyRequestBody(ServerWebExchange exchange, ServerHttpRequest request,
             String uid, boolean pathModified, GatewayFilterChain chain) {
+        log.info("Gateway Filter: Modificando body para UID: {}", uid);
         return DataBufferUtils.join(request.getBody())
                 .flatMap(dataBuffer -> {
                     try {
@@ -101,49 +104,46 @@ public class UidReplacementFilter implements GlobalFilter, Ordered {
                         DataBufferUtils.release(dataBuffer);
 
                         String bodyString = new String(bytes, StandardCharsets.UTF_8);
+                        log.info("Gateway Filter: Body original: {}", bodyString);
 
+                        // Siempre recrear el body para evitar problemas de consumo
+                        byte[] bodyBytes;
                         if (StringUtils.hasText(bodyString) && bodyString.contains("\"uid\"")) {
                             // Parsear JSON y reemplazar uid
                             JsonNode jsonNode = objectMapper.readTree(bodyString);
                             String modifiedBody = replaceUidInJson(jsonNode, uid);
+                            log.info("Gateway Filter: Body modificado: {}", modifiedBody);
+                            log.info("🔄 Reemplazando UID en body JSON");
+                            bodyBytes = modifiedBody.getBytes(StandardCharsets.UTF_8);
+                        } else {
+                            // Usar body original
+                            bodyBytes = bodyString.getBytes(StandardCharsets.UTF_8);
+                        }
 
-                            if (!bodyString.equals(modifiedBody)) {
-                                log.info("🔄 Reemplazando UID en body JSON");
+                        Flux<DataBuffer> bodyFlux = Flux.just(
+                                exchange.getResponse().bufferFactory().wrap(bodyBytes));
 
-                                // Crear nuevo body
-                                byte[] modifiedBytes = modifiedBody.getBytes(StandardCharsets.UTF_8);
-                                Flux<DataBuffer> modifiedBodyFlux = Flux.just(
-                                        exchange.getResponse().bufferFactory().wrap(modifiedBytes));
-
-                                // Crear request decorator con el nuevo body
-                                ServerHttpRequestDecorator decorator = new ServerHttpRequestDecorator(request) {
-                                    @Override
-                                    public Flux<DataBuffer> getBody() {
-                                        return modifiedBodyFlux;
-                                    }
-
-                                    @Override
-                                    public HttpHeaders getHeaders() {
-                                        HttpHeaders headers = new HttpHeaders();
-                                        headers.putAll(super.getHeaders());
-                                        headers.setContentLength(modifiedBytes.length);
-                                        return headers;
-                                    }
-                                };
-
-                                ServerWebExchange modifiedExchange = exchange.mutate().request(decorator).build();
-                                return chain.filter(modifiedExchange);
+                        // Crear request decorator con el body
+                        ServerHttpRequestDecorator decorator = new ServerHttpRequestDecorator(request) {
+                            @Override
+                            public Flux<DataBuffer> getBody() {
+                                return bodyFlux;
                             }
-                        }
 
-                        // Body no modificado, pero path sí
-                        if (pathModified) {
-                            ServerWebExchange modifiedExchange = exchange.mutate().request(request).build();
-                            return chain.filter(modifiedExchange);
-                        }
+                            @Override
+                            public HttpHeaders getHeaders() {
+                                HttpHeaders headers = new HttpHeaders();
+                                headers.putAll(super.getHeaders());
+                                headers.setContentLength(bodyBytes.length);
+                                return headers;
+                            }
+                        };
+
+                        ServerWebExchange modifiedExchange = exchange.mutate().request(decorator).build();
+                        return chain.filter(modifiedExchange);
 
                     } catch (IOException e) {
-                        log.warn("❌ Error procesando body JSON: {}", e.getMessage());
+                        log.error("❌ Error procesando body JSON: {}", e.getMessage(), e);
                     }
 
                     return chain.filter(exchange);

@@ -10,6 +10,6 @@ import com.microservicios.marketplace_ms.entities.Item;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
-    @Query("SELECT i FROM Item i JOIN FETCH i.clasificacion WHERE TYPE(i.clasificacion) = :type")
+    @Query("SELECT i FROM Item i LEFT JOIN FETCH i.clasificacion WHERE TYPE(i.clasificacion) = :type")
     List<Item> findByClasificacionType(@Param("type") Class<?> type);
 }

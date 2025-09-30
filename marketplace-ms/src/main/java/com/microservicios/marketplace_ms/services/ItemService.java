@@ -97,6 +97,7 @@ public class ItemService {
     }
 
     public List<Item> getItemsPorClasificacion(String clasificacion) {
+        System.out.println("Buscando items por clasificación: " + clasificacion);
         Class<?> clasificacionClass = switch (clasificacion) {
             case "Alojamiento" -> Alojamiento.class;
             case "Alimentacion" -> Alimentacion.class;
@@ -105,9 +106,13 @@ public class ItemService {
             default -> null;
         };
         if (clasificacionClass == null) {
+            System.out.println("Clasificación no válida: " + clasificacion);
             return List.of();
         }
-        return itemRepository.findByClasificacionType(clasificacionClass);
+        System.out.println("Clase de clasificación: " + clasificacionClass.getSimpleName());
+        List<Item> items = itemRepository.findByClasificacionType(clasificacionClass);
+        System.out.println("Encontrados " + items.size() + " items");
+        return items;
     }
 
     public void updateItemStock(Long itemId, Integer cantidadVendida, String tipoCambio) {

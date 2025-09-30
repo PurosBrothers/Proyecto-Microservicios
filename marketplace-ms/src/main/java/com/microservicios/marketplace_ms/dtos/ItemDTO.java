@@ -6,12 +6,21 @@ import java.time.LocalDateTime;
 
 import com.microservicios.marketplace_ms.entities.Clasificacion;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class ItemDTO {
     private Long id;
+    @NotNull(message = "La clasificación es obligatoria")
     private Clasificacion clasificacion;
+    @NotBlank(message = "El título es obligatorio")
     private String titulo;
+    @NotBlank(message = "La descripción es obligatoria")
     private String descripcion;
     private LocalDate fechaPublicacion;
+    @NotNull(message = "El stock es obligatorio")
+    @Min(value = 0, message = "El stock no puede ser negativo")
     private Integer stock;
     private Integer visualizaciones;
     private Long calificacionPromedio;

@@ -2,10 +2,20 @@ package com.microservicios.marketplace_ms.dtos;
 
 import java.math.BigDecimal;
 
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class AddToCartMessageDTO {
+    @NotBlank(message = "El UID es obligatorio")
     private String uid;
+    @NotNull(message = "El ID del item es obligatorio")
     private Long idItem;
+    @Min(value = 1, message = "La cantidad debe ser al menos 1")
     private int cantidad;
+    @NotNull(message = "El precio unitario es obligatorio")
+    @DecimalMin(value = "0.0", inclusive = false, message = "El precio unitario debe ser mayor a 0")
     private BigDecimal precioUnitario;
     private String tipoClasificacion; // opcional
     private String nombreItem;
