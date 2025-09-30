@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.microservicios.transaction_ms.dtos.ProcessPaymentRequestDTO;
 import com.microservicios.transaction_ms.dtos.TransaccionDTO;
 import com.microservicios.transaction_ms.mappers.TransaccionMapper;
 import com.microservicios.transaction_ms.models.Transaccion;
@@ -43,8 +44,10 @@ public class TransaccionController {
         }
     }
 
-    @PostMapping("/process-payment/{uid}")
-    public ResponseEntity<?> processPayment(@PathVariable String uid, @RequestBody List<Long> itemIds) {
+    @PostMapping("/process-payment")
+    public ResponseEntity<?> processPayment(@RequestBody ProcessPaymentRequestDTO request) {
+        String uid = request.getUid();
+        List<Long> itemIds = request.getItemIds();
         // Crear transacción desde carrito
         Transaccion transaccion = transaccionService.createTransactionFromCarrito(uid, itemIds);
         if (transaccion == null) {
