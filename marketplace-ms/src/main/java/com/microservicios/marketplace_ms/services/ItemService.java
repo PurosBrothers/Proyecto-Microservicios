@@ -97,11 +97,17 @@ public class ItemService {
     }
 
     public List<Item> getItemsPorClasificacion(String clasificacion) {
-        List<Item> allItems = itemRepository.findAll();
-        return allItems.stream()
-                .filter(item -> item.getClasificacion() != null &&
-                        item.getClasificacion().getClass().getSimpleName().equals(clasificacion))
-                .collect(Collectors.toList());
+        Class<?> clasificacionClass = switch (clasificacion) {
+            case "Alojamiento" -> Alojamiento.class;
+            case "Alimentacion" -> Alimentacion.class;
+            case "PaseosEcologicos" -> PaseosEcologicos.class;
+            case "Transporte" -> Transporte.class;
+            default -> null;
+        };
+        if (clasificacionClass == null) {
+            return List.of();
+        }
+        return itemRepository.findByClasificacionType(clasificacionClass);
     }
 
     public void updateItemStock(Long itemId, Integer cantidadVendida, String tipoCambio) {

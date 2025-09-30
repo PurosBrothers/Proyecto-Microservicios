@@ -201,3 +201,11 @@ Content-Type: application/json
 {
   "query": "query { itemsPorClasificacion(clasificacion: \"PaseosEcologicos\") { id titulo descripcion clasificacion { tipo } } }"
 }
+
+### GraphQL: Get items by Alojamiento with additional fields
+POST {{baseUrl}}/graphql
+Content-Type: application/json
+
+{
+  "query": "query { itemsPorClasificacion(clasificacion: \"Alojamiento\") { id titulo descripcion lugarInicio precio calificacionPromedio visualizaciones capacidadMaxima clasificacion { tipo lugarInicio precio capacidadMaxima } } }"
+}
