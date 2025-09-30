@@ -170,6 +170,9 @@ GET {{baseUrl}}/items/search?query=hotel en
 ### Get all items
 GET {{baseUrl}}/items
 
+### Get item by ID
+GET {{baseUrl}}/items/1
+
 ### GraphQL: Get items by Alojamiento classification
 POST {{baseUrl}}/graphql
 Content-Type: application/json
