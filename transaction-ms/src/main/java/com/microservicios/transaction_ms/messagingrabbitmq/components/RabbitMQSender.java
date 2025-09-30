@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microservicios.transaction_ms.dtos.ProcessPaymentMessageDTO;
+import com.microservicios.transaction_ms.dtos.UpdateItemMessageDTO;
 
 @Service
 public class RabbitMQSender {
@@ -23,6 +24,17 @@ public class RabbitMQSender {
             System.out.println("Mensaje enviado a process-payment: " + message);
         } catch (Exception e) {
             System.out.println("Error enviando mensaje a process-payment: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void sendUpdateItemMessage(UpdateItemMessageDTO messageDTO) {
+        try {
+            String message = objectMapper.writeValueAsString(messageDTO);
+            rabbitTemplate.convertAndSend(RabbitMQConfig.TOPIC_EXCHANGE_NAME, "marketplace.update-item", message);
+            System.out.println("Mensaje enviado a update-item: " + message);
+        } catch (Exception e) {
+            System.out.println("Error enviando mensaje a update-item: " + e.getMessage());
             e.printStackTrace();
         }
     }
