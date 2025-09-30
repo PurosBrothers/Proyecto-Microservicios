@@ -41,6 +41,18 @@ public class AuthController {
             }
 
             log.info("📝 Registrando nuevo usuario: {} como {}", dto.getCorreo(), dto.getTipoUsuario());
+            
+            // DEBUG: Logging de datos recibidos del frontend
+            log.info("🔍 DEBUG - Datos recibidos del frontend:");
+            log.info("   - Nombre: '{}'", dto.getNombre());
+            log.info("   - Apellido: '{}'", dto.getApellido());
+            log.info("   - Correo: '{}'", dto.getCorreo());
+            log.info("   - Tipo Usuario: '{}'", dto.getTipoUsuario());
+            if ("PROVEEDOR".equals(dto.getTipoUsuario().name())) {
+                log.info("   - Página Web: '{}'", dto.getPaginaWeb());
+                log.info("   - Redes Sociales: {}", dto.getRedesSociales());
+                log.info("   - Redes Sociales (tipo): {}", dto.getRedesSociales() != null ? dto.getRedesSociales().getClass().getSimpleName() : "null");
+            }
 
             // 2. Verificar si el correo ya existe en Keycloak
             if (keycloakService.userExistsInKeycloak(dto.getCorreo())) {
@@ -50,14 +62,10 @@ public class AuthController {
             }
 
             // 3. Crear usuario en Keycloak con rol específico
-            String[] nombres = dto.getNombre().split(" ", 2);
-            String firstName = nombres[0];
-            String lastName = nombres.length > 1 ? nombres[1] : "";
-
             String keycloakUserId = keycloakService.createKeycloakUserWithRole(
                 dto.getCorreo(),
-                firstName,
-                lastName,
+                dto.getNombre(),
+                dto.getApellido(),
                 dto.getPassword(),
                 dto.getTipoUsuario()
             );

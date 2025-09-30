@@ -26,7 +26,6 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "*")
 public class ImageController {
 
     private final UsuarioRepository usuarioRepository;
@@ -39,28 +38,44 @@ public class ImageController {
             @PathVariable String userId,
             @RequestParam("file") MultipartFile file) {
         
+        log.info("🔄 Iniciando subida de imagen para usuario: {}", userId);
+        log.info("📁 Archivo recibido: nombre={}, tamaño={}, tipo={}", 
+                file.getOriginalFilename(), file.getSize(), file.getContentType());
+        
         try {
             // Validar que es una imagen
             if (!isImageFile(file)) {
+                log.warn("❌ Archivo rechazado: no es una imagen válida. Tipo: {}", file.getContentType());
                 return ResponseEntity.badRequest()
                     .body(Map.of("error", "El archivo debe ser una imagen (JPG, PNG, GIF, WEBP)"));
             }
 
             // Buscar usuario
+            log.info("🔍 Buscando usuario con ID: {}", userId);
             Optional<Usuario> usuarioOpt = usuarioRepository.findById(userId);
             if (usuarioOpt.isEmpty()) {
+                log.warn("❌ Usuario no encontrado con ID: {}", userId);
                 return ResponseEntity.notFound().build();
             }
 
             Usuario usuario = usuarioOpt.get();
+            log.info("✅ Usuario encontrado: {}", usuario.getCorreo());
 
             // Guardar datos de la imagen
+            log.info("💾 Guardando datos de imagen en base de datos...");
             usuario.setFotoData(file.getBytes());
             usuario.setFotoTipo(file.getContentType());
             usuario.setFotoNombre(file.getOriginalFilename());
             usuario.setFotoUrl("http://localhost:8083/images/" + userId); // URL para acceder a la imagen
 
-            usuarioRepository.save(usuario);
+            log.info("💾 Datos de imagen establecidos:");
+            log.info("  - Tamaño de datos: {} bytes", usuario.getFotoData().length);
+            log.info("  - Tipo: {}", usuario.getFotoTipo());
+            log.info("  - Nombre: {}", usuario.getFotoNombre());
+            log.info("  - URL: {}", usuario.getFotoUrl());
+
+            Usuario usuarioGuardado = usuarioRepository.save(usuario);
+            log.info("✅ Usuario guardado con imagen. ID: {}", usuarioGuardado.getId());
 
             Map<String, String> response = new HashMap<>();
             response.put("message", "Imagen subida correctamente");
@@ -69,13 +84,17 @@ public class ImageController {
             response.put("size", String.valueOf(file.getSize()));
             response.put("contentType", file.getContentType());
 
-            log.info("Imagen subida para usuario {}: {} bytes", userId, file.getSize());
+            log.info("✅ Imagen subida exitosamente para usuario {}: {} bytes", userId, file.getSize());
             return ResponseEntity.ok(response);
 
         } catch (IOException e) {
-            log.error("Error al subir imagen para usuario {}: {}", userId, e.getMessage());
+            log.error("❌ Error de IO al subir imagen para usuario {}: {}", userId, e.getMessage(), e);
             return ResponseEntity.internalServerError()
                 .body(Map.of("error", "Error al procesar la imagen: " + e.getMessage()));
+        } catch (Exception e) {
+            log.error("❌ Error inesperado al subir imagen para usuario {}: {}", userId, e.getMessage(), e);
+            return ResponseEntity.internalServerError()
+                .body(Map.of("error", "Error inesperado: " + e.getMessage()));
         }
     }
 

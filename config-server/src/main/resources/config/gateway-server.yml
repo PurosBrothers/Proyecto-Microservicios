@@ -4,10 +4,34 @@ server:
 spring:
   application:
     name: gateway-server
+  
+  # Configuración para manejar archivos multipart
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+      
+  # Configuración de buffers para el gateway
+  webflux:
+    multipart:
+      max-in-memory-size: 1MB
+      max-disk-usage-per-part: 10MB
+      max-parts: 128
+      
   cloud:
     config:
       enabled: true
     gateway:
+      
+      # Configuración de buffers para el gateway
+      httpclient:
+        max-initial-line-length: 4096
+        max-header-size: 8192
+        max-chunk-size: 8192
+        pool:
+          max-connections: 500
+          max-idle-time: 30s
       
       # Configuración global de CORS
       globalcors:
@@ -48,7 +72,7 @@ keycloak:
 
 # Configuración de user-ms para comunicación interna
 user-ms:
-  url: http://user-ms:8083
+  url: http://localhost:8083
 
 # Configuración OAuth2 para JWT
 security:

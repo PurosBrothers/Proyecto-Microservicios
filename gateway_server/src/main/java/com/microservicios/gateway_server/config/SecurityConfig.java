@@ -57,6 +57,10 @@ public class SecurityConfig {
                 // Endpoints públicos de autenticación
                 .pathMatchers("/auth/**").permitAll()
                 .pathMatchers("/actuator/**").permitAll()
+                
+                // Endpoints públicos para subida de imágenes (temporalmente)
+                .pathMatchers("/user-ms/users/*/image").permitAll()
+                .pathMatchers("/user-ms/images/*").permitAll()
 
                 // Todas las demás rutas requieren autenticación JWT
                 .anyExchange().authenticated()

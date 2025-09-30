@@ -11,7 +11,6 @@ import lombok.Setter;
 @Setter
 public class Cliente extends Usuario {
 
-    private String direccion;
-
-    private String telefono;
+    // Los campos telefono y direccion ya están definidos en la clase padre Usuario
+    // No necesitamos redefinirlos aquí
 }

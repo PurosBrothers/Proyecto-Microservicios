@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import jakarta.validation.constraints.*;
+import java.util.List;
 
 /**
  * DTO para el registro de usuarios con asignación de roles
@@ -19,6 +20,10 @@ public class RegistroUsuarioDto {
     @NotBlank(message = "El nombre es obligatorio")
     @Size(min = 2, max = 100, message = "El nombre debe tener entre 2 y 100 caracteres")
     private String nombre;
+
+    @NotBlank(message = "El apellido es obligatorio")
+    @Size(min = 2, max = 100, message = "El apellido debe tener entre 2 y 100 caracteres")
+    private String apellido;
 
     @NotBlank(message = "El correo es obligatorio")
     @Email(message = "El correo debe tener un formato válido")
@@ -44,4 +49,16 @@ public class RegistroUsuarioDto {
 
     @Size(max = 255, message = "La dirección no puede exceder 255 caracteres")
     private String direccion;
+
+    // Campos específicos para PROVEEDOR
+    @Size(max = 255, message = "La página web no puede exceder 255 caracteres")
+    private String paginaWeb;
+
+    // Lista de redes sociales (será convertida desde array del frontend)
+    private java.util.List<String> redesSociales;
+
+    // Calificación promedio (opcional, usualmente se calcula automáticamente)
+    @DecimalMin(value = "0.0", message = "La calificación mínima es 0.0")
+    @DecimalMax(value = "5.0", message = "La calificación máxima es 5.0")
+    private Float calificacionPromedio;
 }

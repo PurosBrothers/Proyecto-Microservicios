@@ -4,8 +4,8 @@ package com.microservicios.gateway_server.enums;
  * Enum que representa los tipos de usuario en el sistema
  */
 public enum TipoUsuario {
-    CLIENTE("Cliente", "Usuario que consume servicios"),
-    PROVEEDOR("Proveedor", "Usuario que ofrece servicios");
+    CLIENTE("CLIENTE", "Usuario que consume servicios"),
+    PROVEEDOR("PROVEEDOR", "Usuario que ofrece servicios");
 
     private final String nombre;
     private final String descripcion;

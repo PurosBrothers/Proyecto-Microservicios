@@ -18,6 +18,9 @@ public class UsuarioDTO {
     @NotBlank
     private String nombre;
 
+    @NotBlank
+    private String apellido;
+
     @NotNull
     private Integer edad;
 

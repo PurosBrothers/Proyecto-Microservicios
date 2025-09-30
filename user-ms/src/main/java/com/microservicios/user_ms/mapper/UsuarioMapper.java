@@ -17,6 +17,7 @@ public class UsuarioMapper {
         UsuarioDTO usuarioDTO = new UsuarioDTO();
         usuarioDTO.setId(usuario.getId());
         usuarioDTO.setNombre(usuario.getNombre());
+        usuarioDTO.setApellido(usuario.getApellido());
         usuarioDTO.setEdad(usuario.getEdad());
         
         // Manejo de imagen - generar URL si no existe pero hay datos de imagen
@@ -57,6 +58,7 @@ public class UsuarioMapper {
         if (usuarioDTO.getDireccion() != null || usuarioDTO.getTelefono() != null) {
             Cliente cliente = new Cliente();
             cliente.setNombre(usuarioDTO.getNombre());
+            cliente.setApellido(usuarioDTO.getApellido());
             cliente.setEdad(usuarioDTO.getEdad());
             cliente.setFotoUrl(usuarioDTO.getFotoUrl());
             cliente.setDescripcion(usuarioDTO.getDescripcion());
@@ -67,6 +69,7 @@ public class UsuarioMapper {
         } else if (usuarioDTO.getPaginaWeb() != null || usuarioDTO.getRedesSociales() != null || usuarioDTO.getCalificacionPromedio() != null) {
             Proveedor proveedor = new Proveedor();
             proveedor.setNombre(usuarioDTO.getNombre());
+            proveedor.setApellido(usuarioDTO.getApellido());
             proveedor.setEdad(usuarioDTO.getEdad());
             proveedor.setFotoUrl(usuarioDTO.getFotoUrl());
             proveedor.setDescripcion(usuarioDTO.getDescripcion());
@@ -80,6 +83,7 @@ public class UsuarioMapper {
             // Default to Cliente if no specific fields
             Cliente cliente = new Cliente();
             cliente.setNombre(usuarioDTO.getNombre());
+            cliente.setApellido(usuarioDTO.getApellido());
             cliente.setEdad(usuarioDTO.getEdad());
             cliente.setFotoUrl(usuarioDTO.getFotoUrl());
             cliente.setDescripcion(usuarioDTO.getDescripcion());

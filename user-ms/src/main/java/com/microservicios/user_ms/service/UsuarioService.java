@@ -45,9 +45,11 @@ public class UsuarioService {
             // Guardar valores anteriores para Keycloak
             String oldEmail = usuario.getCorreo();
             String oldName = usuario.getNombre();
+            String oldLastName = usuario.getApellido();
             
             // Update fields
             usuario.setNombre(usuarioDTO.getNombre());
+            usuario.setApellido(usuarioDTO.getApellido());
             usuario.setEdad(usuarioDTO.getEdad());
             usuario.setFotoUrl(usuarioDTO.getFotoUrl());
             usuario.setDescripcion(usuarioDTO.getDescripcion());
@@ -69,17 +71,16 @@ public class UsuarioService {
             // Actualizar en base de datos primero
             Usuario savedUsuario = usuarioRepository.save(usuario);
             
-            // Sincronizar con Keycloak si cambió el email o nombre
-            if (!oldEmail.equals(usuarioDTO.getCorreo()) || !oldName.equals(usuarioDTO.getNombre())) {
-                String[] nameParts = usuarioDTO.getNombre().split(" ", 2);
-                String firstName = nameParts[0];
-                String lastName = nameParts.length > 1 ? nameParts[1] : "";
+            // Sincronizar con Keycloak si cambió el email, nombre o apellido
+            if (!oldEmail.equals(usuarioDTO.getCorreo()) || 
+                !oldName.equals(usuarioDTO.getNombre()) || 
+                !oldLastName.equals(usuarioDTO.getApellido())) {
                 
                 boolean keycloakUpdated = keycloakService.updateKeycloakUser(
                     id, 
-                    usuarioDTO.getCorreo(), 
-                    firstName, 
-                    lastName
+                    usuarioDTO.getCorreo(),
+                    usuarioDTO.getNombre(),
+                    usuarioDTO.getApellido()
                 );
                 
                 if (!keycloakUpdated) {

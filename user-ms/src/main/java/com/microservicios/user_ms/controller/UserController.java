@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -107,10 +108,11 @@ public class UserController {
      * Elimina el usuario tanto de BD como de Keycloak
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('SCOPE_profile') or hasAuthority('SCOPE_email')")
+    @PreAuthorize("isAuthenticated()") // Temporal: Solo requiere estar autenticado
     public ResponseEntity<?> deleteUser(@PathVariable String id) {
         try {
-            log.info("🗑️ Eliminando usuario ID: {}", id);
+            log.info("🗑️ INICIO - Eliminando usuario ID: {}", id);
+            log.info("🔍 Authentication context: {}", SecurityContextHolder.getContext().getAuthentication());
             
             UsuarioDTO deleted = usuarioService.deleteUsuario(id);
             if (deleted != null) {
@@ -151,6 +153,23 @@ public class UserController {
 
         try {
             log.info("📡 Creando usuario interno desde gateway: {}", request.getCorreo());
+            log.info("🔍 DEBUG - Datos recibidos del gateway:");
+            log.info("   - Nombre: '{}'", request.getNombre());
+            log.info("   - Apellido: '{}'", request.getApellido());
+            log.info("   - Correo: '{}'", request.getCorreo());
+            log.info("   - Edad: {}", request.getEdad());
+            log.info("   - Descripción: '{}'", request.getDescripcion());
+            log.info("   - Teléfono: '{}'", request.getTelefono());
+            log.info("   - Dirección: '{}'", request.getDireccion());
+            log.info("   - Tipo Usuario: '{}'", request.getTipoUsuario());
+            log.info("   - Keycloak ID: '{}'", request.getKeycloakUserId());
+            
+            // DEBUG: Campos específicos de proveedor
+            if ("PROVEEDOR".equals(request.getTipoUsuario())) {
+                log.info("   - Página Web: '{}'", request.getPaginaWeb());
+                log.info("   - Redes Sociales: {}", request.getRedesSociales());
+                log.info("   - Calificación Promedio: {}", request.getCalificacionPromedio());
+            }
 
             // Verificar que el usuario no exista ya
             if (usuarioRepository.findByCorreo(request.getCorreo()).isPresent()) {
@@ -160,6 +179,18 @@ public class UserController {
 
             // Crear usuario según tipo
             com.microservicios.user_ms.entity.Usuario usuario = crearUsuarioDesdeRequest(request);
+
+            // DEBUG: Ver qué valores tiene la entidad antes de guardar
+            log.info("🔍 DEBUG - Valores en la entidad antes de guardar:");
+            log.info("   - Usuario ID: '{}'", usuario.getId());
+            log.info("   - Nombre: '{}'", usuario.getNombre());
+            log.info("   - Apellido: '{}'", usuario.getApellido());
+            log.info("   - Tipo entidad: {}", usuario.getClass().getSimpleName());
+            if (usuario instanceof Cliente) {
+                Cliente cliente = (Cliente) usuario;
+                log.info("   - Cliente Teléfono: '{}'", cliente.getTelefono());
+                log.info("   - Cliente Dirección: '{}'", cliente.getDireccion());
+            }
 
             // Guardar en base de datos
             usuarioRepository.save(usuario);
@@ -189,27 +220,50 @@ public class UserController {
         switch (tipoUsuario) {
             case CLIENTE:
                 Cliente cliente = new Cliente();
+                // Configurar campos comunes
+                cliente.setId(request.getKeycloakUserId());
+                cliente.setNombre(request.getNombre());
+                cliente.setApellido(request.getApellido());
+                cliente.setCorreo(request.getCorreo());
+                cliente.setEdad(request.getEdad());
+                cliente.setDescripcion(request.getDescripcion());
+                cliente.setTipoUsuario(tipoUsuario);
+                // Configurar campos específicos de Cliente
+                cliente.setTelefono(request.getTelefono());
+                cliente.setDireccion(request.getDireccion());
                 usuario = cliente;
                 break;
 
             case PROVEEDOR:
                 Proveedor proveedor = new Proveedor();
+                // Configurar campos comunes
+                proveedor.setId(request.getKeycloakUserId());
+                proveedor.setNombre(request.getNombre());
+                proveedor.setApellido(request.getApellido());
+                proveedor.setCorreo(request.getCorreo());
+                proveedor.setEdad(request.getEdad());
+                proveedor.setDescripcion(request.getDescripcion());
+                proveedor.setTipoUsuario(tipoUsuario);
+                proveedor.setTelefono(request.getTelefono());
+                proveedor.setDireccion(request.getDireccion()); // Dirección del negocio
+                
+                // Configurar campos específicos de Proveedor
+                proveedor.setPaginaWeb(request.getPaginaWeb());
+                proveedor.setRedesSociales(request.getRedesSociales());
+                proveedor.setCalificacionPromedio(request.getCalificacionPromedio());
+                
+                // DEBUG: Verificar valores establecidos en proveedor
+                log.info("🔍 DEBUG - Campos de proveedor establecidos:");
+                log.info("   - Página Web: '{}'", proveedor.getPaginaWeb());
+                log.info("   - Redes Sociales: {}", proveedor.getRedesSociales());
+                log.info("   - Calificación: {}", proveedor.getCalificacionPromedio());
+                
                 usuario = proveedor;
                 break;
 
             default:
                 throw new IllegalArgumentException("Tipo de usuario no válido: " + request.getTipoUsuario());
         }
-
-        // Configurar campos
-        usuario.setId(request.getKeycloakUserId());
-        usuario.setNombre(request.getNombre());
-        usuario.setCorreo(request.getCorreo());
-        usuario.setEdad(request.getEdad());
-        usuario.setDescripcion(request.getDescripcion());
-        usuario.setTelefono(request.getTelefono());
-        usuario.setDireccion(request.getDireccion());
-        usuario.setTipoUsuario(tipoUsuario);
 
         return usuario;
     }
@@ -220,12 +274,18 @@ public class UserController {
     public static class InternalUserCreationRequest {
         private String keycloakUserId;
         private String nombre;
+        private String apellido;
         private String correo;
         private Integer edad;
         private String descripcion;
         private String telefono;
         private String direccion;
         private String tipoUsuario;
+        
+        // Campos específicos para PROVEEDOR
+        private String paginaWeb;
+        private java.util.List<String> redesSociales;
+        private Float calificacionPromedio;
 
         // Getters y setters
         public String getKeycloakUserId() { return keycloakUserId; }
@@ -233,6 +293,9 @@ public class UserController {
 
         public String getNombre() { return nombre; }
         public void setNombre(String nombre) { this.nombre = nombre; }
+
+        public String getApellido() { return apellido; }
+        public void setApellido(String apellido) { this.apellido = apellido; }
 
         public String getCorreo() { return correo; }
         public void setCorreo(String correo) { this.correo = correo; }
@@ -251,6 +314,15 @@ public class UserController {
 
         public String getTipoUsuario() { return tipoUsuario; }
         public void setTipoUsuario(String tipoUsuario) { this.tipoUsuario = tipoUsuario; }
+
+        public String getPaginaWeb() { return paginaWeb; }
+        public void setPaginaWeb(String paginaWeb) { this.paginaWeb = paginaWeb; }
+
+        public java.util.List<String> getRedesSociales() { return redesSociales; }
+        public void setRedesSociales(java.util.List<String> redesSociales) { this.redesSociales = redesSociales; }
+
+        public Float getCalificacionPromedio() { return calificacionPromedio; }
+        public void setCalificacionPromedio(Float calificacionPromedio) { this.calificacionPromedio = calificacionPromedio; }
     }
 
 

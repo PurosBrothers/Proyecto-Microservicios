@@ -1,0 +1,14 @@
+{
+    "nombre": "Jason",
+    "apellido": "Todd",
+    "correo": "jasontodd2@gmail.com",
+    "password": "password123",
+    "tipoUsuario": "PROVEEDOR",
+    "edad": 20,
+    "descripcion": "Vigilante",
+    "telefono": "+573123164634",
+    "direccion": "Gotham",
+    "paginaWeb": "https://github.com",
+    "redesSociales": ["@jasontodd"],
+    "calificacionPromedio": null
+}
