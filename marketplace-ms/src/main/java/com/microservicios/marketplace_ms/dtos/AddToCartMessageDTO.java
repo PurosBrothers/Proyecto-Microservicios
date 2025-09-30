@@ -10,13 +10,10 @@ import jakarta.validation.constraints.NotNull;
 public class AddToCartMessageDTO {
     @NotBlank(message = "El UID es obligatorio")
     private String uid;
-    @NotNull(message = "El ID del item es obligatorio")
-    private Long idItem;
+    private Long idItem; // Se setea desde el path
     @Min(value = 1, message = "La cantidad debe ser al menos 1")
     private int cantidad;
-    @NotNull(message = "El precio unitario es obligatorio")
-    @DecimalMin(value = "0.0", inclusive = false, message = "El precio unitario debe ser mayor a 0")
-    private BigDecimal precioUnitario;
+    private BigDecimal precioUnitario; // Opcional, se obtiene del backend si no viene
     private String tipoClasificacion; // opcional
     private String nombreItem;
 

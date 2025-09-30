@@ -1,5 +1,7 @@
 package com.microservicios.marketplace_ms.controllers;
 
+import java.math.BigDecimal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,7 +28,11 @@ import java.util.List;
 import com.microservicios.marketplace_ms.dtos.AddToCartMessageDTO;
 import com.microservicios.marketplace_ms.dtos.ItemDTO;
 import com.microservicios.marketplace_ms.dtos.ItemResponseDTO;
+import com.microservicios.marketplace_ms.entities.Alojamiento;
+import com.microservicios.marketplace_ms.entities.Alimentacion;
 import com.microservicios.marketplace_ms.entities.Item;
+import com.microservicios.marketplace_ms.entities.PaseosEcologicos;
+import com.microservicios.marketplace_ms.entities.Transporte;
 import com.microservicios.marketplace_ms.mappers.ItemMapper;
 import com.microservicios.marketplace_ms.messagingrabbitmq.components.RabbitMQSender;
 import com.microservicios.marketplace_ms.services.ItemService;
@@ -94,6 +100,21 @@ public class ItemController {
             return ResponseEntity.badRequest().body("Item no encontrado");
         }
 
+        // Obtener precio del item si no viene en el request
+        BigDecimal precioUnitario = request.getPrecioUnitario();
+        if (precioUnitario == null) {
+            Object clasificacion = itemResponse.getBody().getClasificacionData();
+            if (clasificacion instanceof Alojamiento) {
+                precioUnitario = ((Alojamiento) clasificacion).getPrecio();
+            } else if (clasificacion instanceof Alimentacion) {
+                precioUnitario = ((Alimentacion) clasificacion).getPrecio();
+            } else if (clasificacion instanceof Transporte) {
+                precioUnitario = ((Transporte) clasificacion).getPrecio();
+            } else if (clasificacion instanceof PaseosEcologicos) {
+                precioUnitario = ((PaseosEcologicos) clasificacion).getPrecio();
+            }
+        }
+
         // Enviar mensaje a transaction-ms
         String tipoClasificacion = itemResponse.getBody().getItem().getClasificacion().getClass().getSimpleName();
         String nombreItem = itemResponse.getBody().getItem().getTitulo();
@@ -101,7 +122,7 @@ public class ItemController {
                 request.getUid(),
                 id,
                 request.getCantidad(),
-                request.getPrecioUnitario(),
+                precioUnitario,
                 tipoClasificacion,
                 nombreItem);
         rabbitMQSender.sendAddToCartMessage(message);

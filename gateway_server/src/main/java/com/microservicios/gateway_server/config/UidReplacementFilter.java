@@ -45,6 +45,7 @@ public class UidReplacementFilter implements GlobalFilter, Ordered {
         ServerHttpRequest request = exchange.getRequest();
         String path = request.getPath().value();
         log.info("Gateway Filter: Procesando petición a: {}", path);
+        log.info("Gateway Filter: Headers: {}", request.getHeaders());
 
         return ReactiveSecurityContextHolder.getContext()
                 .map(securityContext -> securityContext.getAuthentication())
@@ -56,6 +57,7 @@ public class UidReplacementFilter implements GlobalFilter, Ordered {
                     log.info("Gateway Filter: UID del usuario: {}", uid);
 
                     if (uid != null && !uid.isEmpty()) {
+                        log.info("Gateway Filter: UID válido: {}", uid);
                         // Verificar si la path contiene "/uid"
                         boolean pathModified = false;
                         ServerHttpRequest modifiedRequest = request;
@@ -86,7 +88,10 @@ public class UidReplacementFilter implements GlobalFilter, Ordered {
                     // No hay modificaciones necesarias
                     return chain.filter(exchange);
                 })
-                .switchIfEmpty(chain.filter(exchange)) // Si no hay autenticación JWT, continuar sin modificar
+                .switchIfEmpty(Mono
+                        .fromRunnable(
+                                () -> log.warn("Gateway Filter: No hay autenticación JWT, continuando sin modificar"))
+                        .then(chain.filter(exchange))) // Si no hay autenticación JWT, continuar sin modificar
                 .onErrorResume(error -> {
                     log.error("❌ Error en filtro de reemplazo UID: {}", error.getMessage(), error);
                     return chain.filter(exchange);

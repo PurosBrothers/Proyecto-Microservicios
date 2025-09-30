@@ -155,13 +155,12 @@ GET {{baseUrl}}/items/1/clasificacion
 ### Test Case 6: Add to Cart
 
 ### item a carrito
-POST {{baseUrl}}/items/1/add-to-cart
+POST {{baseUrl}}/items/4755/add-to-cart
 Content-Type: application/json
 
 {
   "uid": "1",
-  "cantidad": 2,
-  "precioUnitario": 500.00
+  "cantidad": 2
 }
 
 ### buscar item por palabra
