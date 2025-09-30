@@ -1,7 +1,7 @@
 @host=http://localhost:8082
 
 ###
-GET {{host}}/carrito-compra/list-items-carrito
+POST {{host}}/carrito-compra/list-items-carrito
 Content-Type: application/json
 
 {
