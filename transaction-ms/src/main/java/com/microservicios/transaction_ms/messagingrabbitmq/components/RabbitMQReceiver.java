@@ -34,6 +34,7 @@ public class RabbitMQReceiver {
             itemCarrito.setCantidad(dto.getCantidad());
             itemCarrito.setPrecioUnitario(dto.getPrecioUnitario());
             itemCarrito.setFechaAgregado(java.time.LocalDate.now());
+            itemCarrito.setNombreItem(dto.getNombreItem());
             carritoCompraService.addItemToCarrito(dto.getUid(), itemCarrito);
             System.out.println("Item agregado al carrito para uid: " + dto.getUid());
         } catch (JsonProcessingException e) {

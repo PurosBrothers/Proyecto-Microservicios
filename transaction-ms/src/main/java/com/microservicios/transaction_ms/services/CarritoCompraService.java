@@ -69,6 +69,7 @@ public class CarritoCompraService {
             newItem.setCantidad(item.getCantidad());
             newItem.setPrecioUnitario(item.getPrecioUnitario());
             newItem.setFechaAgregado(item.getFechaAgregado());
+            newItem.setNombreItem(item.getNombreItem());
             cart.getItems().add(newItem);
         }
         cart.setFechaUltimaModificacion(LocalDate.now());

@@ -16,7 +16,8 @@ Content-Type: application/json
   "id": 1,
   "idItem": 101,
   "cantidad": 2,
-  "precioUnitario": 100.00
+  "precioUnitario": 100.00,
+  "nombreItem": "Test Item"
 }
 
 ###

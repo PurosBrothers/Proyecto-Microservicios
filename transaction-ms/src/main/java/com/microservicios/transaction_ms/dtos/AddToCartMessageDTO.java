@@ -8,17 +8,19 @@ public class AddToCartMessageDTO {
     private int cantidad;
     private BigDecimal precioUnitario;
     private String tipoClasificacion;
+    private String nombreItem;
 
     public AddToCartMessageDTO() {
     }
 
     public AddToCartMessageDTO(String uid, Long idItem, int cantidad, BigDecimal precioUnitario,
-            String tipoClasificacion) {
+            String tipoClasificacion, String nombreItem) {
         this.uid = uid;
         this.idItem = idItem;
         this.cantidad = cantidad;
         this.precioUnitario = precioUnitario;
         this.tipoClasificacion = tipoClasificacion;
+        this.nombreItem = nombreItem;
     }
 
     // Getters and Setters
@@ -60,5 +62,13 @@ public class AddToCartMessageDTO {
 
     public void setTipoClasificacion(String tipoClasificacion) {
         this.tipoClasificacion = tipoClasificacion;
+    }
+
+    public String getNombreItem() {
+        return nombreItem;
+    }
+
+    public void setNombreItem(String nombreItem) {
+        this.nombreItem = nombreItem;
     }
 }

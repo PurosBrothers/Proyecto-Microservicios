@@ -14,6 +14,7 @@ public class ItemCarritoMapper {
         model.setCantidad(dto.getCantidad());
         model.setPrecioUnitario(dto.getPrecioUnitario());
         model.setFechaAgregado(dto.getFechaAgregado());
+        model.setNombreItem(dto.getNombreItem());
         return model;
     }
 
@@ -26,6 +27,7 @@ public class ItemCarritoMapper {
         dto.setCantidad(model.getCantidad());
         dto.setPrecioUnitario(model.getPrecioUnitario());
         dto.setFechaAgregado(model.getFechaAgregado());
+        dto.setNombreItem(model.getNombreItem());
         return dto;
     }
 

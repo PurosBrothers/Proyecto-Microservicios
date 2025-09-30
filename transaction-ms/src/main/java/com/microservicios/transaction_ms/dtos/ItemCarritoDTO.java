@@ -9,16 +9,19 @@ public class ItemCarritoDTO {
     private int cantidad;
     private BigDecimal precioUnitario;
     private LocalDate fechaAgregado;
+    private String nombreItem;
 
     public ItemCarritoDTO() {
     }
 
-    public ItemCarritoDTO(Long id, Long idItem, int cantidad, BigDecimal precioUnitario, LocalDate fechaAgregado) {
+    public ItemCarritoDTO(Long id, Long idItem, int cantidad, BigDecimal precioUnitario, LocalDate fechaAgregado,
+            String nombreItem) {
         this.id = id;
         this.idItem = idItem;
         this.cantidad = cantidad;
         this.precioUnitario = precioUnitario;
         this.fechaAgregado = fechaAgregado;
+        this.nombreItem = nombreItem;
     }
 
     public Long getId() {
@@ -59,5 +62,13 @@ public class ItemCarritoDTO {
 
     public void setFechaAgregado(LocalDate fechaAgregado) {
         this.fechaAgregado = fechaAgregado;
+    }
+
+    public String getNombreItem() {
+        return nombreItem;
+    }
+
+    public void setNombreItem(String nombreItem) {
+        this.nombreItem = nombreItem;
     }
 }

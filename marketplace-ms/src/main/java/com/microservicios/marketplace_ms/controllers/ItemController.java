@@ -86,12 +86,14 @@ public class ItemController {
 
         // Enviar mensaje a transaction-ms
         String tipoClasificacion = itemResponse.getBody().getItem().getClasificacion().getClass().getSimpleName();
+        String nombreItem = itemResponse.getBody().getItem().getTitulo();
         AddToCartMessageDTO message = new AddToCartMessageDTO(
                 request.getUid(),
                 id,
                 request.getCantidad(),
                 request.getPrecioUnitario(),
-                tipoClasificacion);
+                tipoClasificacion,
+                nombreItem);
         rabbitMQSender.sendAddToCartMessage(message);
 
         return ResponseEntity.ok("Mensaje enviado para agregar al carrito");
