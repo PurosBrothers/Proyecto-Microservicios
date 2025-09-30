@@ -2,6 +2,7 @@ package com.microservicios.transaction_ms.services;
 
 import com.microservicios.transaction_ms.dtos.ItemPaymentDTO;
 import com.microservicios.transaction_ms.dtos.ProcessPaymentMessageDTO;
+import com.microservicios.transaction_ms.dtos.UpdateItemMessageDTO;
 import com.microservicios.transaction_ms.messagingrabbitmq.components.RabbitMQSender;
 import com.microservicios.transaction_ms.models.ItemCarrito;
 import com.microservicios.transaction_ms.models.ItemTransaccion;
@@ -166,6 +167,13 @@ public class TransaccionService {
             trans.setEstado("COMPLETED");
             repository.save(trans);
             System.out.println("Transacción completada: " + id);
+
+            // Enviar updates a marketplace para cada item pagado
+            for (ItemTransaccion item : trans.getItemsPagados()) {
+                UpdateItemMessageDTO updateDTO = new UpdateItemMessageDTO(item.getOfertaId(), item.getCantidad(),
+                        "stock");
+                rabbitMQSender.sendUpdateItemMessage(updateDTO);
+            }
         } else {
             System.out.println("Transacción no encontrada para completar: " + id);
         }

@@ -96,4 +96,39 @@ public class ItemService {
         return ResponseEntity.ok(results);
     }
 
+    public List<Item> getItemsPorClasificacion(String clasificacion) {
+        Class<?> clasificacionClass = switch (clasificacion) {
+            case "Alojamiento" -> Alojamiento.class;
+            case "Alimentacion" -> Alimentacion.class;
+            case "PaseosEcologicos" -> PaseosEcologicos.class;
+            case "Transporte" -> Transporte.class;
+            default -> null;
+        };
+        if (clasificacionClass == null) {
+            return List.of();
+        }
+        return itemRepository.findByClasificacionType(clasificacionClass);
+    }
+
+    public void updateItemStock(Long itemId, Integer cantidadVendida, String tipoCambio) {
+        Optional<Item> itemOpt = itemRepository.findById(itemId);
+        if (itemOpt.isPresent()) {
+            Item item = itemOpt.get();
+            if ("stock".equals(tipoCambio) && item.getStock() != null) {
+                item.setStock(item.getStock() - cantidadVendida);
+                itemRepository.save(item);
+                System.out.println("Stock actualizado para item " + itemId + ": " + item.getStock());
+            } else if ("fechas".equals(tipoCambio)) {
+                // Para alojamiento, marcar fechas como reservadas, pero simplificar por ahora
+                System.out.println("Actualización de fechas para item " + itemId);
+            } else if ("cupo".equals(tipoCambio) && item.getCapacidadMaxima() != null) {
+                item.setCapacidadMaxima(item.getCapacidadMaxima() - cantidadVendida);
+                itemRepository.save(item);
+                System.out.println("Cupo actualizado para item " + itemId + ": " + item.getCapacidadMaxima());
+            }
+        } else {
+            System.out.println("Item no encontrado para actualizar: " + itemId);
+        }
+    }
+
 }

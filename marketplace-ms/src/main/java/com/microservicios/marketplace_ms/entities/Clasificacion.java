@@ -8,6 +8,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorType;
 import jakarta.persistence.Entity;
@@ -34,6 +35,9 @@ public abstract class Clasificacion {
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected Long id;
 
+    @Column(name = "tipo", insertable = false, updatable = false)
+    protected String tipo;
+
     protected String lugarInicio;
     protected BigDecimal precio;
     protected LocalDateTime fechaDisponibilidadInicio;
@@ -50,6 +54,14 @@ public abstract class Clasificacion {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
     }
 
     public String getLugarInicio() {
