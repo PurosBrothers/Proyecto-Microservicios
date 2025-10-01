@@ -155,12 +155,12 @@ GET {{baseUrl}}/items/3/clasificacion
 ### Test Case 6: Add to Cart
 
 ### item a carrito
-POST {{baseUrl}}/items/3/add-to-cart
+POST {{baseUrl}}/items/4/add-to-cart
 Content-Type: application/json
 
 {
   "uid": "2a36ca84-0166-46b2-80b4-0838987388bf",
-  "cantidad": 18
+  "cantidad": 2
 }
 
 ### buscar item por palabra
@@ -170,7 +170,7 @@ GET {{baseUrl}}/items/search?query=hotel en
 GET {{baseUrl}}/items
 
 ### Get item by ID
-GET {{baseUrl}}/items/1
+GET {{baseUrl}}/items/2
 
 ### GraphQL: Get items by Alojamiento classification
 POST {{baseUrl}}/graphql

@@ -121,17 +121,27 @@ public class TransaccionService {
                 }
                 String tipo = (String) clasifMap.get("tipo");
 
-                // Determinar campo a validar
+                // Determinar campo a validar y dónde buscarlo
                 String campoValidar;
+                Map<String, Object> mapaBuscar;
                 switch (tipo) {
-                    case "Alimentacion", "Transporte" -> campoValidar = "stock";
-                    case "Alojamiento", "PaseosEcologicos" -> campoValidar = "capacidadMaxima";
-                    default -> campoValidar = "stock";
+                    case "Alimentacion", "Transporte" -> {
+                        campoValidar = "stock";
+                        mapaBuscar = itemMap;
+                    }
+                    case "Alojamiento", "PaseosEcologicos" -> {
+                        campoValidar = "capacidadMaxima";
+                        mapaBuscar = clasifMap;
+                    }
+                    default -> {
+                        campoValidar = "stock";
+                        mapaBuscar = itemMap;
+                    }
                 }
 
                 // Obtener valor actual
-                Integer valorActual = (Integer) itemMap.get(campoValidar);
-                if (valorActual == null || valorActual < item.getCantidad()) {
+                Integer valorActual = (Integer) mapaBuscar.get(campoValidar);
+                if (valorActual != null && valorActual < item.getCantidad()) {
                     System.out.println("No hay suficiente " + campoValidar + " para item " + item.getIdItem() +
                             ". Disponible: " + valorActual + ", solicitado: " + item.getCantidad());
                     return null;
