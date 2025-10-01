@@ -154,7 +154,7 @@ public class DbInitializer implements CommandLineRunner {
         itemAlojamiento.setTitulo("Hotel en Bogota");
         itemAlojamiento.setDescripcion("Un hotel cómodo en el centro de Bogota");
         itemAlojamiento.setFechaPublicacion(LocalDate.now());
-        itemAlojamiento.setStock(10);
+        itemAlojamiento.setStock(null); // Alojamiento no usa stock
         itemAlojamiento.setVisualizaciones(0);
         itemAlojamiento.setCalificacionPromedio(0L);
         itemAlojamiento.setLugarInicio(alojamiento.getLugarInicio());
@@ -215,7 +215,7 @@ public class DbInitializer implements CommandLineRunner {
         itemAlimentacion.setTitulo("Almuerzo en Medellín");
         itemAlimentacion.setDescripcion("Delicioso almuerzo en Medellín");
         itemAlimentacion.setFechaPublicacion(LocalDate.now());
-        itemAlimentacion.setStock(30);
+        itemAlimentacion.setStock(alimentacion.getCapacidadMaxima()); // Stock = capacidadMaxima
         itemAlimentacion.setVisualizaciones(0);
         itemAlimentacion.setCalificacionPromedio(0L);
         itemAlimentacion.setLugarInicio(alimentacion.getLugarInicio());
@@ -232,7 +232,7 @@ public class DbInitializer implements CommandLineRunner {
         itemTransporte.setTitulo("Bus Cali-Bogotá");
         itemTransporte.setDescripcion("Viaje cómodo en bus");
         itemTransporte.setFechaPublicacion(LocalDate.now());
-        itemTransporte.setStock(20);
+        itemTransporte.setStock(transporte.getCapacidadMaxima()); // Stock = capacidadMaxima
         itemTransporte.setVisualizaciones(0);
         itemTransporte.setCalificacionPromedio(0L);
         itemTransporte.setLugarInicio(transporte.getLugarInicio());
@@ -249,7 +249,7 @@ public class DbInitializer implements CommandLineRunner {
         itemPaseos.setTitulo("Tour Ecológico Cartagena");
         itemPaseos.setDescripcion("Tour guiado ecológico");
         itemPaseos.setFechaPublicacion(LocalDate.now());
-        itemPaseos.setStock(15);
+        itemPaseos.setStock(paseos.getCapacidadMaxima()); // Stock = capacidadMaxima
         itemPaseos.setVisualizaciones(0);
         itemPaseos.setCalificacionPromedio(0L);
         itemPaseos.setLugarInicio(paseos.getLugarInicio());

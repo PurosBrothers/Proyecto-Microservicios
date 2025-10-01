@@ -19,7 +19,6 @@ public class ItemDTO {
     @NotBlank(message = "La descripción es obligatoria")
     private String descripcion;
     private LocalDate fechaPublicacion;
-    @NotNull(message = "El stock es obligatorio")
     @Min(value = 0, message = "El stock no puede ser negativo")
     private Integer stock;
     private Integer visualizaciones;

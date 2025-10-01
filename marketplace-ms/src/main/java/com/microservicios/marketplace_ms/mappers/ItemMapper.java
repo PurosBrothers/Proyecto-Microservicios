@@ -17,7 +17,12 @@ public class ItemMapper {
         item.setTitulo(itemDTO.getTitulo());
         item.setDescripcion(itemDTO.getDescripcion());
         item.setFechaPublicacion(itemDTO.getFechaPublicacion());
-        item.setStock(itemDTO.getStock());
+        // For alojamiento, stock is not applicable, for others stock = capacidadMaxima
+        if (itemDTO.getClasificacion() != null && "Alojamiento".equals(itemDTO.getClasificacion().getTipo())) {
+            item.setStock(null);
+        } else {
+            item.setStock(itemDTO.getStock() != null ? itemDTO.getStock() : itemDTO.getClasificacion().getCapacidadMaxima());
+        }
         item.setVisualizaciones(itemDTO.getVisualizaciones());
         item.setCalificacionPromedio(itemDTO.getCalificacionPromedio());
         item.setClasificacion(itemDTO.getClasificacion());
