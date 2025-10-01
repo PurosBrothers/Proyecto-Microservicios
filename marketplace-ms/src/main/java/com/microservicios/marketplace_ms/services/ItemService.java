@@ -119,19 +119,33 @@ public class ItemService {
         Optional<Item> itemOpt = itemRepository.findById(itemId);
         if (itemOpt.isPresent()) {
             Item item = itemOpt.get();
+            boolean shouldDelete = false;
             if ("stock".equals(tipoCambio) && item.getStock() != null) {
                 item.setStock(item.getStock() - cantidadVendida);
                 itemRepository.save(item);
                 System.out.println("Stock actualizado para item " + itemId + ": " + item.getStock());
+                if (item.getStock() <= 0) {
+                    shouldDelete = true;
+                }
             } else if ("fechas".equals(tipoCambio) && item.getCapacidadMaxima() != null) {
                 // Para alojamiento, reducir capacidad máxima (ej. habitaciones disponibles)
                 item.setCapacidadMaxima(item.getCapacidadMaxima() - cantidadVendida);
                 itemRepository.save(item);
                 System.out.println("Capacidad actualizada para item " + itemId + ": " + item.getCapacidadMaxima());
+                if (item.getCapacidadMaxima() <= 0) {
+                    shouldDelete = true;
+                }
             } else if ("cupo".equals(tipoCambio) && item.getCapacidadMaxima() != null) {
                 item.setCapacidadMaxima(item.getCapacidadMaxima() - cantidadVendida);
                 itemRepository.save(item);
                 System.out.println("Cupo actualizado para item " + itemId + ": " + item.getCapacidadMaxima());
+                if (item.getCapacidadMaxima() <= 0) {
+                    shouldDelete = true;
+                }
+            }
+            if (shouldDelete) {
+                itemRepository.deleteById(itemId);
+                System.out.println("Item " + itemId + " eliminado por agotamiento de stock/capacidad");
             }
         } else {
             System.out.println("Item no encontrado para actualizar: " + itemId);

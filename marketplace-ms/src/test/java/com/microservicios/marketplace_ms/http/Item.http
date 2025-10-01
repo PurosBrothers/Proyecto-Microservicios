@@ -150,17 +150,17 @@ Content-Type: application/json
 ### Test Case 5: Get Item Classification
 
 ### Get the classification data for an Item - assuming item ID is 1
-GET {{baseUrl}}/items/1/clasificacion
+GET {{baseUrl}}/items/3/clasificacion
 
 ### Test Case 6: Add to Cart
 
 ### item a carrito
-POST {{baseUrl}}/items/4755/add-to-cart
+POST {{baseUrl}}/items/3/add-to-cart
 Content-Type: application/json
 
 {
   "uid": "2a36ca84-0166-46b2-80b4-0838987388bf",
-  "cantidad": 2
+  "cantidad": 18
 }
 
 ### buscar item por palabra

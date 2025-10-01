@@ -98,15 +98,23 @@ public class TransaccionService {
                 // Obtener item completo
                 String itemUrl = baseUrl + "/items/" + item.getIdItem();
                 @SuppressWarnings("unchecked")
-                Map<String, Object> itemMap = restTemplate.getForObject(itemUrl, Map.class);
-                if (itemMap == null) {
+                Map<String, Object> itemResponse = restTemplate.getForObject(itemUrl, Map.class);
+                if (itemResponse == null) {
                     System.out.println("Item no encontrado: " + item.getIdItem());
+                    return null;
+                }
+
+                // El response es ItemResponseDTO, que tiene "item" y "clasificacionData"
+                @SuppressWarnings("unchecked")
+                Map<String, Object> itemMap = (Map<String, Object>) itemResponse.get("item");
+                if (itemMap == null) {
+                    System.out.println("Datos del item no encontrados: " + item.getIdItem());
                     return null;
                 }
 
                 // Obtener clasificación
                 @SuppressWarnings("unchecked")
-                Map<String, Object> clasifMap = (Map<String, Object>) itemMap.get("clasificacion");
+                Map<String, Object> clasifMap = (Map<String, Object>) itemResponse.get("clasificacionData");
                 if (clasifMap == null) {
                     System.out.println("Clasificación no encontrada para item: " + item.getIdItem());
                     return null;
@@ -237,10 +245,20 @@ public class TransaccionService {
             // Enviar updates a marketplace para cada item pagado
             for (ItemTransaccion item : trans.getItemsPagados()) {
                 try {
-                    // Consultar clasificación del item
-                    String clasifUrl = baseUrl + "/items/" + item.getOfertaId() + "/clasificacion";
+                    // Consultar item completo
+                    String itemUrl = baseUrl + "/items/" + item.getOfertaId();
                     @SuppressWarnings("unchecked")
-                    Map<String, Object> clasifMap = restTemplate.getForObject(clasifUrl, Map.class);
+                    Map<String, Object> itemResponse = restTemplate.getForObject(itemUrl, Map.class);
+                    if (itemResponse == null) {
+                        System.out.println("Item no encontrado para update: " + item.getOfertaId());
+                        continue;
+                    }
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> clasifMap = (Map<String, Object>) itemResponse.get("clasificacionData");
+                    if (clasifMap == null) {
+                        System.out.println("Clasificación no encontrada para item: " + item.getOfertaId());
+                        continue;
+                    }
                     String tipo = (String) clasifMap.get("tipo");
 
                     // Determinar tipoCambio basado en clasificación
