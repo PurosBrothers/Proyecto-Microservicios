@@ -19,10 +19,6 @@ spring:
       enabled: true
       path: /h2-console
 
-  cloud:
-    config:
-      enabled: false
-
 eureka:
   client:
     service-url:
