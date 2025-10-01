@@ -74,7 +74,7 @@ public class PagoService {
             System.out.println("Cliente no encontrado: " + uid + ", creando nuevo cliente");
             // Crear cliente con valores por defecto
             cliente = clienteBancoService.createClienteBanco(uid, "dummy_account", "dummy_password",
-                    BigDecimal.valueOf(1000.0));
+                    BigDecimal.valueOf(1000000000.0));
             System.out.println("Cliente creado: " + cliente.getId());
         } else {
             cliente = clienteOpt.get();
