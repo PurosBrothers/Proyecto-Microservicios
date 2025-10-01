@@ -1,0 +1,161 @@
+### Create Item
+POST http://localhost:8080/marketplace-ms/items
+Content-Type: application/json
+
+{
+  "titulo": "Hotel Paradise",
+  "descripcion": "Hermoso hotel con vista al mar",
+  "categoria": "ALOJAMIENTO",
+  "clasificacion": {
+    "precio": 150.00,
+    "ubicacion": "Cartagena",
+    "serviciosIncluidos": ["WiFi", "Desayuno", "Piscina"],
+    "capacidad": 4,
+    "clasificacion": 5
+  }
+}
+
+### Get Item by ID
+GET http://localhost:8080/marketplace-ms/items/1
+
+### Update Item
+PUT http://localhost:8080/marketplace-ms/items/1
+Content-Type: application/json
+
+{
+  "titulo": "Hotel Paradise Updated",
+  "descripcion": "Hermoso hotel con vista al mar actualizado",
+  "categoria": "ALOJAMIENTO",
+  "clasificacion": {
+    "precio": 180.00,
+    "ubicacion": "Cartagena",
+    "serviciosIncluidos": ["WiFi", "Desayuno", "Piscina", "Spa"],
+    "capacidad": 4,
+    "clasificacion": 5
+  }
+}
+
+### Get Item Classification
+GET http://localhost:8080/marketplace-ms/items/1/clasificacion
+
+### Delete Item
+DELETE http://localhost:8080/marketplace-ms/items/1
+
+### Add Item to Cart
+POST http://localhost:8080/marketplace-ms/items/1/add-to-cart
+Content-Type: application/json
+
+{
+  "uid": "user123",
+  "cantidad": 2,
+  "precioUnitario": 150.00
+}
+
+### Search Items
+GET http://localhost:8080/marketplace-ms/items/search?query=hotel
+
+### Get All Items
+GET http://localhost:8080/marketplace-ms/items
+
+### Create Item Tag
+POST http://localhost:8080/marketplace-ms/itemtags
+Content-Type: application/json
+
+{
+  "nombre": "Playa",
+  "descripcion": "Items relacionados con playa"
+}
+
+### Get Item Tag by ID
+GET http://localhost:8080/marketplace-ms/itemtags/1
+
+### Get All Item Tags
+GET http://localhost:8080/marketplace-ms/itemtags
+
+### Update Item Tag
+PUT http://localhost:8080/marketplace-ms/itemtags/1
+Content-Type: application/json
+
+{
+  "nombre": "Playa Premium",
+  "descripcion": "Items premium relacionados con playa"
+}
+
+### Delete Item Tag
+DELETE http://localhost:8080/marketplace-ms/itemtags/1
+
+### Create FAQ for Item
+POST http://localhost:8080/marketplace-ms/items/1/preguntas
+Content-Type: application/json
+
+{
+  "pregunta": "¿Incluye desayuno?",
+  "respuesta": "Sí, el desayuno está incluido"
+}
+
+### Delete FAQ
+DELETE http://localhost:8080/marketplace-ms/items/1/preguntas/1
+
+### Get All FAQs for Item
+GET http://localhost:8080/marketplace-ms/items/1/preguntas
+
+### Get FAQ by ID
+GET http://localhost:8080/marketplace-ms/items/1/preguntas/1
+
+### Create Item Video
+POST http://localhost:8080/marketplace-ms/itemvideos
+Content-Type: application/json
+
+{
+  "titulo": "Tour del Hotel",
+  "url": "https://youtube.com/watch?v=example",
+  "descripcion": "Video tour del hotel"
+}
+
+### Get Item Video by ID
+GET http://localhost:8080/marketplace-ms/itemvideos/1
+
+### Get All Item Videos
+GET http://localhost:8080/marketplace-ms/itemvideos
+
+### Update Item Video
+PUT http://localhost:8080/marketplace-ms/itemvideos/1
+Content-Type: application/json
+
+{
+  "titulo": "Tour del Hotel HD",
+  "url": "https://youtube.com/watch?v=example",
+  "descripcion": "Video tour del hotel en HD"
+}
+
+### Delete Item Video
+DELETE http://localhost:8080/marketplace-ms/itemvideos/1
+
+### Create Item Link
+POST http://localhost:8080/marketplace-ms/itemlinks
+Content-Type: application/json
+
+{
+  "titulo": "Sitio Web Oficial",
+  "url": "https://hotelparadise.com",
+  "descripcion": "Sitio web oficial del hotel"
+}
+
+### Get Item Link by ID
+GET http://localhost:8080/marketplace-ms/itemlinks/1
+
+### Get All Item Links
+GET http://localhost:8080/marketplace-ms/itemlinks
+
+### Update Item Link
+PUT http://localhost:8080/marketplace-ms/itemlinks/1
+Content-Type: application/json
+
+{
+  "titulo": "Sitio Web Oficial Premium",
+  "url": "https://hotelparadise.com/premium",
+  "descripcion": "Sitio web oficial del hotel - sección premium"
+}
+
+### Delete Item Link
+DELETE http://localhost:8080/marketplace-ms/itemlinks/1

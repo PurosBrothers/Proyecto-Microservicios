@@ -1,0 +1,103 @@
+### GraphQL - Get All Pagos
+POST http://localhost:8080/payment-ms/graphql
+Content-Type: application/json
+
+{
+  "query": "query { pagos { id metodoPago monto fechaPago estado } }"
+}
+
+### GraphQL - Get Pago by ID
+POST http://localhost:8080/payment-ms/graphql
+Content-Type: application/json
+
+{
+  "query": "query { pago(id: 1) { id metodoPago monto fechaPago estado } }"
+}
+
+### GraphQL - Get Pagos by Estado
+POST http://localhost:8080/payment-ms/graphql
+Content-Type: application/json
+
+{
+  "query": "query { pagosByEstado(estado: \"COMPLETADO\") { id metodoPago monto fechaPago estado } }"
+}
+
+### GraphQL - Get Pagos by Usuario
+POST http://localhost:8080/payment-ms/graphql
+Content-Type: application/json
+
+{
+  "query": "query { pagosByUsuario(usuarioId: \"user123\") { id metodoPago monto fechaPago estado } }"
+}
+
+### GraphQL - Create Pago
+POST http://localhost:8080/payment-ms/graphql
+Content-Type: application/json
+
+{
+  "query": "mutation { createPago(input: { metodoPago: \"TARJETA_CREDITO\", monto: 150.50, usuarioId: \"user123\" }) { id metodoPago monto fechaPago estado } }"
+}
+
+### GraphQL - Update Pago Estado
+POST http://localhost:8080/payment-ms/graphql
+Content-Type: application/json
+
+{
+  "query": "mutation { updatePagoEstado(id: 1, estado: \"COMPLETADO\") { id metodoPago monto fechaPago estado } }"
+}
+
+### GraphQL - Delete Pago
+POST http://localhost:8080/payment-ms/graphql
+Content-Type: application/json
+
+{
+  "query": "mutation { deletePago(id: 1) }"
+}
+
+### GraphQL - Get All ClienteBancos
+POST http://localhost:8080/payment-ms/graphql
+Content-Type: application/json
+
+{
+  "query": "query { clienteBancos { id nombreCompleto banco numeroCuenta saldo activo } }"
+}
+
+### GraphQL - Get ClienteBanco by ID
+POST http://localhost:8080/payment-ms/graphql
+Content-Type: application/json
+
+{
+  "query": "query { clienteBanco(id: 1) { id nombreCompleto banco numeroCuenta saldo activo } }"
+}
+
+### GraphQL - Get ClienteBancos by Usuario
+POST http://localhost:8080/payment-ms/graphql
+Content-Type: application/json
+
+{
+  "query": "query { clienteBancosByUsuario(usuarioId: \"user123\") { id nombreCompleto banco numeroCuenta saldo activo } }"
+}
+
+### GraphQL - Create ClienteBanco
+POST http://localhost:8080/payment-ms/graphql
+Content-Type: application/json
+
+{
+  "query": "mutation { createClienteBanco(input: { nombreCompleto: \"Juan Perez\", banco: \"Banco Nacional\", numeroCuenta: \"1234567890\", saldo: 1000.00, usuarioId: \"user123\" }) { id nombreCompleto banco numeroCuenta saldo activo } }"
+}
+
+### GraphQL - Update ClienteBanco
+POST http://localhost:8080/payment-ms/graphql
+Content-Type: application/json
+
+{
+  "query": "mutation { updateClienteBanco(id: 1, input: { nombreCompleto: \"Juan Carlos Perez\", banco: \"Banco Nacional Premium\", numeroCuenta: \"1234567890\", saldo: 1500.00 }) { id nombreCompleto banco numeroCuenta saldo activo } }"
+}
+
+### GraphQL - Delete ClienteBanco
+POST http://localhost:8080/payment-ms/graphql
+Content-Type: application/json
+
+{
+  "query": "mutation { deleteClienteBanco(id: 1) }"
+}

@@ -1,0 +1,65 @@
+### Get Transactions by User ID
+GET http://localhost:8080/transaction-ms/transaccion/list/user123
+
+### Create Transaction
+POST http://localhost:8080/transaction-ms/transaccion/create/user123
+Content-Type: application/json
+
+{
+  "metodoPago": "TARJETA_CREDITO",
+  "montoTotal": 300.50,
+  "descripcion": "Compra de servicios turísticos"
+}
+
+### Process Payment
+POST http://localhost:8080/transaction-ms/transaccion/process-payment
+Content-Type: application/json
+
+{
+  "transaccionId": 1,
+  "metodoPago": "TARJETA_CREDITO",
+  "monto": 300.50,
+  "datosAdicionales": {
+    "numeroTarjeta": "1234567890123456",
+    "codigoSeguridad": "123"
+  }
+}
+
+### Get All Database Tables
+GET http://localhost:8080/transaction-ms/debug/tables
+
+### Get Table Data
+GET http://localhost:8080/transaction-ms/debug/table/transaccion
+
+### Get Carrito Compra Debug
+GET http://localhost:8080/transaction-ms/debug/carrito-compra
+
+### List Cart Items
+POST http://localhost:8080/transaction-ms/carrito-compra/list-items-carrito
+Content-Type: application/json
+
+{
+  "uid": "user123"
+}
+
+### Delete Cart Item
+DELETE http://localhost:8080/transaction-ms/carrito-compra/delete-item-carrito
+Content-Type: application/json
+
+{
+  "uid": "user123",
+  "itemId": 1
+}
+
+### Add Item to Cart
+PUT http://localhost:8080/transaction-ms/carrito-compra/agregar-item-carrito
+Content-Type: application/json
+
+{
+  "uid": "user123",
+  "itemId": 1,
+  "cantidad": 2,
+  "precioUnitario": 150.00,
+  "tipoClasificacion": "Alojamiento",
+  "nombreItem": "Hotel Paradise"
+}
