@@ -1,8 +1,5 @@
 @baseUrl = http://localhost:8084
 
-### Test Case 1: Item with Alojamiento classification
-
-### Create an Alojamiento first
 POST {{baseUrl}}/clasificaciones
 Content-Type: application/json
 
@@ -21,7 +18,6 @@ Content-Type: application/json
   "lng": -75.5144
 }
 
-### Create an Item with Alojamiento classification - assuming alojamiento ID is 1
 POST {{baseUrl}}/items
 Content-Type: application/json
 
@@ -38,9 +34,6 @@ Content-Type: application/json
 
 }
 
-### Test Case 2: Item with Alimentacion classification
-
-### Create an Alimentacion
 POST {{baseUrl}}/clasificaciones
 Content-Type: application/json
 
@@ -58,7 +51,6 @@ Content-Type: application/json
   "longitud": -75.5812
 }
 
-### Create an Item with Alimentacion classification - assuming alimentacion ID is 2
 POST {{baseUrl}}/items
 Content-Type: application/json
 
@@ -74,9 +66,6 @@ Content-Type: application/json
   }
 }
 
-### Test Case 3: Item with Transporte classification
-
-### Create a Transporte
 POST {{baseUrl}}/clasificaciones
 Content-Type: application/json
 
@@ -94,7 +83,6 @@ Content-Type: application/json
   "rutaGps": "Route 1"
 }
 
-### Create an Item with Transporte classification - assuming transporte ID is 3
 POST {{baseUrl}}/items
 Content-Type: application/json
 
@@ -110,9 +98,6 @@ Content-Type: application/json
   }
 }
 
-### Test Case 4: Item with PaseosEcologicos classification
-
-### Create PaseosEcologicos
 POST {{baseUrl}}/clasificaciones
 Content-Type: application/json
 
@@ -131,7 +116,6 @@ Content-Type: application/json
   "rutaEncuentro": "Street 123"
 }
 
-### Create an Item with PaseosEcologicos classification - assuming paseos ID is 4
 POST {{baseUrl}}/items
 Content-Type: application/json
 
@@ -147,14 +131,8 @@ Content-Type: application/json
   }
 }
 
-### Test Case 5: Get Item Classification
-
-### Get the classification data for an Item - assuming item ID is 1
 GET {{baseUrl}}/items/3/clasificacion
 
-### Test Case 6: Add to Cart
-
-### item a carrito
 POST {{baseUrl}}/items/4/add-to-cart
 Content-Type: application/json
 
@@ -163,16 +141,12 @@ Content-Type: application/json
   "cantidad": 2
 }
 
-### buscar item por palabra
 GET {{baseUrl}}/items/search?query=hotel en
 
-### Get all items
 GET {{baseUrl}}/items
 
-### Get item by ID
 GET {{baseUrl}}/items/2
 
-### GraphQL: Get items by Alojamiento classification
 POST {{baseUrl}}/graphql
 Content-Type: application/json
 
@@ -180,7 +154,6 @@ Content-Type: application/json
   "query": "query { itemsPorClasificacion(clasificacion: \"Alojamiento\") { id titulo descripcion clasificacion { tipo } } }"
 }
 
-### GraphQL: Get items by Alimentacion classification
 POST {{baseUrl}}/graphql
 Content-Type: application/json
 
@@ -188,7 +161,6 @@ Content-Type: application/json
   "query": "query { itemsPorClasificacion(clasificacion: \"Alimentacion\") { id titulo descripcion clasificacion { tipo } } }"
 }
 
-### GraphQL: Get items by Transporte classification
 POST {{baseUrl}}/graphql
 Content-Type: application/json
 
@@ -196,7 +168,6 @@ Content-Type: application/json
   "query": "query { itemsPorClasificacion(clasificacion: \"Transporte\") { id titulo descripcion clasificacion { tipo } } }"
 }
 
-### GraphQL: Get items by PaseosEcologicos classification
 POST {{baseUrl}}/graphql
 Content-Type: application/json
 
@@ -204,7 +175,6 @@ Content-Type: application/json
   "query": "query { itemsPorClasificacion(clasificacion: \"PaseosEcologicos\") { id titulo descripcion clasificacion { tipo } } }"
 }
 
-### GraphQL: Get items by Alojamiento with additional fields
 POST {{baseUrl}}/graphql
 Content-Type: application/json
 

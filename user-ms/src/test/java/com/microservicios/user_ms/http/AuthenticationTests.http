@@ -1,11 +1,5 @@
-### ENDPOINT DE AUTENTICACIÓN - MARKETPLACE TURÍSTICO
-### Este endpoint permite autenticar usuarios directamente desde el microservicio
-### sin necesidad de comunicación directa entre frontend y Keycloak
-
 @baseUrl = http://localhost:8083
 
-###
-# Test 1: Autenticación de cliente existente (Laura Martínez)
 POST {{baseUrl}}/users/authenticate
 Content-Type: application/json
 
@@ -14,8 +8,6 @@ Content-Type: application/json
     "password": "password123"
 }
 
-###
-# Test 2: Autenticación de cliente existente (Andrés Silva)
 POST {{baseUrl}}/users/authenticate  
 Content-Type: application/json
 
@@ -24,8 +16,6 @@ Content-Type: application/json
     "password": "password123"
 }
 
-###
-# Test 3: Autenticación de proveedor existente (Casa Verde Hotel)
 POST {{baseUrl}}/users/authenticate
 Content-Type: application/json
 
@@ -34,8 +24,6 @@ Content-Type: application/json
     "password": "password123"
 }
 
-###
-# Test 4: Autenticación de proveedor existente (Sabor Caribe)
 POST {{baseUrl}}/users/authenticate
 Content-Type: application/json
 
@@ -44,8 +32,6 @@ Content-Type: application/json
     "password": "password123"
 }
 
-###
-# Test 5: Autenticación con credenciales incorrectas
 POST {{baseUrl}}/users/authenticate
 Content-Type: application/json
 
@@ -54,27 +40,15 @@ Content-Type: application/json
     "password": "wrongpassword"
 }
 
-###
-# Test 6: Verificar información del sistema
 GET {{baseUrl}}/users/info
 
-###
-# Test 7: Listar todos los usuarios (para verificar quiénes están disponibles)
 GET {{baseUrl}}/users
 
-###
-# ========== TESTS CON AUTENTICACIÓN JWT ==========
-# Primero autentica con cualquier usuario de arriba para obtener el token
-# Luego copia el accessToken y úsalo en los siguientes tests
-
 @jwtToken = eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTWdvZ0pJN3JPRi1OWlY1anVjRkx6Mjh0TlB3eHNsbVlBbG1ORTZZMDNRIn0.eyJleHAiOjE3NTkwOTU4MzIsImlhdCI6MTc1OTA5NTUzMiwianRpIjoib25ydHJvOjNiMjk1YTFkLWJmMzUtODUwZi1iODliLWM2ZmUwZDE1MGFmOSIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MS9yZWFsbXMvcHJveWVjdC1tcy1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyYTM2Y2E4NC0wMTY2LTQ2YjItODBiNC0wODM4OTg3Mzg4YmYiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ1c2VyLW1zLWNsaWVudCIsInNpZCI6ImFkOTg1MDJkLTJiZjctNGNhNC1iNDAyLTcwN2YyNjIyN2E3YyIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyoiLCJodHRwOi8vbG9jYWxob3N0OjgwODMvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLXByb3llY3QtbXMtcmVhbG0iLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiTGF1cmEgTWFydMOtbmV6IiwicHJlZmVycmVkX3VzZXJuYW1lIjoibGF1cmEubWFydGluZXpAZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6IkxhdXJhIiwiZmFtaWx5X25hbWUiOiJNYXJ0w61uZXoiLCJlbWFpbCI6ImxhdXJhLm1hcnRpbmV6QGdtYWlsLmNvbSJ9.s1r29rNBZ1oXb43hIXqaknLPS5oz9ZEeQUrfh305BzsXXG5kR3yUWTexMtGk9JjtMyRD2oXMPMPLWf9huMsdyGG8rkA-1LyF4oOduN6KDjqDz7K9_0cNJYukFtTshI2u5Soz7rKgyqoQaZ1o-H-SBJczUWk263ezRp6aziZm8hqWGmdMBvUrHZBGo7HSh9M39Y-kfiBM3y95Pcd7i1WH-5J2YPUxPnuRrZucuC2dMZRf_sEzcFA5FGoHVmrVbjlgTJjyaj71VNGnWm-qEeVMqpihLRy42N50dl0IP8h6iEn7BRLlRfu3B-ahen7Q4a_Uo7zuo3GH6utiThvSUDP9Og
-###
-# Test 8: Obtener usuario específico con JWT (Laura Martínez)
+
 GET {{baseUrl}}/users/2a36ca84-0166-46b2-80b4-0838987388bf
 Authorization: Bearer {{jwtToken}}
 
-###
-# Test 9: Crear nuevo usuario con JWT
 POST {{baseUrl}}/users
 Authorization: Bearer {{jwtToken}}
 Content-Type: application/json
@@ -91,8 +65,6 @@ Content-Type: application/json
     "password": "password123"
 }
 
-###
-# Test 10: Actualizar usuario con JWT (actualizar Laura Martínez)
 PUT {{baseUrl}}/users/2a36ca84-0166-46b2-80b4-0838987388bf
 Authorization: Bearer {{jwtToken}}
 Content-Type: application/json
@@ -107,25 +79,7 @@ Content-Type: application/json
     "telefono": "+57 301 456 7890"
 }
 
-###
-# Test 11: Probar acceso sin JWT (debería fallar con 401)
 GET {{baseUrl}}/users/2a36ca84-0166-46b2-80b4-0838987388bf
 
-###
-# Test 12: Probar con JWT inválido (debería fallar con 401)
 GET {{baseUrl}}/users/2a36ca84-0166-46b2-80b4-0838987388bf
 Authorization: Bearer invalid_token_here
-
-### NOTAS:
-# 1. ✅ El endpoint de autenticación funciona perfectamente
-# 2. 🔑 Copia el accessToken de la respuesta de autenticación y úsalo en @jwtToken
-# 3. 🔄 Los tokens expiran en 300 segundos (5 minutos), regenera si es necesario
-# 4. 🛡️ Los endpoints protegidos requieren JWT válido en el header Authorization
-# 5. 🎯 Usa diferentes usuarios para obtener tokens con diferentes permisos
-# 6. 📱 Este patrón es perfecto para aplicaciones frontend (React, Angular, etc.)
-
-### FLUJO TÍPICO DE FRONTEND:
-# 1. POST /users/authenticate → Obtener token
-# 2. Almacenar token en localStorage/sessionStorage
-# 3. Incluir token en todas las peticiones autenticadas
-# 4. Manejar renovación cuando expire (401 response)

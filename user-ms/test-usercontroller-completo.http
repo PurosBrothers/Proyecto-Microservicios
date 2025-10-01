@@ -1,18 +1,12 @@
-### PRUEBAS COMPLETAS - UserController con Registro de Roles Obligatorios
-
 @userms_url = http://localhost:8083
 @gateway_url = http://localhost:8080
 
-### 1. Información del sistema
 GET {{userms_url}}/users/info
 
-### 2. Verificar tipos de usuario disponibles
 GET {{userms_url}}/users/tipos-usuario
 
-### 3. Verificar si un correo ya existe (debe retornar false para nuevo correo)
 GET {{userms_url}}/users/verificar-correo?correo=nuevo.usuario@gmail.com
 
-### 4. ✅ REGISTRO EXITOSO - Cliente con todos los campos
 POST {{userms_url}}/users
 Content-Type: application/json
 
@@ -27,7 +21,6 @@ Content-Type: application/json
     "direccion": "Calle 123 #45-67, Bogota, Colombia"
 }
 
-### 5. ✅ REGISTRO EXITOSO - Proveedor con todos los campos
 POST {{userms_url}}/users
 Content-Type: application/json
 
@@ -42,7 +35,6 @@ Content-Type: application/json
     "direccion": "Carrera 15 #67-89, Medellin, Colombia"
 }
 
-### 6. ❌ ERROR - Sin tipo de usuario (OBLIGATORIO)
 POST {{userms_url}}/users
 Content-Type: application/json
 
@@ -54,7 +46,6 @@ Content-Type: application/json
     "descripcion": "Usuario sin tipo especificado"
 }
 
-### 7. ❌ ERROR - Tipo de usuario null (OBLIGATORIO)
 POST {{userms_url}}/users
 Content-Type: application/json
 
@@ -66,7 +57,6 @@ Content-Type: application/json
     "edad": 28
 }
 
-### 8. ❌ ERROR - Correo duplicado
 POST {{userms_url}}/users
 Content-Type: application/json
 
@@ -78,7 +68,6 @@ Content-Type: application/json
     "edad": 25
 }
 
-### 9. ❌ ERROR - Datos inválidos (edad menor, correo inválido, contraseña corta)
 POST {{userms_url}}/users
 Content-Type: application/json
 
@@ -90,25 +79,20 @@ Content-Type: application/json
     "edad": 15
 }
 
-### 10. Verificar que el correo ya existe después del registro
 GET {{userms_url}}/users/verificar-correo?correo=juan.cliente@gmail.com
 
-### 11. Listar todos los usuarios registrados
 GET {{userms_url}}/users
 
-### 12. Obtener token para usuario CLIENTE (Keycloak)
 POST http://localhost:8081/realms/proyect-ms-realm/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
 
 grant_type=password&client_id=user-ms-client&client_secret=Aq3vK9EfTGwoWpK3j48RkN6Q0yCUZqGd&username=juan.cliente@gmail.com&password=password123
 
-### 13. Obtener token para usuario PROVEEDOR (Keycloak)
 POST http://localhost:8081/realms/proyect-ms-realm/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
 
 grant_type=password&client_id=user-ms-client&client_secret=Aq3vK9EfTGwoWpK3j48RkN6Q0yCUZqGd&username=maria.proveedor@gmail.com&password=password123
 
-### 14. Autenticación integrada - Cliente (usando endpoint del UserController)
 POST {{userms_url}}/users/authenticate
 Content-Type: application/json
 
@@ -117,7 +101,6 @@ Content-Type: application/json
     "password": "password123"
 }
 
-### 15. Autenticación integrada - Proveedor (usando endpoint del UserController)
 POST {{userms_url}}/users/authenticate
 Content-Type: application/json
 
@@ -126,5 +109,4 @@ Content-Type: application/json
     "password": "password123"
 }
 
-### 16. Debug de configuración de Keycloak
 GET {{userms_url}}/users/debug-keycloak

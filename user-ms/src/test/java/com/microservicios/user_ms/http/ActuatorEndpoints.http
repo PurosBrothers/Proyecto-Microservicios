@@ -1,24 +1,11 @@
 @host=http://localhost:8083
 
-### Verificar estado del servicio
 GET {{host}}/actuator/health
 
-###
-
-### Verificar información del servicio
 GET {{host}}/actuator/info
 
-###
-
-### Verificar métricas del servicio
 GET {{host}}/actuator/metrics
 
-###
-
-### Verificar configuración del servicio
 GET {{host}}/actuator/configprops
 
-###
-
-### Verificar logs del servicio
 GET {{host}}/actuator/loggers

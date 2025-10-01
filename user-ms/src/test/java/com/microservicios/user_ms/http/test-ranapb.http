@@ -1,25 +1,18 @@
-### PRUEBA SISTEMA DE IMÁGENES CON RANAPB.PNG
-
-# Variables
 @gateway_url = http://localhost:8080
 @userId = 2a36ca84-0166-46b2-80b4-0838987388bf
 
-### PASO 1: Obtener Token
 # @name auth
 POST http://localhost:8081/realms/proyect-ms-realm/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
 
 grant_type=password&client_id=user-ms-client&client_secret=Aq3vK9EfTGwoWpK3j48RkN6Q0yCUZqGd&username=laura.martinez@gmail.com&password=password123
 
-### PASO 2: Listar usuarios (usa el token del paso anterior)
 GET {{gateway_url}}/api/users
 Authorization: Bearer {{auth.response.body.access_token}}
 
-### PASO 3: Verificar imagen actual (debe dar 404)
 GET {{gateway_url}}/api/images/{{userId}}
 Authorization: Bearer {{auth.response.body.access_token}}
 
-### PASO 4: SUBIR IMAGEN RANAPB.PNG
 POST {{gateway_url}}/api/users/{{userId}}/image
 Authorization: Bearer {{auth.response.body.access_token}}
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
@@ -31,10 +24,8 @@ Content-Type: image/png
 < ./ranapb.png
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
 
-### PASO 5: Verificar imagen subida (debe devolver la imagen)
 GET {{gateway_url}}/api/images/{{userId}}
 Authorization: Bearer {{auth.response.body.access_token}}
 
-### PASO 6: Verificar usuario actualizado
 GET {{gateway_url}}/api/users
 Authorization: Bearer {{auth.response.body.access_token}}

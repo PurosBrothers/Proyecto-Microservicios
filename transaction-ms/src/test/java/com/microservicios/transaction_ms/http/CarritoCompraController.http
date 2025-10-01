@@ -1,6 +1,5 @@
 @host=http://localhost:8082
 
-###
 POST {{host}}/carrito-compra/list-items-carrito
 Content-Type: application/json
 
@@ -8,12 +7,8 @@ Content-Type: application/json
   "uid": "2a36ca84-0166-46b2-80b4-0838987388bf"
 }
 
-
-
-###
 DELETE {{host}}/carrito-compra/delete-item-carrito?uid=1&itemId=1
 
-###
 PUT {{host}}/carrito-compra/agregar-item-carrito?uid=1
 Content-Type: application/json
 
@@ -25,5 +20,4 @@ Content-Type: application/json
   "nombreItem": "Test Item"
 }
 
-###
 GET {{host}}/actuator/info
