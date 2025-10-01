@@ -9,11 +9,15 @@ import com.microservicios.transaction_ms.models.ItemTransaccion;
 import com.microservicios.transaction_ms.models.Transaccion;
 import com.microservicios.transaction_ms.repository.TransaccionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -31,6 +35,11 @@ public class TransaccionService {
 
     @Autowired
     private RabbitMQSender rabbitMQSender;
+
+    @Autowired
+    private DiscoveryClient discoveryClient;
+
+    private final RestTemplate restTemplate = new RestTemplate();
 
     public Transaccion create(Transaccion transaccion) {
         return repository.save(transaccion);
@@ -168,11 +177,43 @@ public class TransaccionService {
             repository.save(trans);
             System.out.println("Transacción completada: " + id);
 
+            // Obtener instancia de marketplace-ms
+            List<ServiceInstance> instances = discoveryClient.getInstances("marketplace-ms");
+            if (instances.isEmpty()) {
+                System.out.println("No se encontró instancia de marketplace-ms");
+                return;
+            }
+            String baseUrl = instances.get(0).getUri().toString();
+
             // Enviar updates a marketplace para cada item pagado
             for (ItemTransaccion item : trans.getItemsPagados()) {
-                UpdateItemMessageDTO updateDTO = new UpdateItemMessageDTO(item.getOfertaId(), item.getCantidad(),
-                        "stock");
-                rabbitMQSender.sendUpdateItemMessage(updateDTO);
+                try {
+                    // Consultar clasificación del item
+                    String clasifUrl = baseUrl + "/items/" + item.getOfertaId() + "/clasificacion";
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> clasifMap = restTemplate.getForObject(clasifUrl, Map.class);
+                    String tipo = (String) clasifMap.get("tipo");
+
+                    // Determinar tipoCambio basado en clasificación
+                    String tipoCambio = switch (tipo) {
+                        case "Alimentacion" -> "stock";
+                        case "Alojamiento" -> "fechas";
+                        case "PaseosEcologicos" -> "cupo";
+                        case "Transporte" -> "stock";
+                        default -> "stock";
+                    };
+
+                    UpdateItemMessageDTO updateDTO = new UpdateItemMessageDTO(item.getOfertaId(), item.getCantidad(),
+                            tipoCambio);
+                    rabbitMQSender.sendUpdateItemMessage(updateDTO);
+                } catch (Exception e) {
+                    System.out.println(
+                            "Error consultando clasificación para item " + item.getOfertaId() + ": " + e.getMessage());
+                    // Fallback a stock
+                    UpdateItemMessageDTO updateDTO = new UpdateItemMessageDTO(item.getOfertaId(), item.getCantidad(),
+                            "stock");
+                    rabbitMQSender.sendUpdateItemMessage(updateDTO);
+                }
             }
         } else {
             System.out.println("Transacción no encontrada para completar: " + id);

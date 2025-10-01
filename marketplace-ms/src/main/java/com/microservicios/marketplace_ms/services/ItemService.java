@@ -119,24 +119,19 @@ public class ItemService {
         Optional<Item> itemOpt = itemRepository.findById(itemId);
         if (itemOpt.isPresent()) {
             Item item = itemOpt.get();
-            String clasificacionTipo = item.getClasificacion().getTipo();
-            if ("Alojamiento".equals(clasificacionTipo)) {
-                // Para alojamiento, no usar stock, usar capacidadMaxima
-                if ("cupo".equals(tipoCambio) && item.getCapacidadMaxima() != null) {
-                    item.setCapacidadMaxima(item.getCapacidadMaxima() - cantidadVendida);
-                    itemRepository.save(item);
-                    System.out.println("Cupo actualizado para alojamiento " + itemId + ": " + item.getCapacidadMaxima());
-                } else if ("fechas".equals(tipoCambio)) {
-                    // Marcar fechas como reservadas
-                    System.out.println("Actualización de fechas para alojamiento " + itemId);
-                }
-            } else {
-                // Para otras clasificaciones, usar stock
-                if ("stock".equals(tipoCambio) && item.getStock() != null) {
-                    item.setStock(item.getStock() - cantidadVendida);
-                    itemRepository.save(item);
-                    System.out.println("Stock actualizado para item " + itemId + ": " + item.getStock());
-                }
+            if ("stock".equals(tipoCambio) && item.getStock() != null) {
+                item.setStock(item.getStock() - cantidadVendida);
+                itemRepository.save(item);
+                System.out.println("Stock actualizado para item " + itemId + ": " + item.getStock());
+            } else if ("fechas".equals(tipoCambio) && item.getCapacidadMaxima() != null) {
+                // Para alojamiento, reducir capacidad máxima (ej. habitaciones disponibles)
+                item.setCapacidadMaxima(item.getCapacidadMaxima() - cantidadVendida);
+                itemRepository.save(item);
+                System.out.println("Capacidad actualizada para item " + itemId + ": " + item.getCapacidadMaxima());
+            } else if ("cupo".equals(tipoCambio) && item.getCapacidadMaxima() != null) {
+                item.setCapacidadMaxima(item.getCapacidadMaxima() - cantidadVendida);
+                itemRepository.save(item);
+                System.out.println("Cupo actualizado para item " + itemId + ": " + item.getCapacidadMaxima());
             }
         } else {
             System.out.println("Item no encontrado para actualizar: " + itemId);
