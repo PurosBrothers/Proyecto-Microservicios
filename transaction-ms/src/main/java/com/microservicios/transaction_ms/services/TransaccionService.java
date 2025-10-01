@@ -85,6 +85,55 @@ public class TransaccionService {
             return null;
         }
 
+        // Validar stock/capacidad disponible para cada item
+        List<ServiceInstance> instances = discoveryClient.getInstances("marketplace-ms");
+        if (instances.isEmpty()) {
+            System.out.println("No se encontró instancia de marketplace-ms para validación");
+            return null;
+        }
+        String baseUrl = instances.get(0).getUri().toString();
+
+        for (ItemCarrito item : cartItems) {
+            try {
+                // Obtener item completo
+                String itemUrl = baseUrl + "/items/" + item.getIdItem();
+                @SuppressWarnings("unchecked")
+                Map<String, Object> itemMap = restTemplate.getForObject(itemUrl, Map.class);
+                if (itemMap == null) {
+                    System.out.println("Item no encontrado: " + item.getIdItem());
+                    return null;
+                }
+
+                // Obtener clasificación
+                @SuppressWarnings("unchecked")
+                Map<String, Object> clasifMap = (Map<String, Object>) itemMap.get("clasificacion");
+                if (clasifMap == null) {
+                    System.out.println("Clasificación no encontrada para item: " + item.getIdItem());
+                    return null;
+                }
+                String tipo = (String) clasifMap.get("tipo");
+
+                // Determinar campo a validar
+                String campoValidar;
+                switch (tipo) {
+                    case "Alimentacion", "Transporte" -> campoValidar = "stock";
+                    case "Alojamiento", "PaseosEcologicos" -> campoValidar = "capacidadMaxima";
+                    default -> campoValidar = "stock";
+                }
+
+                // Obtener valor actual
+                Integer valorActual = (Integer) itemMap.get(campoValidar);
+                if (valorActual == null || valorActual < item.getCantidad()) {
+                    System.out.println("No hay suficiente " + campoValidar + " para item " + item.getIdItem() +
+                            ". Disponible: " + valorActual + ", solicitado: " + item.getCantidad());
+                    return null;
+                }
+            } catch (Exception e) {
+                System.out.println("Error validando item " + item.getIdItem() + ": " + e.getMessage());
+                return null;
+            }
+        }
+
         // Convertir items de carrito (por pagar) a items de transacción (pagados)
         List<ItemTransaccion> itemsTransaccion = cartItems.stream().map(item -> {
             ItemTransaccion it = new ItemTransaccion();
