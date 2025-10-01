@@ -92,7 +92,7 @@ public class DbInitializer implements CommandLineRunner {
         alojamiento.setPrecio(new BigDecimal("150.00"));
         alojamiento.setFechaDisponibilidadInicio(LocalDateTime.now());
         alojamiento.setFechaDisponibilidadFin(LocalDateTime.now().plusDays(7));
-        alojamiento.setCapacidadMaxima(4);
+        alojamiento.setCapacidadMaxima(1);
         alojamiento.setFechaCheckin(LocalDateTime.now().plusDays(1));
         alojamiento.setFechaCheckout(LocalDateTime.now().plusDays(7));
         alojamiento.setTipoInmueble("Hotel");
