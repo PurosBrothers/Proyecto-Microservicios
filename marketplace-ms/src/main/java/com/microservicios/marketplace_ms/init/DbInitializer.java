@@ -19,6 +19,7 @@ import com.microservicios.marketplace_ms.entities.ItemLink;
 import com.microservicios.marketplace_ms.entities.ItemTag;
 import com.microservicios.marketplace_ms.entities.ItemVideo;
 import com.microservicios.marketplace_ms.entities.PaseosEcologicos;
+import com.microservicios.marketplace_ms.entities.PreguntaFrecuente;
 import com.microservicios.marketplace_ms.entities.RequisitosEspeciales;
 import com.microservicios.marketplace_ms.entities.RestriccionesDieteticas;
 import com.microservicios.marketplace_ms.entities.ServiciosIncluidos;
@@ -31,6 +32,7 @@ import com.microservicios.marketplace_ms.repositories.ItemLinkRepository;
 import com.microservicios.marketplace_ms.repositories.ItemRepository;
 import com.microservicios.marketplace_ms.repositories.ItemTagRepository;
 import com.microservicios.marketplace_ms.repositories.ItemVideoRepository;
+import com.microservicios.marketplace_ms.repositories.PreguntaFrecuenteRepository;
 import com.microservicios.marketplace_ms.repositories.RequisitosEspecialesRepository;
 import com.microservicios.marketplace_ms.repositories.RestriccionesDieteticasRepository;
 import com.microservicios.marketplace_ms.repositories.ServiciosIncluidosRepository;
@@ -46,6 +48,7 @@ public class DbInitializer implements CommandLineRunner {
     private final ItemRepository itemRepository;
     private final ItemTagRepository itemTagRepository;
     private final ItemVideoRepository itemVideoRepository;
+    private final PreguntaFrecuenteRepository preguntaFrecuenteRepository;
     private final RequisitosEspecialesRepository requisitosEspecialesRepository;
     private final RestriccionesDieteticasRepository restriccionesDieteticasRepository;
     private final ServiciosIncluidosRepository serviciosIncluidosRepository;
@@ -58,6 +61,7 @@ public class DbInitializer implements CommandLineRunner {
             ItemRepository itemRepository,
             ItemTagRepository itemTagRepository,
             ItemVideoRepository itemVideoRepository,
+            PreguntaFrecuenteRepository preguntaFrecuenteRepository,
             RequisitosEspecialesRepository requisitosEspecialesRepository,
             RestriccionesDieteticasRepository restriccionesDieteticasRepository,
             ServiciosIncluidosRepository serviciosIncluidosRepository) {
@@ -69,6 +73,7 @@ public class DbInitializer implements CommandLineRunner {
         this.itemRepository = itemRepository;
         this.itemTagRepository = itemTagRepository;
         this.itemVideoRepository = itemVideoRepository;
+        this.preguntaFrecuenteRepository = preguntaFrecuenteRepository;
         this.requisitosEspecialesRepository = requisitosEspecialesRepository;
         this.restriccionesDieteticasRepository = restriccionesDieteticasRepository;
         this.serviciosIncluidosRepository = serviciosIncluidosRepository;
@@ -166,6 +171,17 @@ public class DbInitializer implements CommandLineRunner {
 
         itemAlojamiento = itemRepository.save(itemAlojamiento);
 
+        // Create PreguntaFrecuente for the Item
+        PreguntaFrecuente pregunta1 = new PreguntaFrecuente();
+        pregunta1.setPregunta("¿El hotel incluye desayuno?");
+        pregunta1.setItem(itemAlojamiento);
+        preguntaFrecuenteRepository.save(pregunta1);
+
+        PreguntaFrecuente pregunta2 = new PreguntaFrecuente();
+        pregunta2.setPregunta("¿Hay estacionamiento disponible?");
+        pregunta2.setItem(itemAlojamiento);
+        preguntaFrecuenteRepository.save(pregunta2);
+
         // Create ItemFoto for the Item
         ItemFoto foto1 = new ItemFoto();
         foto1.setUrl("https://example.com/hotel1.jpg");
@@ -225,7 +241,18 @@ public class DbInitializer implements CommandLineRunner {
         itemAlimentacion.setCapacidadMaxima(alimentacion.getCapacidadMaxima());
         itemAlimentacion.setClasificacion(alimentacion);
 
-        itemRepository.save(itemAlimentacion);
+        itemAlimentacion = itemRepository.save(itemAlimentacion);
+
+        // Create PreguntaFrecuente for Alimentacion
+        PreguntaFrecuente preguntaAlimentacion1 = new PreguntaFrecuente();
+        preguntaAlimentacion1.setPregunta("¿El menú incluye opciones vegetarianas?");
+        preguntaAlimentacion1.setItem(itemAlimentacion);
+        preguntaFrecuenteRepository.save(preguntaAlimentacion1);
+
+        PreguntaFrecuente preguntaAlimentacion2 = new PreguntaFrecuente();
+        preguntaAlimentacion2.setPregunta("¿Hay restricciones dietéticas disponibles?");
+        preguntaAlimentacion2.setItem(itemAlimentacion);
+        preguntaFrecuenteRepository.save(preguntaAlimentacion2);
 
         // Create Item with Transporte classification
         Item itemTransporte = new Item();
@@ -242,7 +269,18 @@ public class DbInitializer implements CommandLineRunner {
         itemTransporte.setCapacidadMaxima(transporte.getCapacidadMaxima());
         itemTransporte.setClasificacion(transporte);
 
-        itemRepository.save(itemTransporte);
+        itemTransporte = itemRepository.save(itemTransporte);
+
+        // Create PreguntaFrecuente for Transporte
+        PreguntaFrecuente preguntaTransporte1 = new PreguntaFrecuente();
+        preguntaTransporte1.setPregunta("¿El precio incluye equipaje?");
+        preguntaTransporte1.setItem(itemTransporte);
+        preguntaFrecuenteRepository.save(preguntaTransporte1);
+
+        PreguntaFrecuente preguntaTransporte2 = new PreguntaFrecuente();
+        preguntaTransporte2.setPregunta("¿Hay paradas intermedias?");
+        preguntaTransporte2.setItem(itemTransporte);
+        preguntaFrecuenteRepository.save(preguntaTransporte2);
 
         // Create Item with PaseosEcologicos classification
         Item itemPaseos = new Item();
@@ -259,7 +297,18 @@ public class DbInitializer implements CommandLineRunner {
         itemPaseos.setCapacidadMaxima(paseos.getCapacidadMaxima());
         itemPaseos.setClasificacion(paseos);
 
-        itemRepository.save(itemPaseos);
+        itemPaseos = itemRepository.save(itemPaseos);
+
+        // Create PreguntaFrecuente for PaseosEcologicos
+        PreguntaFrecuente preguntaPaseos1 = new PreguntaFrecuente();
+        preguntaPaseos1.setPregunta("¿Qué equipo se incluye en el tour?");
+        preguntaPaseos1.setItem(itemPaseos);
+        preguntaFrecuenteRepository.save(preguntaPaseos1);
+
+        PreguntaFrecuente preguntaPaseos2 = new PreguntaFrecuente();
+        preguntaPaseos2.setPregunta("¿Hay límite de edad para participar?");
+        preguntaPaseos2.setItem(itemPaseos);
+        preguntaFrecuenteRepository.save(preguntaPaseos2);
 
         // Create Comentario
         Comentario comentario = new Comentario();

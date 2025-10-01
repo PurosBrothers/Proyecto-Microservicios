@@ -3,6 +3,7 @@ package com.microservicios.marketplace_ms.dtos;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.microservicios.marketplace_ms.entities.Clasificacion;
 
@@ -23,6 +24,7 @@ public class ItemDTO {
     private Integer stock;
     private Integer visualizaciones;
     private Long calificacionPromedio;
+    private List<PreguntaFrecuenteDTO> preguntasFrecuentes;
 
     // Getters and Setters
     public Long getId() {
@@ -87,5 +89,13 @@ public class ItemDTO {
 
     public void setCalificacionPromedio(Long calificacionPromedio) {
         this.calificacionPromedio = calificacionPromedio;
+    }
+
+    public List<PreguntaFrecuenteDTO> getPreguntasFrecuentes() {
+        return preguntasFrecuentes;
+    }
+
+    public void setPreguntasFrecuentes(List<PreguntaFrecuenteDTO> preguntasFrecuentes) {
+        this.preguntasFrecuentes = preguntasFrecuentes;
     }
 }

@@ -22,6 +22,7 @@ type Item {
   links: [ItemLink]
   calificaciones: [Calificacion]
   serviciosIncluidos: [ServicioIncluido]
+  preguntasFrecuentes: [PreguntaFrecuente]
 }
 
 type Clasificacion {
@@ -65,4 +66,10 @@ type ServicioIncluido {
   id: ID!
   nombre: String!
   descripcion: String
+}
+
+type PreguntaFrecuente {
+  id: ID!
+  pregunta: String!
+  itemId: ID
 }

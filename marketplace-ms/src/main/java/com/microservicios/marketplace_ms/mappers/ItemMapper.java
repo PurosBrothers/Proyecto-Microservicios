@@ -1,5 +1,8 @@
 package com.microservicios.marketplace_ms.mappers;
 
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.microservicios.marketplace_ms.dtos.ItemDTO;
@@ -7,6 +10,9 @@ import com.microservicios.marketplace_ms.entities.Item;
 
 @Component
 public class ItemMapper {
+
+    @Autowired
+    private PreguntaFrecuenteMapper preguntaFrecuenteMapper;
 
     public Item dtoToEntity(ItemDTO itemDTO) {
         if (itemDTO == null) {
@@ -42,6 +48,11 @@ public class ItemMapper {
         itemDTO.setVisualizaciones(item.getVisualizaciones());
         itemDTO.setCalificacionPromedio(item.getCalificacionPromedio());
         itemDTO.setClasificacion(item.getClasificacion());
+        if (item.getPreguntasFrecuentes() != null) {
+            itemDTO.setPreguntasFrecuentes(item.getPreguntasFrecuentes().stream()
+                    .map(preguntaFrecuenteMapper::entityToDto)
+                    .collect(Collectors.toList()));
+        }
         return itemDTO;
     }
 }

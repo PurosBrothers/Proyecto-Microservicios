@@ -54,6 +54,9 @@ public class Item {
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
     private List<ServiciosIncluidos> serviciosIncluidos = new ArrayList<>();
 
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    private List<PreguntaFrecuente> preguntasFrecuentes = new ArrayList<>();
+
     // Getters and Setters
     public Long getId() {
         return id;
@@ -205,6 +208,14 @@ public class Item {
 
     public void setServiciosIncluidos(List<ServiciosIncluidos> serviciosIncluidos) {
         this.serviciosIncluidos = serviciosIncluidos;
+    }
+
+    public List<PreguntaFrecuente> getPreguntasFrecuentes() {
+        return preguntasFrecuentes;
+    }
+
+    public void setPreguntasFrecuentes(List<PreguntaFrecuente> preguntasFrecuentes) {
+        this.preguntasFrecuentes = preguntasFrecuentes;
     }
 
 }
