@@ -123,9 +123,11 @@ public class ItemService {
                 item.setStock(item.getStock() - cantidadVendida);
                 itemRepository.save(item);
                 System.out.println("Stock actualizado para item " + itemId + ": " + item.getStock());
-            } else if ("fechas".equals(tipoCambio)) {
-                // Para alojamiento, marcar fechas como reservadas, pero simplificar por ahora
-                System.out.println("Actualización de fechas para item " + itemId);
+            } else if ("fechas".equals(tipoCambio) && item.getCapacidadMaxima() != null) {
+                // Para alojamiento, reducir capacidad máxima (ej. habitaciones disponibles)
+                item.setCapacidadMaxima(item.getCapacidadMaxima() - cantidadVendida);
+                itemRepository.save(item);
+                System.out.println("Capacidad actualizada para item " + itemId + ": " + item.getCapacidadMaxima());
             } else if ("cupo".equals(tipoCambio) && item.getCapacidadMaxima() != null) {
                 item.setCapacidadMaxima(item.getCapacidadMaxima() - cantidadVendida);
                 itemRepository.save(item);
