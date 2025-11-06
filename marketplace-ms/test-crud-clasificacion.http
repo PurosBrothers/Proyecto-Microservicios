@@ -1,0 +1,199 @@
+### Pruebas de autenticación JWT para marketplace-ms
+
+### 1. Obtener token JWT a través del Gateway
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+    "email": "dickgrayson@gmail.com",
+    "password": "password123"
+}
+
+> {%
+client.global.set("access_token", response.body.accessToken);
+client.log("Token obtenido: " + response.body.accessToken);
+%}
+
+### 1B. Verificar token obtenido (debug)
+GET http://httpbin.org/get
+
+> {%
+var token = client.global.get("access_token");
+client.log("=== DEBUG TOKEN ===");
+client.log("Token guardado: " + token);
+client.log("Token length: " + (token ? token.length : "null/undefined"));
+client.log("Token starts with: " + (token ? token.substring(0, 20) : "no token"));
+client.log("==================");
+%}
+
+### 2. Listar todas las clasificaciones (sin autenticación - debería funcionar)
+GET http://localhost:8084/clasificaciones
+Accept: application/json
+
+### 2B. Alternativa - A través del Gateway (si está configurado)
+GET http://localhost:8080/marketplace/clasificaciones
+Accept: application/json
+
+### 3A. Test con token hardcodeado (para debug)
+POST http://localhost:8084/alojamiento
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTWdvZ0pJN3JPRi1OWlY1anVjRkx6Mjh0TlB3eHNsbVlBbG1ORTZZMDNRIn0.eyJleHAiOjE3NjI0MDk2MzQsImlhdCI6MTc2MjQwODczNCwianRpIjoib25ydHJvOjY5YzdhMGQ2LWYwYTYtYjA0Zi1mZGNmLTg4OTM2ZDJlYzc0MyIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MS9yZWFsbXMvcHJveWVjdC1tcy1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyM2FlN2Y0Yi1lNTA3LTRlOWMtOGVkNi1kZWMyMGJmOWQwNGEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ1c2VyLW1zLWNsaWVudCIsInNpZCI6ImQxM2Y5OTdlLTc4OTAtNGM1ZS05OGVjLWUzMTY5ODkyZGFmYSIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyoiLCJodHRwOi8vbG9jYWxob3N0OjgwODMvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiUFJPVkVFRE9SIiwib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLXByb3llY3QtbXMtcmVhbG0iLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiRGljayBHcmF5c29uIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiZGlja2dyYXlzb25AZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6IkRpY2siLCJmYW1pbHlfbmFtZSI6IkdyYXlzb24iLCJlbWFpbCI6ImRpY2tncmF5c29uQGdtYWlsLmNvbSJ9.QhWYIsrMvXf6ScLFiP9AxL_bNeYoCZ5pNPWxBJLHjJH6ZN1cCzqMzC69wXOIK8ownFI0whzBFjPIM-iR8owLm40FWkqJR8uov5HfQEdhFbrsAgsIN1-Mh2uszjd4PhX04OPp6gDobE7HJLEjI_WBMtDSszWYlEwBgpPoi1QbyixhtXXJSApma-64yOpr-Exg3eWQEobZasd49_XR425N2tymeAw3MQ220isO0ksk6zTJUwmhc0vNRpUpWZ3FEgrrkBt_HVL_CU8f9_x8HoGSjbrqRBFSWIs4EQIav8b2ePCds-ATVx4Vfia6HfuVsbRNx8oXKQNrd9U_XeFSPpgOjg
+
+{
+  "tipo": "Alojamiento",
+  "lugarInicio": "Bogotá",
+  "precio": 150.00,
+  "fechaDisponibilidadInicio": "2025-11-07T00:00:00",
+  "fechaDisponibilidadFin": "2025-11-14T00:00:00",
+  "capacidadMaxima": 4,
+  "fechaCheckin": "2025-11-07T15:00:00",
+  "fechaCheckout": "2025-11-14T11:00:00",
+  "tipoInmueble": "Hotel",
+  "numeroBanos": 2,
+  "numeroHabitaciones": 3,
+  "lat": 4.7110,
+  "lng": -74.0721
+}
+
+### 3. Crear una nueva clasificación (requiere ROLE_PROVEEDOR)
+POST http://localhost:8084/alojamiento
+Content-Type: application/json
+Authorization: Bearer {access_token}
+
+{
+  "tipo": "Alojamiento",
+  "lugarInicio": "Medellín",
+  "precio": 120.00,
+  "fechaDisponibilidadInicio": "2025-11-08T00:00:00",
+  "fechaDisponibilidadFin": "2025-11-15T00:00:00",
+  "capacidadMaxima": 2,
+  "fechaCheckin": "2025-11-08T15:00:00",
+  "fechaCheckout": "2025-11-15T11:00:00",
+  "tipoInmueble": "Apartamento",
+  "numeroBanos": 1,
+  "numeroHabitaciones": 2,
+  "lat": 6.2442,
+  "lng": -75.5812
+}
+
+### 4. Actualizar clasificación (requiere ROLE_PROVEEDOR)
+PUT http://localhost:8084/alojamiento/8
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTWdvZ0pJN3JPRi1OWlY1anVjRkx6Mjh0TlB3eHNsbVlBbG1ORTZZMDNRIn0.eyJleHAiOjE3NjI0MDk2MzQsImlhdCI6MTc2MjQwODczNCwianRpIjoib25ydHJvOjY5YzdhMGQ2LWYwYTYtYjA0Zi1mZGNmLTg4OTM2ZDJlYzc0MyIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MS9yZWFsbXMvcHJveWVjdC1tcy1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyM2FlN2Y0Yi1lNTA3LTRlOWMtOGVkNi1kZWMyMGJmOWQwNGEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ1c2VyLW1zLWNsaWVudCIsInNpZCI6ImQxM2Y5OTdlLTc4OTAtNGM1ZS05OGVjLWUzMTY5ODkyZGFmYSIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyoiLCJodHRwOi8vbG9jYWxob3N0OjgwODMvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiUFJPVkVFRE9SIiwib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLXByb3llY3QtbXMtcmVhbG0iLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiRGljayBHcmF5c29uIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiZGlja2dyYXlzb25AZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6IkRpY2siLCJmYW1pbHlfbmFtZSI6IkdyYXlzb24iLCJlbWFpbCI6ImRpY2tncmF5c29uQGdtYWlsLmNvbSJ9.QhWYIsrMvXf6ScLFiP9AxL_bNeYoCZ5pNPWxBJLHjJH6ZN1cCzqMzC69wXOIK8ownFI0whzBFjPIM-iR8owLm40FWkqJR8uov5HfQEdhFbrsAgsIN1-Mh2uszjd4PhX04OPp6gDobE7HJLEjI_WBMtDSszWYlEwBgpPoi1QbyixhtXXJSApma-64yOpr-Exg3eWQEobZasd49_XR425N2tymeAw3MQ220isO0ksk6zTJUwmhc0vNRpUpWZ3FEgrrkBt_HVL_CU8f9_x8HoGSjbrqRBFSWIs4EQIav8b2ePCds-ATVx4Vfia6HfuVsbRNx8oXKQNrd9U_XeFSPpgOjg
+
+{
+  "id": 1,
+  "tipo": "Alojamiento",
+  "lugarInicio": "Bogotá Centro",
+  "precio": 180.00,
+  "fechaDisponibilidadInicio": "2025-11-07T00:00:00",
+  "fechaDisponibilidadFin": "2025-11-21T00:00:00",
+  "capacidadMaxima": 6,
+  "fechaCheckin": "2025-11-07T15:00:00",
+  "fechaCheckout": "2025-11-21T11:00:00",
+  "tipoInmueble": "Hotel Boutique",
+  "numeroBanos": 3,
+  "numeroHabitaciones": 4,
+  "lat": 4.7110,
+  "lng": -74.0721
+}
+
+### 5. Eliminar clasificación (requiere ROLE_PROVEEDOR)
+DELETE http://localhost:8084/alojamiento/8
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTWdvZ0pJN3JPRi1OWlY1anVjRkx6Mjh0TlB3eHNsbVlBbG1ORTZZMDNRIn0.eyJleHAiOjE3NjI0MDk2MzQsImlhdCI6MTc2MjQwODczNCwianRpIjoib25ydHJvOjY5YzdhMGQ2LWYwYTYtYjA0Zi1mZGNmLTg4OTM2ZDJlYzc0MyIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MS9yZWFsbXMvcHJveWVjdC1tcy1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyM2FlN2Y0Yi1lNTA3LTRlOWMtOGVkNi1kZWMyMGJmOWQwNGEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ1c2VyLW1zLWNsaWVudCIsInNpZCI6ImQxM2Y5OTdlLTc4OTAtNGM1ZS05OGVjLWUzMTY5ODkyZGFmYSIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyoiLCJodHRwOi8vbG9jYWxob3N0OjgwODMvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiUFJPVkVFRE9SIiwib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLXByb3llY3QtbXMtcmVhbG0iLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiRGljayBHcmF5c29uIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiZGlja2dyYXlzb25AZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6IkRpY2siLCJmYW1pbHlfbmFtZSI6IkdyYXlzb24iLCJlbWFpbCI6ImRpY2tncmF5c29uQGdtYWlsLmNvbSJ9.QhWYIsrMvXf6ScLFiP9AxL_bNeYoCZ5pNPWxBJLHjJH6ZN1cCzqMzC69wXOIK8ownFI0whzBFjPIM-iR8owLm40FWkqJR8uov5HfQEdhFbrsAgsIN1-Mh2uszjd4PhX04OPp6gDobE7HJLEjI_WBMtDSszWYlEwBgpPoi1QbyixhtXXJSApma-64yOpr-Exg3eWQEobZasd49_XR425N2tymeAw3MQ220isO0ksk6zTJUwmhc0vNRpUpWZ3FEgrrkBt_HVL_CU8f9_x8HoGSjbrqRBFSWIs4EQIav8b2ePCds-ATVx4Vfia6HfuVsbRNx8oXKQNrd9U_XeFSPpgOjg
+
+### 6. Intentar crear sin token (debería fallar con 401)
+POST http://localhost:8084/alojamiento
+Content-Type: application/json
+
+{
+  "tipo": "Alojamiento",
+  "lugarInicio": "Cali",
+  "precio": 100.00,
+  "fechaDisponibilidadInicio": "2025-11-07T00:00:00",
+  "fechaDisponibilidadFin": "2025-11-14T00:00:00",
+  "capacidadMaxima": 2,
+  "fechaCheckin": "2025-11-07T15:00:00",
+  "fechaCheckout": "2025-11-14T11:00:00",
+  "tipoInmueble": "Hostal",
+  "numeroBanos": 1,
+  "numeroHabitaciones": 1,
+  "lat": 3.4516,
+  "lng": -76.5320
+}
+
+### 7. Verificar endpoint de salud (sin autenticación)
+GET http://localhost:8084/actuator/health
+Accept: application/json
+
+### 8. Probar endpoint H2 console (sin autenticación para desarrollo)
+GET http://localhost:8084/h2-console
+
+### 9. Debug JWT (verificar roles)
+GET http://localhost:8084/api/debug/jwt-info
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTWdvZ0pJN3JPRi1OWlY1anVjRkx6Mjh0TlB3eHNsbVlBbG1ORTZZMDNRIn0.eyJleHAiOjE3NjI0MDk2MzQsImlhdCI6MTc2MjQwODczNCwianRpIjoib25ydHJvOjY5YzdhMGQ2LWYwYTYtYjA0Zi1mZGNmLTg4OTM2ZDJlYzc0MyIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MS9yZWFsbXMvcHJveWVjdC1tcy1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyM2FlN2Y0Yi1lNTA3LTRlOWMtOGVkNi1kZWMyMGJmOWQwNGEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ1c2VyLW1zLWNsaWVudCIsInNpZCI6ImQxM2Y5OTdlLTc4OTAtNGM1ZS05OGVjLWUzMTY5ODkyZGFmYSIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyoiLCJodHRwOi8vbG9jYWxob3N0OjgwODMvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiUFJPVkVFRE9SIiwib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLXByb3llY3QtbXMtcmVhbG0iLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiRGljayBHcmF5c29uIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiZGlja2dyYXlzb25AZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6IkRpY2siLCJmYW1pbHlfbmFtZSI6IkdyYXlzb24iLCJlbWFpbCI6ImRpY2tncmF5c29uQGdtYWlsLmNvbSJ9.QhWYIsrMvXf6ScLFiP9AxL_bNeYoCZ5pNPWxBJLHjJH6ZN1cCzqMzC69wXOIK8ownFI0whzBFjPIM-iR8owLm40FWkqJR8uov5HfQEdhFbrsAgsIN1-Mh2uszjd4PhX04OPp6gDobE7HJLEjI_WBMtDSszWYlEwBgpPoi1QbyixhtXXJSApma-64yOpr-Exg3eWQEobZasd49_XR425N2tymeAw3MQ220isO0ksk6zTJUwmhc0vNRpUpWZ3FEgrrkBt_HVL_CU8f9_x8HoGSjbrqRBFSWIs4EQIav8b2ePCds-ATVx4Vfia6HfuVsbRNx8oXKQNrd9U_XeFSPpgOjg
+
+### 10. Debug User ID (verificar extracción de usuario)
+GET http://localhost:8084/api/debug/user-id
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTWdvZ0pJN3JPRi1OWlY1anVjRkx6Mjh0TlB3eHNsbVlBbG1ORTZZMDNRIn0.eyJleHAiOjE3NjI0MDk2MzQsImlhdCI6MTc2MjQwODczNCwianRpIjoib25ydHJvOjY5YzdhMGQ2LWYwYTYtYjA0Zi1mZGNmLTg4OTM2ZDJlYzc0MyIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MS9yZWFsbXMvcHJveWVjdC1tcy1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyM2FlN2Y0Yi1lNTA3LTRlOWMtOGVkNi1kZWMyMGJmOWQwNGEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ1c2VyLW1zLWNsaWVudCIsInNpZCI6ImQxM2Y5OTdlLTc4OTAtNGM1ZS05OGVjLWUzMTY5ODkyZGFmYSIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyoiLCJodHRwOi8vbG9jYWxob3N0OjgwODMvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiUFJPVkVFRE9SIiwib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLXByb3llY3QtbXMtcmVhbG0iLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiRGljayBHcmF5c29uIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiZGlja2dyYXlzb25AZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6IkRpY2siLCJmYW1pbHlfbmFtZSI6IkdyYXlzb24iLCJlbWFpbCI6ImRpY2tncmF5c29uQGdtYWlsLmNvbSJ9.QhWYIsrMvXf6ScLFiP9AxL_bNeYoCZ5pNPWxBJLHjJH6ZN1cCzqMzC69wXOIK8ownFI0whzBFjPIM-iR8owLm40FWkqJR8uov5HfQEdhFbrsAgsIN1-Mh2uszjd4PhX04OPp6gDobE7HJLEjI_WBMtDSszWYlEwBgpPoi1QbyixhtXXJSApma-64yOpr-Exg3eWQEobZasd49_XR425N2tymeAw3MQ220isO0ksk6zTJUwmhc0vNRpUpWZ3FEgrrkBt_HVL_CU8f9_x8HoGSjbrqRBFSWIs4EQIav8b2ePCds-ATVx4Vfia6HfuVsbRNx8oXKQNrd9U_XeFSPpgOjg
+
+### 11. Crear Alimentacion (requiere ROLE_PROVEEDOR)
+POST http://localhost:8084/alimentacion
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTWdvZ0pJN3JPRi1OWlY1anVjRkx6Mjh0TlB3eHNsbVlBbG1ORTZZMDNRIn0.eyJleHAiOjE3NjI0MDk2MzQsImlhdCI6MTc2MjQwODczNCwianRpIjoib25ydHJvOjY5YzdhMGQ2LWYwYTYtYjA0Zi1mZGNmLTg4OTM2ZDJlYzc0MyIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MS9yZWFsbXMvcHJveWVjdC1tcy1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyM2FlN2Y0Yi1lNTA3LTRlOWMtOGVkNi1kZWMyMGJmOWQwNGEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ1c2VyLW1zLWNsaWVudCIsInNpZCI6ImQxM2Y5OTdlLTc4OTAtNGM1ZS05OGVjLWUzMTY5ODkyZGFmYSIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyoiLCJodHRwOi8vbG9jYWxob3N0OjgwODMvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiUFJPVkVFRE9SIiwib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLXByb3llY3QtbXMtcmVhbG0iLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiRGljayBHcmF5c29uIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiZGlja2dyYXlzb25AZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6IkRpY2siLCJmYW1pbHlfbmFtZSI6IkdyYXlzb24iLCJlbWFpbCI6ImRpY2tncmF5c29uQGdtYWlsLmNvbSJ9.QhWYIsrMvXf6ScLFiP9AxL_bNeYoCZ5pNPWxBJLHjJH6ZN1cCzqMzC69wXOIK8ownFI0whzBFjPIM-iR8owLm40FWkqJR8uov5HfQEdhFbrsAgsIN1-Mh2uszjd4PhX04OPp6gDobE7HJLEjI_WBMtDSszWYlEwBgpPoi1QbyixhtXXJSApma-64yOpr-Exg3eWQEobZasd49_XR425N2tymeAw3MQ220isO0ksk6zTJUwmhc0vNRpUpWZ3FEgrrkBt_HVL_CU8f9_x8HoGSjbrqRBFSWIs4EQIav8b2ePCds-ATVx4Vfia6HfuVsbRNx8oXKQNrd9U_XeFSPpgOjg
+
+{
+  "tipo": "Alimentacion",
+  "lugarInicio": "Cartagena",
+  "precio": 35.00,
+  "fechaDisponibilidadInicio": "2025-11-07T00:00:00",
+  "fechaDisponibilidadFin": "2025-11-07T23:59:59",
+  "capacidadMaxima": 50,
+  "horaInicio": "12:00:00",
+  "horaFinal": "15:00:00",
+  "tipoComida": "Almuerzo",
+  "menuIncluido": "Entrada, plato fuerte, postre y bebida",
+  "latitud": 10.4236,
+  "longitud": -75.5378
+}
+
+### 12. Crear Transporte (requiere ROLE_PROVEEDOR)  
+POST http://localhost:8084/transporte
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTWdvZ0pJN3JPRi1OWlY1anVjRkx6Mjh0TlB3eHNsbVlBbG1ORTZZMDNRIn0.eyJleHAiOjE3NjI0MDk2MzQsImlhdCI6MTc2MjQwODczNCwianRpIjoib25ydHJvOjY5YzdhMGQ2LWYwYTYtYjA0Zi1mZGNmLTg4OTM2ZDJlYzc0MyIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MS9yZWFsbXMvcHJveWVjdC1tcy1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyM2FlN2Y0Yi1lNTA3LTRlOWMtOGVkNi1kZWMyMGJmOWQwNGEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ1c2VyLW1zLWNsaWVudCIsInNpZCI6ImQxM2Y5OTdlLTc4OTAtNGM1ZS05OGVjLWUzMTY5ODkyZGFmYSIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyoiLCJodHRwOi8vbG9jYWxob3N0OjgwODMvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiUFJPVkVFRE9SIiwib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLXByb3llY3QtbXMtcmVhbG0iLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiRGljayBHcmF5c29uIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiZGlja2dyYXlzb25AZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6IkRpY2siLCJmYW1pbHlfbmFtZSI6IkdyYXlzb24iLCJlbWFpbCI6ImRpY2tncmF5c29uQGdtYWlsLmNvbSJ9.QhWYIsrMvXf6ScLFiP9AxL_bNeYoCZ5pNPWxBJLHjJH6ZN1cCzqMzC69wXOIK8ownFI0whzBFjPIM-iR8owLm40FWkqJR8uov5HfQEdhFbrsAgsIN1-Mh2uszjd4PhX04OPp6gDobE7HJLEjI_WBMtDSszWYlEwBgpPoi1QbyixhtXXJSApma-64yOpr-Exg3eWQEobZasd49_XR425N2tymeAw3MQ220isO0ksk6zTJUwmhc0vNRpUpWZ3FEgrrkBt_HVL_CU8f9_x8HoGSjbrqRBFSWIs4EQIav8b2ePCds-ATVx4Vfia6HfuVsbRNx8oXKQNrd9U_XeFSPpgOjg
+
+{
+  "tipo": "Transporte",
+  "lugarInicio": "Cali",
+  "precio": 85.00,
+  "fechaDisponibilidadInicio": "2025-11-07T06:00:00",
+  "fechaDisponibilidadFin": "2025-11-07T20:00:00",
+  "capacidadMaxima": 40,
+  "lugarDestino": "Bogotá",
+  "horaSalida": "2025-11-07T08:00:00",
+  "horaLlegada": "2025-11-07T18:00:00",
+  "tipoTransporte": "Bus",
+  "duracionViaje": 600,
+  "rutaGps": "Ruta Panamericana via Armenia"
+}
+
+### 13. Crear PaseosEcologicos (requiere ROLE_PROVEEDOR)
+POST http://localhost:8084/paseos-ecologico
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTWdvZ0pJN3JPRi1OWlY1anVjRkx6Mjh0TlB3eHNsbVlBbG1ORTZZMDNRIn0.eyJleHAiOjE3NjI0MDk2MzQsImlhdCI6MTc2MjQwODczNCwianRpIjoib25ydHJvOjY5YzdhMGQ2LWYwYTYtYjA0Zi1mZGNmLTg4OTM2ZDJlYzc0MyIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MS9yZWFsbXMvcHJveWVjdC1tcy1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyM2FlN2Y0Yi1lNTA3LTRlOWMtOGVkNi1kZWMyMGJmOWQwNGEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ1c2VyLW1zLWNsaWVudCIsInNpZCI6ImQxM2Y5OTdlLTc4OTAtNGM1ZS05OGVjLWUzMTY5ODkyZGFmYSIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyoiLCJodHRwOi8vbG9jYWxob3N0OjgwODMvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiUFJPVkVFRE9SIiwib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLXByb3llY3QtbXMtcmVhbG0iLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiRGljayBHcmF5c29uIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiZGlja2dyYXlzb25AZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6IkRpY2siLCJmYW1pbHlfbmFtZSI6IkdyYXlzb24iLCJlbWFpbCI6ImRpY2tncmF5c29uQGdtYWlsLmNvbSJ9.QhWYIsrMvXf6ScLFiP9AxL_bNeYoCZ5pNPWxBJLHjJH6ZN1cCzqMzC69wXOIK8ownFI0whzBFjPIM-iR8owLm40FWkqJR8uov5HfQEdhFbrsAgsIN1-Mh2uszjd4PhX04OPp6gDobE7HJLEjI_WBMtDSszWYlEwBgpPoi1QbyixhtXXJSApma-64yOpr-Exg3eWQEobZasd49_XR425N2tymeAw3MQ220isO0ksk6zTJUwmhc0vNRpUpWZ3FEgrrkBt_HVL_CU8f9_x8HoGSjbrqRBFSWIs4EQIav8b2ePCds-ATVx4Vfia6HfuVsbRNx8oXKQNrd9U_XeFSPpgOjg
+
+{
+  "tipo": "PaseosEcologicos",
+  "lugarInicio": "Parque Nacional Tayrona",
+  "precio": 95.00,
+  "fechaDisponibilidadInicio": "2025-11-07T00:00:00",
+  "fechaDisponibilidadFin": "2025-11-10T00:00:00",
+  "capacidadMaxima": 15,
+  "duracionHoras": 6,
+  "nivelDificultad": "Intermedio",
+  "equipoIncluido": true,
+  "guiaIncluido": true,
+  "edadMinima": 12,
+  "puntoEncuentro": "Entrada Principal del Parque",
+  "rutaEncuentro": "Carretera Troncal del Caribe Km 34"
+}

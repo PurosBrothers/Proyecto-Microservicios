@@ -29,6 +29,7 @@ public class ClasificacionController {
         return ResponseEntity.ok(saved);
     }
 
+
     @GetMapping("/{id}")
     public ResponseEntity<Clasificacion> getClasificacion(@PathVariable Long id) {
         return clasificacionService.getClasificacionById(id)

@@ -44,8 +44,14 @@ public abstract class Clasificacion {
     protected LocalDateTime fechaDisponibilidadFin;
     protected Integer capacidadMaxima;
 
+    @Column(name = "usuario_id", nullable = false)
+    protected String usuarioId;
+
     @ManyToMany
     protected List<RequisitosEspeciales> requisitosEspeciales = new ArrayList<>();
+
+    public Clasificacion() {
+    }
 
     // Getters and Setters
     public Long getId() {
@@ -110,5 +116,13 @@ public abstract class Clasificacion {
 
     public void setRequisitosEspeciales(List<RequisitosEspeciales> requisitosEspeciales) {
         this.requisitosEspeciales = requisitosEspeciales;
+    }
+
+    public String getUsuarioId() {
+        return usuarioId;
+    }
+
+    public void setUsuarioId(String usuarioId) {
+        this.usuarioId = usuarioId;
     }
 }

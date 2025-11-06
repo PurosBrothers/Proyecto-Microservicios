@@ -1,8 +1,6 @@
 package com.microservicios.marketplace_ms.dtos;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import com.microservicios.marketplace_ms.entities.Clasificacion;
