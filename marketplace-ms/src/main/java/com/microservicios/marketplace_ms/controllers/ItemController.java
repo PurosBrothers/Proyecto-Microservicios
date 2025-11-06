@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,10 +31,8 @@ import com.microservicios.marketplace_ms.dtos.ItemDTO;
 import com.microservicios.marketplace_ms.dtos.ItemResponseDTO;
 import com.microservicios.marketplace_ms.entities.Alojamiento;
 import com.microservicios.marketplace_ms.entities.Alimentacion;
-import com.microservicios.marketplace_ms.entities.Item;
 import com.microservicios.marketplace_ms.entities.PaseosEcologicos;
 import com.microservicios.marketplace_ms.entities.Transporte;
-import com.microservicios.marketplace_ms.mappers.ItemMapper;
 import com.microservicios.marketplace_ms.messagingrabbitmq.components.RabbitMQSender;
 import com.microservicios.marketplace_ms.services.ItemService;
 
@@ -45,20 +44,13 @@ public class ItemController {
     private ItemService itemService;
 
     @Autowired
-    private ItemMapper itemMapper;
-
-    @Autowired
     private RabbitMQSender rabbitMQSender;
 
     @PostMapping
-    public ResponseEntity<ItemDTO> createItem(@Valid @RequestBody ItemDTO item) {
-        Item entity = itemMapper.dtoToEntity(item);
-        ResponseEntity<Item> response = itemService.createItem(entity);
-        if (response.getStatusCode().is2xxSuccessful()) {
-            ItemDTO dto = itemMapper.entityToDto(response.getBody());
-            return ResponseEntity.status(response.getStatusCode()).body(dto);
-        }
-        return ResponseEntity.status(response.getStatusCode()).build();
+    @PreAuthorize("hasRole('PROVEEDOR')")
+    public ResponseEntity<ItemDTO> createItem(@Valid @RequestBody ItemDTO itemDTO) {
+        ResponseEntity<ItemDTO> response = itemService.createItemFromDTO(itemDTO);
+        return response;
     }
 
     @GetMapping("/{id}")
@@ -68,14 +60,9 @@ public class ItemController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ItemDTO> updateItem(@PathVariable Long id, @Valid @RequestBody ItemDTO item) {
-        Item entity = itemMapper.dtoToEntity(item);
-        ResponseEntity<Item> response = itemService.updateItem(id, entity);
-        if (response.getStatusCode().is2xxSuccessful()) {
-            ItemDTO dto = itemMapper.entityToDto(response.getBody());
-            return ResponseEntity.ok(dto);
-        }
-        return ResponseEntity.status(response.getStatusCode()).build();
+    @PreAuthorize("hasRole('PROVEEDOR')")
+    public ResponseEntity<ItemDTO> updateItem(@PathVariable Long id, @Valid @RequestBody ItemDTO itemDTO) {
+        return itemService.updateItemFromDTO(id, itemDTO);
     }
 
     @GetMapping("/{id}/clasificacion")
@@ -88,6 +75,7 @@ public class ItemController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('PROVEEDOR')")
     public ResponseEntity<Void> deleteItem(@PathVariable Long id) {
         return itemService.deleteItem(id);
     }
@@ -116,7 +104,8 @@ public class ItemController {
         }
 
         // Enviar mensaje a transaction-ms
-        String tipoClasificacion = itemResponse.getBody().getItem().getClasificacion().getClass().getSimpleName();
+        Object clasificacionData = itemResponse.getBody().getClasificacionData();
+        String tipoClasificacion = clasificacionData.getClass().getSimpleName();
         String nombreItem = itemResponse.getBody().getItem().getTitulo();
         AddToCartMessageDTO message = new AddToCartMessageDTO(
                 request.getUid(),

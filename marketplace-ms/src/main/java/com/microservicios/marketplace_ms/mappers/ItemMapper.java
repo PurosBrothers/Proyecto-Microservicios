@@ -1,8 +1,5 @@
 package com.microservicios.marketplace_ms.mappers;
 
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.microservicios.marketplace_ms.dtos.ItemDTO;
@@ -11,8 +8,7 @@ import com.microservicios.marketplace_ms.entities.Item;
 @Component
 public class ItemMapper {
 
-    @Autowired
-    private PreguntaFrecuenteMapper preguntaFrecuenteMapper;
+
 
     public Item dtoToEntity(ItemDTO itemDTO) {
         if (itemDTO == null) {
@@ -23,15 +19,12 @@ public class ItemMapper {
         item.setTitulo(itemDTO.getTitulo());
         item.setDescripcion(itemDTO.getDescripcion());
         item.setFechaPublicacion(itemDTO.getFechaPublicacion());
-        // For alojamiento, stock is not applicable, for others stock = capacidadMaxima
-        if (itemDTO.getClasificacion() != null && "Alojamiento".equals(itemDTO.getClasificacion().getTipo())) {
-            item.setStock(null);
-        } else {
-            item.setStock(itemDTO.getStock() != null ? itemDTO.getStock() : itemDTO.getClasificacion().getCapacidadMaxima());
-        }
+        item.setStock(itemDTO.getStock());
         item.setVisualizaciones(itemDTO.getVisualizaciones());
         item.setCalificacionPromedio(itemDTO.getCalificacionPromedio());
-        item.setClasificacion(itemDTO.getClasificacion());
+        
+        // El servicio se encargará de cargar la clasificación usando clasificacionId
+        
         return item;
     }
 
@@ -47,12 +40,20 @@ public class ItemMapper {
         itemDTO.setStock(item.getStock());
         itemDTO.setVisualizaciones(item.getVisualizaciones());
         itemDTO.setCalificacionPromedio(item.getCalificacionPromedio());
-        itemDTO.setClasificacion(item.getClasificacion());
-        if (item.getPreguntasFrecuentes() != null) {
-            itemDTO.setPreguntasFrecuentes(item.getPreguntasFrecuentes().stream()
-                    .map(preguntaFrecuenteMapper::entityToDto)
-                    .collect(Collectors.toList()));
+        
+        // Mapear datos de clasificación al nuevo DTO
+        if (item.getClasificacion() != null) {
+            itemDTO.setClasificacionId(item.getClasificacion().getId());
+            itemDTO.setLugarInicio(item.getClasificacion().getLugarInicio());
+            itemDTO.setPrecio(item.getClasificacion().getPrecio());
+            itemDTO.setFechaDisponibilidadInicio(item.getClasificacion().getFechaDisponibilidadInicio());
+            itemDTO.setFechaDisponibilidadFin(item.getClasificacion().getFechaDisponibilidadFin());
+            itemDTO.setCapacidadMaxima(item.getClasificacion().getCapacidadMaxima());
+            itemDTO.setUsuarioId(item.getClasificacion().getUsuarioId());
         }
+        
         return itemDTO;
     }
+    
+
 }

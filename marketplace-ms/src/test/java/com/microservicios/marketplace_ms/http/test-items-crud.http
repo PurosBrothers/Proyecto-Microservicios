@@ -1,0 +1,247 @@
+### Pruebas de CRUD de Items - Nueva estructura con clasificacionId
+
+### Declarar variable access token con token quemado
+@access_token = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTWdvZ0pJN3JPRi1OWlY1anVjRkx6Mjh0TlB3eHNsbVlBbG1ORTZZMDNRIn0.eyJleHAiOjE3NjI0NzMzMjAsImlhdCI6MTc2MjQ3MjQyMCwianRpIjoib25ydHJvOjJiNGMxMGNmLThhNzgtNDAwMi0wZGNhLTQxZTIwY2Q3NzZkYSIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MS9yZWFsbXMvcHJveWVjdC1tcy1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyM2FlN2Y0Yi1lNTA3LTRlOWMtOGVkNi1kZWMyMGJmOWQwNGEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ1c2VyLW1zLWNsaWVudCIsInNpZCI6ImUyMzQzNzk4LTEwY2QtNDc0ZC1hZTYwLTVhOTZmNTE5MGE2NyIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyoiLCJodHRwOi8vbG9jYWxob3N0OjgwODMvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiUFJPVkVFRE9SIiwib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLXByb3llY3QtbXMtcmVhbG0iLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiRGljayBHcmF5c29uIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiZGlja2dyYXlzb25AZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6IkRpY2siLCJmYW1pbHlfbmFtZSI6IkdyYXlzb24iLCJlbWFpbCI6ImRpY2tncmF5c29uQGdtYWlsLmNvbSJ9.XAI087RW3Gj44_1PVn8k5bkIf0SRn5v63qg-HtK7d1xV4KgpGXNGhGSWAAwXXJ5RxzqcVdzD1CK5SS5ENI0b6J1IpL9xNNtH8Ky2xLGIqM4izrHnp34JvrsBxqk3PZtTvmKaxCtLy-7CJHlzQWUY_SCCoIxHyMVVxzb15Y89lDUhmrzYjVxuqY_PqIXlJwKWHIFEWUzKnbXjN1OHFSkpjrDKSu_TS9EclOSaE9KThEsuNMvTRVXLZ71-DGPjqTH7eVm9owGBV-PwWj49Ehx1LeP-ZqFS_f92ShwxoRkZu-Svfi_OK0krhHLAhGued4wM2u8WD1ucV4vcXvtydyaVwQ"
+
+### 1. Obtener token JWT a través del Gateway
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+    "email": "dickgrayson@gmail.com",
+    "password": "password123"
+}
+
+### 2. Listar todos los items (sin autenticación)
+GET http://localhost:8084/items
+Accept: application/json
+
+### 3. Obtener item específico por ID
+GET http://localhost:8084/items/1
+Accept: application/json
+
+### 4. Crear Item de Alojamiento (clasificacionId: 1)
+POST http://localhost:8084/items
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTWdvZ0pJN3JPRi1OWlY1anVjRkx6Mjh0TlB3eHNsbVlBbG1ORTZZMDNRIn0.eyJleHAiOjE3NjI0NzMzMjAsImlhdCI6MTc2MjQ3MjQyMCwianRpIjoib25ydHJvOjJiNGMxMGNmLThhNzgtNDAwMi0wZGNhLTQxZTIwY2Q3NzZkYSIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MS9yZWFsbXMvcHJveWVjdC1tcy1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyM2FlN2Y0Yi1lNTA3LTRlOWMtOGVkNi1kZWMyMGJmOWQwNGEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ1c2VyLW1zLWNsaWVudCIsInNpZCI6ImUyMzQzNzk4LTEwY2QtNDc0ZC1hZTYwLTVhOTZmNTE5MGE2NyIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyoiLCJodHRwOi8vbG9jYWxob3N0OjgwODMvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiUFJPVkVFRE9SIiwib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLXByb3llY3QtbXMtcmVhbG0iLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiRGljayBHcmF5c29uIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiZGlja2dyYXlzb25AZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6IkRpY2siLCJmYW1pbHlfbmFtZSI6IkdyYXlzb24iLCJlbWFpbCI6ImRpY2tncmF5c29uQGdtYWlsLmNvbSJ9.XAI087RW3Gj44_1PVn8k5bkIf0SRn5v63qg-HtK7d1xV4KgpGXNGhGSWAAwXXJ5RxzqcVdzD1CK5SS5ENI0b6J1IpL9xNNtH8Ky2xLGIqM4izrHnp34JvrsBxqk3PZtTvmKaxCtLy-7CJHlzQWUY_SCCoIxHyMVVxzb15Y89lDUhmrzYjVxuqY_PqIXlJwKWHIFEWUzKnbXjN1OHFSkpjrDKSu_TS9EclOSaE9KThEsuNMvTRVXLZ71-DGPjqTH7eVm9owGBV-PwWj49Ehx1LeP-ZqFS_f92ShwxoRkZu-Svfi_OK0krhHLAhGued4wM2u8WD1ucV4vcXvtydyaVwQ
+
+{
+  "clasificacionId": 1,
+  "titulo": "Hotel Boutique Centro Premium",
+  "descripcion": "Hermoso hotel boutique en el centro de la ciudad con todas las comodidades modernas y servicios de lujo"
+}
+
+### 5. Crear Item de Alimentación (clasificacionId: 2)
+POST http://localhost:8084/items
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTWdvZ0pJN3JPRi1OWlY1anVjRkx6Mjh0TlB3eHNsbVlBbG1ORTZZMDNRIn0.eyJleHAiOjE3NjI0NzMzMjAsImlhdCI6MTc2MjQ3MjQyMCwianRpIjoib25ydHJvOjJiNGMxMGNmLThhNzgtNDAwMi0wZGNhLTQxZTIwY2Q3NzZkYSIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MS9yZWFsbXMvcHJveWVjdC1tcy1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyM2FlN2Y0Yi1lNTA3LTRlOWMtOGVkNi1kZWMyMGJmOWQwNGEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ1c2VyLW1zLWNsaWVudCIsInNpZCI6ImUyMzQzNzk4LTEwY2QtNDc0ZC1hZTYwLTVhOTZmNTE5MGE2NyIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyoiLCJodHRwOi8vbG9jYWxob3N0OjgwODMvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiUFJPVkVFRE9SIiwib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLXByb3llY3QtbXMtcmVhbG0iLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiRGljayBHcmF5c29uIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiZGlja2dyYXlzb25AZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6IkRpY2siLCJmYW1pbHlfbmFtZSI6IkdyYXlzb24iLCJlbWFpbCI6ImRpY2tncmF5c29uQGdtYWlsLmNvbSJ9.XAI087RW3Gj44_1PVn8k5bkIf0SRn5v63qg-HtK7d1xV4KgpGXNGhGSWAAwXXJ5RxzqcVdzD1CK5SS5ENI0b6J1IpL9xNNtH8Ky2xLGIqM4izrHnp34JvrsBxqk3PZtTvmKaxCtLy-7CJHlzQWUY_SCCoIxHyMVVxzb15Y89lDUhmrzYjVxuqY_PqIXlJwKWHIFEWUzKnbXjN1OHFSkpjrDKSu_TS9EclOSaE9KThEsuNMvTRVXLZ71-DGPjqTH7eVm9owGBV-PwWj49Ehx1LeP-ZqFS_f92ShwxoRkZu-Svfi_OK0krhHLAhGued4wM2u8WD1ucV4vcXvtydyaVwQ
+
+{
+  "clasificacionId": 2,
+  "titulo": "Almuerzo Gourmet Medellín",
+  "descripcion": "Experiencia gastronómica única con los mejores sabores de la cocina antioqueña tradicional",
+  "stock": 30
+}
+
+### 6. Crear Item de Transporte (clasificacionId: 3)
+POST http://localhost:8084/items
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "clasificacionId": 3,
+  "titulo": "Bus Ejecutivo Cali-Bogotá",
+  "descripcion": "Viaje cómodo y seguro en bus ejecutivo con WiFi, aire acondicionado y entretenimiento",
+  "stock": 40
+}
+
+### 7. Crear Item de Paseos Ecológicos (clasificacionId: 4)
+POST http://localhost:8084/items
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "clasificacionId": 4,
+  "titulo": "Aventura Ecoturística Cartagena",
+  "descripcion": "Tour ecológico guiado por los manglares y reservas naturales de Cartagena con equipo incluido",
+  "stock": 15
+}
+
+### 8. Actualizar Item existente (requiere ROLE_PROVEEDOR)
+PUT http://localhost:8084/items/5
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTWdvZ0pJN3JPRi1OWlY1anVjRkx6Mjh0TlB3eHNsbVlBbG1ORTZZMDNRIn0.eyJleHAiOjE3NjI0NzMzMjAsImlhdCI6MTc2MjQ3MjQyMCwianRpIjoib25ydHJvOjJiNGMxMGNmLThhNzgtNDAwMi0wZGNhLTQxZTIwY2Q3NzZkYSIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MS9yZWFsbXMvcHJveWVjdC1tcy1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyM2FlN2Y0Yi1lNTA3LTRlOWMtOGVkNi1kZWMyMGJmOWQwNGEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ1c2VyLW1zLWNsaWVudCIsInNpZCI6ImUyMzQzNzk4LTEwY2QtNDc0ZC1hZTYwLTVhOTZmNTE5MGE2NyIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyoiLCJodHRwOi8vbG9jYWxob3N0OjgwODMvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiUFJPVkVFRE9SIiwib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLXByb3llY3QtbXMtcmVhbG0iLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiRGljayBHcmF5c29uIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiZGlja2dyYXlzb25AZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6IkRpY2siLCJmYW1pbHlfbmFtZSI6IkdyYXlzb24iLCJlbWFpbCI6ImRpY2tncmF5c29uQGdtYWlsLmNvbSJ9.XAI087RW3Gj44_1PVn8k5bkIf0SRn5v63qg-HtK7d1xV4KgpGXNGhGSWAAwXXJ5RxzqcVdzD1CK5SS5ENI0b6J1IpL9xNNtH8Ky2xLGIqM4izrHnp34JvrsBxqk3PZtTvmKaxCtLy-7CJHlzQWUY_SCCoIxHyMVVxzb15Y89lDUhmrzYjVxuqY_PqIXlJwKWHIFEWUzKnbXjN1OHFSkpjrDKSu_TS9EclOSaE9KThEsuNMvTRVXLZ71-DGPjqTH7eVm9owGBV-PwWj49Ehx1LeP-ZqFS_f92ShwxoRkZu-Svfi_OK0krhHLAhGued4wM2u8WD1ucV4vcXvtydyaVwQ
+
+{
+  "id": 5,
+  "clasificacionId": 1,
+  "titulo": "Marriot Hotel Renovado",
+  "descripcion": "Marriot Hotel completamente renovado con nuevas instalaciones spa y centro de bienestar"
+}
+
+### 9. Obtener clasificación de un item
+GET http://localhost:8084/items/1/clasificacion
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTWdvZ0pJN3JPRi1OWlY1anVjRkx6Mjh0TlB3eHNsbVlBbG1ORTZZMDNRIn0.eyJleHAiOjE3NjI0NzMzMjAsImlhdCI6MTc2MjQ3MjQyMCwianRpIjoib25ydHJvOjJiNGMxMGNmLThhNzgtNDAwMi0wZGNhLTQxZTIwY2Q3NzZkYSIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MS9yZWFsbXMvcHJveWVjdC1tcy1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyM2FlN2Y0Yi1lNTA3LTRlOWMtOGVkNi1kZWMyMGJmOWQwNGEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ1c2VyLW1zLWNsaWVudCIsInNpZCI6ImUyMzQzNzk4LTEwY2QtNDc0ZC1hZTYwLTVhOTZmNTE5MGE2NyIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyoiLCJodHRwOi8vbG9jYWxob3N0OjgwODMvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiUFJPVkVFRE9SIiwib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLXByb3llY3QtbXMtcmVhbG0iLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiRGljayBHcmF5c29uIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiZGlja2dyYXlzb25AZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6IkRpY2siLCJmYW1pbHlfbmFtZSI6IkdyYXlzb24iLCJlbWFpbCI6ImRpY2tncmF5c29uQGdtYWlsLmNvbSJ9.XAI087RW3Gj44_1PVn8k5bkIf0SRn5v63qg-HtK7d1xV4KgpGXNGhGSWAAwXXJ5RxzqcVdzD1CK5SS5ENI0b6J1IpL9xNNtH8Ky2xLGIqM4izrHnp34JvrsBxqk3PZtTvmKaxCtLy-7CJHlzQWUY_SCCoIxHyMVVxzb15Y89lDUhmrzYjVxuqY_PqIXlJwKWHIFEWUzKnbXjN1OHFSkpjrDKSu_TS9EclOSaE9KThEsuNMvTRVXLZ71-DGPjqTH7eVm9owGBV-PwWj49Ehx1LeP-ZqFS_f92ShwxoRkZu-Svfi_OK0krhHLAhGued4wM2u8WD1ucV4vcXvtydyaVwQ
+
+
+### 10. Buscar items por query
+GET http://localhost:8084/items/search?query=hotel
+Accept: application/json
+
+### 11. Verificar estructura de respuesta - Item con clasificacionId
+GET http://localhost:8084/items/1
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTWdvZ0pJN3JPRi1OWlY1anVjRkx6Mjh0TlB3eHNsbVlBbG1ORTZZMDNRIn0.eyJleHAiOjE3NjI0NzMzMjAsImlhdCI6MTc2MjQ3MjQyMCwianRpIjoib25ydHJvOjJiNGMxMGNmLThhNzgtNDAwMi0wZGNhLTQxZTIwY2Q3NzZkYSIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MS9yZWFsbXMvcHJveWVjdC1tcy1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyM2FlN2Y0Yi1lNTA3LTRlOWMtOGVkNi1kZWMyMGJmOWQwNGEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ1c2VyLW1zLWNsaWVudCIsInNpZCI6ImUyMzQzNzk4LTEwY2QtNDc0ZC1hZTYwLTVhOTZmNTE5MGE2NyIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyoiLCJodHRwOi8vbG9jYWxob3N0OjgwODMvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiUFJPVkVFRE9SIiwib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLXByb3llY3QtbXMtcmVhbG0iLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiRGljayBHcmF5c29uIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiZGlja2dyYXlzb25AZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6IkRpY2siLCJmYW1pbHlfbmFtZSI6IkdyYXlzb24iLCJlbWFpbCI6ImRpY2tncmF5c29uQGdtYWlsLmNvbSJ9.XAI087RW3Gj44_1PVn8k5bkIf0SRn5v63qg-HtK7d1xV4KgpGXNGhGSWAAwXXJ5RxzqcVdzD1CK5SS5ENI0b6J1IpL9xNNtH8Ky2xLGIqM4izrHnp34JvrsBxqk3PZtTvmKaxCtLy-7CJHlzQWUY_SCCoIxHyMVVxzb15Y89lDUhmrzYjVxuqY_PqIXlJwKWHIFEWUzKnbXjN1OHFSkpjrDKSu_TS9EclOSaE9KThEsuNMvTRVXLZ71-DGPjqTH7eVm9owGBV-PwWj49Ehx1LeP-ZqFS_f92ShwxoRkZu-Svfi_OK0krhHLAhGued4wM2u8WD1ucV4vcXvtydyaVwQ
+
+### 12. AddToCart - Funcionalidad con nueva estructura
+POST http://localhost:8084/items/1/add-to-cart
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTWdvZ0pJN3JPRi1OWlY1anVjRkx6Mjh0TlB3eHNsbVlBbG1ORTZZMDNRIn0.eyJleHAiOjE3NjI0NzMzMjAsImlhdCI6MTc2MjQ3MjQyMCwianRpIjoib25ydHJvOjJiNGMxMGNmLThhNzgtNDAwMi0wZGNhLTQxZTIwY2Q3NzZkYSIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MS9yZWFsbXMvcHJveWVjdC1tcy1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyM2FlN2Y0Yi1lNTA3LTRlOWMtOGVkNi1kZWMyMGJmOWQwNGEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ1c2VyLW1zLWNsaWVudCIsInNpZCI6ImUyMzQzNzk4LTEwY2QtNDc0ZC1hZTYwLTVhOTZmNTE5MGE2NyIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyoiLCJodHRwOi8vbG9jYWxob3N0OjgwODMvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiUFJPVkVFRE9SIiwib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLXByb3llY3QtbXMtcmVhbG0iLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiRGljayBHcmF5c29uIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiZGlja2dyYXlzb25AZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6IkRpY2siLCJmYW1pbHlfbmFtZSI6IkdyYXlzb24iLCJlbWFpbCI6ImRpY2tncmF5c29uQGdtYWlsLmNvbSJ9.XAI087RW3Gj44_1PVn8k5bkIf0SRn5v63qg-HtK7d1xV4KgpGXNGhGSWAAwXXJ5RxzqcVdzD1CK5SS5ENI0b6J1IpL9xNNtH8Ky2xLGIqM4izrHnp34JvrsBxqk3PZtTvmKaxCtLy-7CJHlzQWUY_SCCoIxHyMVVxzb15Y89lDUhmrzYjVxuqY_PqIXlJwKWHIFEWUzKnbXjN1OHFSkpjrDKSu_TS9EclOSaE9KThEsuNMvTRVXLZ71-DGPjqTH7eVm9owGBV-PwWj49Ehx1LeP-ZqFS_f92ShwxoRkZu-Svfi_OK0krhHLAhGued4wM2u8WD1ucV4vcXvtydyaVwQ
+
+{
+  "uid": "23ae7f4b-e507-4e9c-8ed6-dec20bf9d04a",
+  "cantidad": 2,
+  "precioUnitario": 150.00
+}
+
+### 13. Obtener preguntas frecuentes de un item
+GET http://localhost:8084/items/1/preguntas
+Accept: application/json
+
+### 14. Crear pregunta frecuente (requiere ROLE_PROVEEDOR)
+POST http://localhost:8084/items/5/preguntas
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTWdvZ0pJN3JPRi1OWlY1anVjRkx6Mjh0TlB3eHNsbVlBbG1ORTZZMDNRIn0.eyJleHAiOjE3NjI0NzMzMjAsImlhdCI6MTc2MjQ3MjQyMCwianRpIjoib25ydHJvOjJiNGMxMGNmLThhNzgtNDAwMi0wZGNhLTQxZTIwY2Q3NzZkYSIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MS9yZWFsbXMvcHJveWVjdC1tcy1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyM2FlN2Y0Yi1lNTA3LTRlOWMtOGVkNi1kZWMyMGJmOWQwNGEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ1c2VyLW1zLWNsaWVudCIsInNpZCI6ImUyMzQzNzk4LTEwY2QtNDc0ZC1hZTYwLTVhOTZmNTE5MGE2NyIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyoiLCJodHRwOi8vbG9jYWxob3N0OjgwODMvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiUFJPVkVFRE9SIiwib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLXByb3llY3QtbXMtcmVhbG0iLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiRGljayBHcmF5c29uIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiZGlja2dyYXlzb25AZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6IkRpY2siLCJmYW1pbHlfbmFtZSI6IkdyYXlzb24iLCJlbWFpbCI6ImRpY2tncmF5c29uQGdtYWlsLmNvbSJ9.XAI087RW3Gj44_1PVn8k5bkIf0SRn5v63qg-HtK7d1xV4KgpGXNGhGSWAAwXXJ5RxzqcVdzD1CK5SS5ENI0b6J1IpL9xNNtH8Ky2xLGIqM4izrHnp34JvrsBxqk3PZtTvmKaxCtLy-7CJHlzQWUY_SCCoIxHyMVVxzb15Y89lDUhmrzYjVxuqY_PqIXlJwKWHIFEWUzKnbXjN1OHFSkpjrDKSu_TS9EclOSaE9KThEsuNMvTRVXLZ71-DGPjqTH7eVm9owGBV-PwWj49Ehx1LeP-ZqFS_f92ShwxoRkZu-Svfi_OK0krhHLAhGued4wM2u8WD1ucV4vcXvtydyaVwQ
+
+{
+  "pregunta": "¿El hotel renovado incluye spa y gimnasio?"
+}
+
+### 15. Eliminar pregunta frecuente (requiere ROLE_PROVEEDOR)
+DELETE http://localhost:8084/items/5/preguntas/9
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTWdvZ0pJN3JPRi1OWlY1anVjRkx6Mjh0TlB3eHNsbVlBbG1ORTZZMDNRIn0.eyJleHAiOjE3NjI0NzMzMjAsImlhdCI6MTc2MjQ3MjQyMCwianRpIjoib25ydHJvOjJiNGMxMGNmLThhNzgtNDAwMi0wZGNhLTQxZTIwY2Q3NzZkYSIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MS9yZWFsbXMvcHJveWVjdC1tcy1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyM2FlN2Y0Yi1lNTA3LTRlOWMtOGVkNi1kZWMyMGJmOWQwNGEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ1c2VyLW1zLWNsaWVudCIsInNpZCI6ImUyMzQzNzk4LTEwY2QtNDc0ZC1hZTYwLTVhOTZmNTE5MGE2NyIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyoiLCJodHRwOi8vbG9jYWxob3N0OjgwODMvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiUFJPVkVFRE9SIiwib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLXByb3llY3QtbXMtcmVhbG0iLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiRGljayBHcmF5c29uIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiZGlja2dyYXlzb25AZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6IkRpY2siLCJmYW1pbHlfbmFtZSI6IkdyYXlzb24iLCJlbWFpbCI6ImRpY2tncmF5c29uQGdtYWlsLmNvbSJ9.XAI087RW3Gj44_1PVn8k5bkIf0SRn5v63qg-HtK7d1xV4KgpGXNGhGSWAAwXXJ5RxzqcVdzD1CK5SS5ENI0b6J1IpL9xNNtH8Ky2xLGIqM4izrHnp34JvrsBxqk3PZtTvmKaxCtLy-7CJHlzQWUY_SCCoIxHyMVVxzb15Y89lDUhmrzYjVxuqY_PqIXlJwKWHIFEWUzKnbXjN1OHFSkpjrDKSu_TS9EclOSaE9KThEsuNMvTRVXLZ71-DGPjqTH7eVm9owGBV-PwWj49Ehx1LeP-ZqFS_f92ShwxoRkZu-Svfi_OK0krhHLAhGued4wM2u8WD1ucV4vcXvtydyaVwQ
+
+### 16. Eliminar item creado (requiere ROLE_PROVEEDOR)
+DELETE http://localhost:8084/items/5
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTWdvZ0pJN3JPRi1OWlY1anVjRkx6Mjh0TlB3eHNsbVlBbG1ORTZZMDNRIn0.eyJleHAiOjE3NjI0NzMzMjAsImlhdCI6MTc2MjQ3MjQyMCwianRpIjoib25ydHJvOjJiNGMxMGNmLThhNzgtNDAwMi0wZGNhLTQxZTIwY2Q3NzZkYSIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MS9yZWFsbXMvcHJveWVjdC1tcy1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyM2FlN2Y0Yi1lNTA3LTRlOWMtOGVkNi1kZWMyMGJmOWQwNGEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ1c2VyLW1zLWNsaWVudCIsInNpZCI6ImUyMzQzNzk4LTEwY2QtNDc0ZC1hZTYwLTVhOTZmNTE5MGE2NyIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyoiLCJodHRwOi8vbG9jYWxob3N0OjgwODMvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiUFJPVkVFRE9SIiwib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLXByb3llY3QtbXMtcmVhbG0iLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiRGljayBHcmF5c29uIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiZGlja2dyYXlzb25AZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6IkRpY2siLCJmYW1pbHlfbmFtZSI6IkdyYXlzb24iLCJlbWFpbCI6ImRpY2tncmF5c29uQGdtYWlsLmNvbSJ9.XAI087RW3Gj44_1PVn8k5bkIf0SRn5v63qg-HtK7d1xV4KgpGXNGhGSWAAwXXJ5RxzqcVdzD1CK5SS5ENI0b6J1IpL9xNNtH8Ky2xLGIqM4izrHnp34JvrsBxqk3PZtTvmKaxCtLy-7CJHlzQWUY_SCCoIxHyMVVxzb15Y89lDUhmrzYjVxuqY_PqIXlJwKWHIFEWUzKnbXjN1OHFSkpjrDKSu_TS9EclOSaE9KThEsuNMvTRVXLZ71-DGPjqTH7eVm9owGBV-PwWj49Ehx1LeP-ZqFS_f92ShwxoRkZu-Svfi_OK0krhHLAhGued4wM2u8WD1ucV4vcXvtydyaVwQ
+
+
+### 17. Validación - Crear con clasificacionId inválido (debería fallar)
+POST http://localhost:8084/items
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "clasificacionId": 999,
+  "titulo": "Item con ID inválido",
+  "descripcion": "Este debería fallar por clasificacionId inexistente"
+}
+
+### 18. Validación - Crear sin token (debería fallar con 401)
+POST http://localhost:8084/items
+Content-Type: application/json
+
+{
+  "clasificacionId": 1,
+  "titulo": "Hotel Sin Autenticación",
+  "descripcion": "Este debería fallar por falta de autenticación y rol PROVEEDOR"
+}
+
+### 19. Validación - Crear con datos incompletos (debería fallar con 400)
+POST http://localhost:8084/items
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "clasificacionId": 1,
+  "titulo": "AB",
+  "descripcion": "Corta"
+}
+
+### 20. Test de respuesta completa - Verificar que el DTO incluye datos de clasificación
+GET http://localhost:8084/items/1
+Accept: application/json
+
+> {%
+client.test("Verificar estructura de respuesta ItemDTO", function() {
+    client.assert(response.status === 200, "Status code should be 200");
+    
+    var json = response.body;
+    
+    // Verificar campos básicos del Item
+    client.assert(json.id !== undefined, "Item should have id");
+    client.assert(json.titulo !== undefined, "Item should have titulo");
+    client.assert(json.descripcion !== undefined, "Item should have descripcion");
+    client.assert(json.clasificacionId !== undefined, "Item should have clasificacionId");
+    
+    // Verificar campos heredados de clasificación
+    client.assert(json.lugarInicio !== undefined, "Item should have lugarInicio from classification");
+    client.assert(json.precio !== undefined, "Item should have precio from classification");
+    client.assert(json.fechaDisponibilidadInicio !== undefined, "Item should have fechaDisponibilidadInicio");
+    client.assert(json.fechaDisponibilidadFin !== undefined, "Item should have fechaDisponibilidadFin");
+    client.assert(json.capacidadMaxima !== undefined, "Item should have capacidadMaxima");
+    
+    // Verificar campos de solo lectura
+    client.assert(json.visualizaciones !== undefined, "Item should have visualizaciones");
+    client.assert(json.calificacionPromedio !== undefined, "Item should have calificacionPromedio");
+    
+    client.log("ItemDTO structure validated successfully");
+});
+%}
+
+### 21. Test creación exitosa con diferentes tipos de clasificación
+POST http://localhost:8084/items
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "clasificacionId": 2,
+  "titulo": "Restaurante Vegetariano Innovador",
+  "descripcion": "Experiencia culinaria única con ingredientes orgánicos y técnicas de cocina molecular vegetariana",
+  "stock": 25
+}
+
+> {%
+client.test("Verificar creación exitosa de Item", function() {
+    client.assert(response.status === 201, "Status code should be 201 for successful creation");
+    
+    var json = response.body;
+    client.assert(json.id !== undefined, "Created item should have an ID");
+    client.assert(json.clasificacionId === 2, "Should have correct clasificacionId");
+    client.assert(json.titulo === "Restaurante Vegetariano Innovador", "Should have correct titulo");
+    client.assert(json.stock === 25, "Should have correct stock");
+    
+    // Los datos de clasificación deberían estar presentes
+    client.assert(json.lugarInicio !== undefined, "Should inherit lugarInicio from classification");
+    client.assert(json.precio !== undefined, "Should inherit precio from classification");
+    
+    client.global.set("created_item_id", json.id);
+    client.log("Item created successfully with ID: " + json.id);
+});
+%}
+
+### 22. Test actualización con nueva estructura
+PUT http://localhost:8084/items/{{created_item_id}}
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "id": {{created_item_id}},
+  "clasificacionId": 2,
+  "titulo": "Restaurante Vegetariano Premium - Actualizado",
+  "descripcion": "Descripción actualizada con nuevos platos de temporada y experiencias gastronómicas exclusivas",
+  "stock": 20
+}
+
+> {%
+client.test("Verificar actualización exitosa", function() {
+    client.assert(response.status === 200, "Status code should be 200 for successful update");
+    
+    var json = response.body;
+    client.assert(json.titulo === "Restaurante Vegetariano Premium - Actualizado", "Titulo should be updated");
+    client.assert(json.stock === 20, "Stock should be updated");
+    
+    client.log("Item updated successfully");
+});
+%}
