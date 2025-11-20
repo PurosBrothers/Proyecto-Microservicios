@@ -35,6 +35,7 @@ public class SecurityConfig {
                 .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()  // Solo para desarrollo
                 .requestMatchers("/api/debug/**").permitAll()  // Debug endpoints - solo desarrollo
+                .requestMatchers("/items/internal/**").permitAll()  // Comunicación interna entre microservicios
                 
                 // Endpoints de lectura - acceso público o autenticado
                 .requestMatchers("GET", "/alojamiento").permitAll()

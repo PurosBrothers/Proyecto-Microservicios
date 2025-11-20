@@ -59,6 +59,13 @@ public class ItemController {
         return response;
     }
 
+    // Endpoint interno para comunicación entre microservicios (sin autenticación)
+    @GetMapping("/internal/{id}")
+    public ResponseEntity<ItemResponseDTO> getItemInternal(@PathVariable Long id) {
+        ResponseEntity<ItemResponseDTO> response = itemService.getItem(id);
+        return response;
+    }
+
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('PROVEEDOR')")
     public ResponseEntity<ItemDTO> updateItem(@PathVariable Long id, @Valid @RequestBody ItemDTO itemDTO) {
