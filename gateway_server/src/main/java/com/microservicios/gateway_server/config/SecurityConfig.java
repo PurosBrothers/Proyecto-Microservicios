@@ -61,6 +61,9 @@ public class SecurityConfig {
                 // Endpoints públicos para subida de imágenes (temporalmente)
                 .pathMatchers("/user-ms/users/*/image").permitAll()
                 .pathMatchers("/user-ms/images/*").permitAll()
+                
+                // Endpoints internos para comunicación entre microservicios
+                .pathMatchers("/marketplace-ms/items/internal/**").permitAll()
 
                 // Todas las demás rutas requieren autenticación JWT
                 .anyExchange().authenticated()

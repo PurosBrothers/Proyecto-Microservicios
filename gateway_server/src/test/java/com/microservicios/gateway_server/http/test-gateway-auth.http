@@ -77,22 +77,25 @@ Content-Type: application/json
     "tipoUsuario": "CLIENTE",
     "edad": 15
 }
+###
 
 GET {{gatewayUrl}}/auth/verificar-correo?correo=juan.cliente@gmail.com
 
+### cliente
 POST {{gatewayUrl}}/auth/login
 Content-Type: application/json
 
 {
-    "email": "juan.cliente@gmail.com",
+    "email": "laura.martinez@gmail.com",
     "password": "password123"
 }
 
+### proveedor
 POST {{gatewayUrl}}/auth/login
 Content-Type: application/json
 
 {
-    "email": "maria.proveedor@gmail.com",
+    "email": "dickgrayson@gmail.com",
     "password": "password123"
 }
 

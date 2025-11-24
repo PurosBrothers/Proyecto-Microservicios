@@ -1,8 +1,8 @@
 package com.microservicios.marketplace_ms.services;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.microservicios.marketplace_ms.dtos.ItemDTO;
 import com.microservicios.marketplace_ms.dtos.ItemResponseDTO;
+import com.microservicios.marketplace_ms.repositories.ClasificacionRepository;
 import com.microservicios.marketplace_ms.entities.Alojamiento;
 import com.microservicios.marketplace_ms.entities.Alimentacion;
 import com.microservicios.marketplace_ms.entities.Item;
@@ -25,12 +26,116 @@ public class ItemService {
     private ItemRepository itemRepository;
 
     @Autowired
+    private ClasificacionRepository clasificacionRepository;
+
+    @Autowired
     private ItemMapper itemMapper;
 
+    public ResponseEntity<ItemDTO> createItemFromDTO(ItemDTO itemDTO) {
+        // Validar que clasificacionId esté presente
+        if (itemDTO.getClasificacionId() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        
+        // Buscar la clasificación
+        Optional<com.microservicios.marketplace_ms.entities.Clasificacion> clasificacionOpt = 
+            clasificacionRepository.findById(itemDTO.getClasificacionId());
+        if (clasificacionOpt.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        
+        // Crear entidad Item
+        Item item = itemMapper.dtoToEntity(itemDTO);
+        item.setClasificacion(clasificacionOpt.get());
+        
+        // Setear valores por defecto
+        if (item.getFechaPublicacion() == null) {
+            item.setFechaPublicacion(LocalDate.now());
+        }
+        if (item.getVisualizaciones() == null) {
+            item.setVisualizaciones(0);
+        }
+        if (item.getCalificacionPromedio() == null) {
+            item.setCalificacionPromedio(0L);
+        }
+        
+        // Copiar datos de clasificación al item
+        copyClasificacionDataToItem(item);
+        
+        Item saved = itemRepository.save(item);
+        ItemDTO responseDTO = itemMapper.entityToDto(saved);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+    }
+    
+    public ResponseEntity<ItemDTO> updateItemFromDTO(Long id, ItemDTO itemDTO) {
+        // Verificar que el item existe
+        Optional<Item> existingItemOpt = itemRepository.findById(id);
+        if (existingItemOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        Item existingItem = existingItemOpt.get();
+        
+        // Si se proporciona clasificacionId, validar y actualizar
+        if (itemDTO.getClasificacionId() != null) {
+            Optional<com.microservicios.marketplace_ms.entities.Clasificacion> clasificacionOpt = 
+                clasificacionRepository.findById(itemDTO.getClasificacionId());
+            if (clasificacionOpt.isEmpty()) {
+                return ResponseEntity.badRequest().build();
+            }
+            existingItem.setClasificacion(clasificacionOpt.get());
+            copyClasificacionDataToItem(existingItem);
+        }
+        
+        // Actualizar campos modificables
+        existingItem.setTitulo(itemDTO.getTitulo());
+        existingItem.setDescripcion(itemDTO.getDescripcion());
+        if (itemDTO.getStock() != null) {
+            existingItem.setStock(itemDTO.getStock());
+        }
+        
+        Item saved = itemRepository.save(existingItem);
+        ItemDTO responseDTO = itemMapper.entityToDto(saved);
+        return ResponseEntity.ok(responseDTO);
+    }
+
     public ResponseEntity<Item> createItem(Item item) {
+        // Setear valores por defecto
+        if (item.getFechaPublicacion() == null) {
+            item.setFechaPublicacion(LocalDate.now());
+        }
+        if (item.getVisualizaciones() == null) {
+            item.setVisualizaciones(0);
+        }
+        if (item.getCalificacionPromedio() == null) {
+            item.setCalificacionPromedio(0L);
+        }
+        
         Item saved = itemRepository.save(item);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
+
+    private void copyClasificacionDataToItem(Item item) {
+        if (item.getClasificacion() == null) return;
+        
+        // Copiar datos básicos de clasificación
+        item.setLugarInicio(item.getClasificacion().getLugarInicio());
+        item.setPrecio(item.getClasificacion().getPrecio());
+        item.setFechaDisponibilidadInicio(item.getClasificacion().getFechaDisponibilidadInicio());
+        item.setFechaDisponibilidadFin(item.getClasificacion().getFechaDisponibilidadFin());
+        item.setCapacidadMaxima(item.getClasificacion().getCapacidadMaxima());
+        
+        // Manejar stock según tipo de clasificación
+        String tipoClasificacion = item.getClasificacion().getClass().getSimpleName();
+        if ("Alojamiento".equals(tipoClasificacion)) {
+            item.setStock(null); // Alojamiento no usa stock
+        } else if (item.getStock() == null) {
+            // Para otros tipos, usar capacidadMaxima como stock inicial
+            item.setStock(item.getClasificacion().getCapacidadMaxima());
+        }
+    }
+    
+
 
     public ResponseEntity<ItemResponseDTO> getItem(Long id) {
         Optional<Item> itemOpt = itemRepository.findById(id);

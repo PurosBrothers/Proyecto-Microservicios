@@ -2,14 +2,33 @@ package com.microservicios.marketplace_ms.dtos;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
-public class ClasificacionDTO {
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "tipo")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = AlojamientoDTO.class, name = "Alojamiento"),
+        @JsonSubTypes.Type(value = AlimentacionDTO.class, name = "Alimentacion"),
+        @JsonSubTypes.Type(value = TransporteDTO.class, name = "Transporte"),
+        @JsonSubTypes.Type(value = PaseosEcologicosDTO.class, name = "PaseosEcologicos")
+})
+public abstract class ClasificacionDTO {
     private Long id;
+    private String tipo;
     private String lugarInicio;
     private BigDecimal precio;
     private LocalDateTime fechaDisponibilidadInicio;
     private LocalDateTime fechaDisponibilidadFin;
     private Integer capacidadMaxima;
+    private String usuarioId;
+    private List<RequisitosEspecialesDTO> requisitosEspeciales = new ArrayList<>();
+
+    // Constructors
+    public ClasificacionDTO() {
+    }
 
     // Getters and Setters
     public Long getId() {
@@ -18,6 +37,14 @@ public class ClasificacionDTO {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
     }
 
     public String getLugarInicio() {
@@ -58,5 +85,21 @@ public class ClasificacionDTO {
 
     public void setCapacidadMaxima(Integer capacidadMaxima) {
         this.capacidadMaxima = capacidadMaxima;
+    }
+
+    public List<RequisitosEspecialesDTO> getRequisitosEspeciales() {
+        return requisitosEspeciales;
+    }
+
+    public void setRequisitosEspeciales(List<RequisitosEspecialesDTO> requisitosEspeciales) {
+        this.requisitosEspeciales = requisitosEspeciales;
+    }
+
+    public String getUsuarioId() {
+        return usuarioId;
+    }
+
+    public void setUsuarioId(String usuarioId) {
+        this.usuarioId = usuarioId;
     }
 }

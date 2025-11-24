@@ -100,6 +100,7 @@ public class DbInitializer implements CommandLineRunner {
         alojamiento.setNumeroHabitaciones(2);
         alojamiento.setLat(new BigDecimal("4.7110"));
         alojamiento.setLng(new BigDecimal("-74.0721"));
+        alojamiento.setUsuarioId("proveedor-001"); // Usuario proveedor de ejemplo
 
         alojamiento = (Alojamiento) clasificacionRepository.save(alojamiento);
 
@@ -116,6 +117,7 @@ public class DbInitializer implements CommandLineRunner {
         alimentacion.setMenuIncluido("Pasta, Salad, Dessert");
         alimentacion.setLatitud(new BigDecimal("6.2442"));
         alimentacion.setLongitud(new BigDecimal("-75.5812"));
+        alimentacion.setUsuarioId("proveedor-002"); // Usuario proveedor de ejemplo
 
         alimentacion = (Alimentacion) clasificacionRepository.save(alimentacion);
 
@@ -132,6 +134,7 @@ public class DbInitializer implements CommandLineRunner {
         transporte.setTipoTransporte("Bus");
         transporte.setDuracionViaje(120);
         transporte.setRutaGps("Route 1");
+        transporte.setUsuarioId("proveedor-003"); // Usuario proveedor de ejemplo
 
         transporte = (Transporte) clasificacionRepository.save(transporte);
 
@@ -149,6 +152,7 @@ public class DbInitializer implements CommandLineRunner {
         paseos.setEdadMinima(12);
         paseos.setPuntoEncuentro("Central Park");
         paseos.setRutaEncuentro("Street 123");
+        paseos.setUsuarioId("proveedor-004"); // Usuario proveedor de ejemplo
 
         paseos = (PaseosEcologicos) clasificacionRepository.save(paseos);
 

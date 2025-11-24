@@ -4,3 +4,13 @@ spring:
 
   config:
     import: configserver:http://localhost:8888
+
+  # Configuración de seguridad OAuth2 para Keycloak
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # URL del JWK Set de Keycloak - ajustar según configuración
+          jwk-set-uri: http://localhost:8081/realms/proyect-ms-realm/protocol/openid-connect/certs
+          # Issuer URI de Keycloak
+          issuer-uri: http://localhost:8081/realms/proyect-ms-realm

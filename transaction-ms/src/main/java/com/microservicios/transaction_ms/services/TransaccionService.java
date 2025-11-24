@@ -9,8 +9,6 @@ import com.microservicios.transaction_ms.models.ItemTransaccion;
 import com.microservicios.transaction_ms.models.Transaccion;
 import com.microservicios.transaction_ms.repository.TransaccionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -35,9 +33,6 @@ public class TransaccionService {
 
     @Autowired
     private RabbitMQSender rabbitMQSender;
-
-    @Autowired
-    private DiscoveryClient discoveryClient;
 
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -86,17 +81,12 @@ public class TransaccionService {
         }
 
         // Validar stock/capacidad disponible para cada item
-        List<ServiceInstance> instances = discoveryClient.getInstances("marketplace-ms");
-        if (instances.isEmpty()) {
-            System.out.println("No se encontró instancia de marketplace-ms para validación");
-            return null;
-        }
-        String baseUrl = instances.get(0).getUri().toString();
+        String baseUrl = "http://localhost:8080/marketplace-ms";
 
         for (ItemCarrito item : cartItems) {
             try {
-                // Obtener item completo
-                String itemUrl = baseUrl + "/items/" + item.getIdItem();
+                // Obtener item completo usando endpoint interno
+                String itemUrl = baseUrl + "/items/internal/" + item.getIdItem();
                 @SuppressWarnings("unchecked")
                 Map<String, Object> itemResponse = restTemplate.getForObject(itemUrl, Map.class);
                 if (itemResponse == null) {
@@ -244,19 +234,14 @@ public class TransaccionService {
             repository.save(trans);
             System.out.println("Transacción completada: " + id);
 
-            // Obtener instancia de marketplace-ms
-            List<ServiceInstance> instances = discoveryClient.getInstances("marketplace-ms");
-            if (instances.isEmpty()) {
-                System.out.println("No se encontró instancia de marketplace-ms");
-                return;
-            }
-            String baseUrl = instances.get(0).getUri().toString();
+            // Usar Gateway para comunicación con marketplace-ms
+            String baseUrl = "http://localhost:8080/marketplace-ms";
 
             // Enviar updates a marketplace para cada item pagado
             for (ItemTransaccion item : trans.getItemsPagados()) {
                 try {
-                    // Consultar item completo
-                    String itemUrl = baseUrl + "/items/" + item.getOfertaId();
+                    // Consultar item completo usando endpoint interno
+                    String itemUrl = baseUrl + "/items/internal/" + item.getOfertaId();
                     @SuppressWarnings("unchecked")
                     Map<String, Object> itemResponse = restTemplate.getForObject(itemUrl, Map.class);
                     if (itemResponse == null) {
