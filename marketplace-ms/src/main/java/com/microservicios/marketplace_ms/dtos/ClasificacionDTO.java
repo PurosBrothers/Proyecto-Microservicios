@@ -24,6 +24,12 @@ public abstract class ClasificacionDTO {
     private LocalDateTime fechaDisponibilidadFin;
     private Integer capacidadMaxima;
     private String usuarioId;
+    private String paisDestino;
+    private String flag;
+    private Long population;
+    private Double gini;
+    private String fifa;
+    private MapsDTO maps;
     private List<RequisitosEspecialesDTO> requisitosEspeciales = new ArrayList<>();
 
     // Constructors
@@ -101,5 +107,53 @@ public abstract class ClasificacionDTO {
 
     public void setUsuarioId(String usuarioId) {
         this.usuarioId = usuarioId;
+    }
+
+    public String getPaisDestino() {
+        return paisDestino;
+    }
+
+    public void setPaisDestino(String paisDestino) {
+        this.paisDestino = paisDestino;
+    }
+
+    public String getFlag() {
+        return flag;
+    }
+
+    public void setFlag(String flag) {
+        this.flag = flag;
+    }
+
+    public Long getPopulation() {
+        return population;
+    }
+
+    public void setPopulation(Long population) {
+        this.population = population;
+    }
+
+    public Double getGini() {
+        return gini;
+    }
+
+    public void setGini(Double gini) {
+        this.gini = gini;
+    }
+
+    public String getFifa() {
+        return fifa;
+    }
+
+    public void setFifa(String fifa) {
+        this.fifa = fifa;
+    }
+
+    public MapsDTO getMaps() {
+        return maps;
+    }
+
+    public void setMaps(MapsDTO maps) {
+        this.maps = maps;
     }
 }

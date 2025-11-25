@@ -18,6 +18,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Embedded;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -43,6 +44,14 @@ public abstract class Clasificacion {
     protected LocalDateTime fechaDisponibilidadInicio;
     protected LocalDateTime fechaDisponibilidadFin;
     protected Integer capacidadMaxima;
+    protected String paisDestino;
+    protected String flag;
+    protected Long population;
+    protected Double gini;
+    protected String fifa;
+
+    @Embedded
+    protected Maps maps;
 
     @Column(name = "usuario_id", nullable = false)
     protected String usuarioId;
@@ -124,5 +133,53 @@ public abstract class Clasificacion {
 
     public void setUsuarioId(String usuarioId) {
         this.usuarioId = usuarioId;
+    }
+
+    public String getPaisDestino() {
+        return paisDestino;
+    }
+
+    public void setPaisDestino(String paisDestino) {
+        this.paisDestino = paisDestino;
+    }
+
+    public String getFlag() {
+        return flag;
+    }
+
+    public void setFlag(String flag) {
+        this.flag = flag;
+    }
+
+    public Long getPopulation() {
+        return population;
+    }
+
+    public void setPopulation(Long population) {
+        this.population = population;
+    }
+
+    public Double getGini() {
+        return gini;
+    }
+
+    public void setGini(Double gini) {
+        this.gini = gini;
+    }
+
+    public String getFifa() {
+        return fifa;
+    }
+
+    public void setFifa(String fifa) {
+        this.fifa = fifa;
+    }
+
+    public Maps getMaps() {
+        return maps;
+    }
+
+    public void setMaps(Maps maps) {
+        this.maps = maps;
     }
 }
