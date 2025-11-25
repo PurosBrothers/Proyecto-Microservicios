@@ -112,7 +112,6 @@ public class ClasificacionService {
         String address = null;
         if (clasificacion instanceof Alojamiento) {
             address = ((Alojamiento) clasificacion).getDireccion();
-            System.out.println("Es Alojamiento, dirección: " + address);
         } else if (clasificacion instanceof Transporte) {
             address = ((Transporte) clasificacion).getLugarDestino();
             System.out.println("Es Transporte, lugar destino: " + address);
@@ -142,11 +141,48 @@ public class ClasificacionService {
     }
 
     public Optional<Clasificacion> getClasificacionById(Long id) {
-        return clasificacionRepository.findById(id);
+        Optional<Clasificacion> opt = clasificacionRepository.findById(id);
+        opt.ifPresent(this::populateCountryDataIfMissing);
+        return opt;
     }
 
     public List<Clasificacion> getAllClasificaciones() {
-        return clasificacionRepository.findAll();
+        List<Clasificacion> list = clasificacionRepository.findAll();
+        list.forEach(this::populateCountryDataIfMissing);
+        return list;
+    }
+
+    private void populateCountryDataIfMissing(Clasificacion clasificacion) {
+        if (clasificacion.getFlag() == null && (clasificacion.getPaisDestino() != null || clasificacion.getLugarInicio() != null)) {
+            String countryName = clasificacion.getPaisDestino();
+            if (countryName == null || countryName.isEmpty()) {
+                countryName = clasificacion.getLugarInicio();
+            }
+            if (countryName != null && !countryName.isEmpty()) {
+                try {
+                    String url = "https://restcountries.com/v3.1/name/" + countryName;
+                    CountryResponse[] responses = restTemplate.getForObject(url, CountryResponse[].class);
+                    if (responses != null && responses.length > 0) {
+                        CountryResponse country = responses[0];
+                        clasificacion.setFlag(country.getFlag());
+                        clasificacion.setPopulation(country.getPopulation());
+                        clasificacion.setFifa(country.getFifa());
+                        if (country.getGini() != null && !country.getGini().isEmpty()) {
+                            Double giniValue = country.getGini().values().iterator().next();
+                            clasificacion.setGini(giniValue);
+                        }
+                        if (country.getMaps() != null) {
+                            Maps maps = new Maps();
+                            maps.setGoogleMaps(country.getMaps().get("googleMaps"));
+                            maps.setOpenStreetMaps(country.getMaps().get("openStreetMaps"));
+                            clasificacion.setMaps(maps);
+                        }
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error fetching country data: " + e.getMessage());
+                }
+            }
+        }
     }
 
     public Clasificacion updateClasificacion(Long id, Clasificacion clasificacion) {
@@ -189,16 +225,20 @@ public class ClasificacionService {
 
     // Métodos específicos para Alojamiento
     public Optional<Alojamiento> getAlojamientoById(Long id) {
-        return clasificacionRepository.findById(id)
+        Optional<Alojamiento> opt = clasificacionRepository.findById(id)
                 .filter(c -> c instanceof Alojamiento)
                 .map(c -> (Alojamiento) c);
+        opt.ifPresent(this::populateCountryDataIfMissing);
+        return opt;
     }
 
     public List<Alojamiento> getAllAlojamientos() {
-        return clasificacionRepository.findAll().stream()
+        List<Alojamiento> list = clasificacionRepository.findAll().stream()
                 .filter(c -> c instanceof Alojamiento)
                 .map(c -> (Alojamiento) c)
                 .toList();
+        list.forEach(this::populateCountryDataIfMissing);
+        return list;
     }
 
     // Métodos específicos para Alimentacion
@@ -245,9 +285,11 @@ public class ClasificacionService {
 
     // Métodos para buscar por usuario
     public List<Clasificacion> getClasificacionesByUsuario(String usuarioId) {
-        return clasificacionRepository.findAll().stream()
+        List<Clasificacion> list = clasificacionRepository.findAll().stream()
                 .filter(c -> usuarioId.equals(c.getUsuarioId()))
                 .toList();
+        list.forEach(this::populateCountryDataIfMissing);
+        return list;
     }
 
     public List<Alojamiento> getAlojamientosByUsuario(String usuarioId) {
