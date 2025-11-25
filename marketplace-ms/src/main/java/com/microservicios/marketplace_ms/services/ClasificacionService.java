@@ -1,18 +1,23 @@
 package com.microservicios.marketplace_ms.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import com.microservicios.marketplace_ms.entities.Alimentacion;
 import com.microservicios.marketplace_ms.entities.Alojamiento;
 import com.microservicios.marketplace_ms.entities.Clasificacion;
+import com.microservicios.marketplace_ms.entities.Maps;
 import com.microservicios.marketplace_ms.entities.PaseosEcologicos;
+import com.microservicios.marketplace_ms.entities.RequisitosEspeciales;
 import com.microservicios.marketplace_ms.entities.Transporte;
 import com.microservicios.marketplace_ms.exceptions.InvalidProviderException;
 import com.microservicios.marketplace_ms.repositories.ClasificacionRepository;
+import com.microservicios.marketplace_ms.repositories.RequisitosEspecialesRepository;
 import com.microservicios.marketplace_ms.security.JwtSecurityContext;
 
 @Service
@@ -22,7 +27,13 @@ public class ClasificacionService {
     private ClasificacionRepository clasificacionRepository;
 
     @Autowired
+    private RequisitosEspecialesRepository requisitosEspecialesRepository;
+
+    @Autowired
     private JwtSecurityContext jwtSecurityContext;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     public Clasificacion createClasificacion(Clasificacion clasificacion) {
         // Establecer el usuarioId desde el JWT del usuario autenticado
@@ -30,10 +41,67 @@ public class ClasificacionService {
         if (currentUserId == null) {
             throw new InvalidProviderException("Usuario no autenticado");
         }
-        
+
         // La validación de PROVEEDOR ya se hace a nivel de Spring Security
         clasificacion.setUsuarioId(currentUserId);
-        
+
+        // Asegurar que los RequisitosEspeciales existan en la BD
+        if (clasificacion.getRequisitosEspeciales() != null) {
+            List<RequisitosEspeciales> updatedRequisitos = new ArrayList<>();
+            for (RequisitosEspeciales req : clasificacion.getRequisitosEspeciales()) {
+                final RequisitosEspeciales finalReq = req;
+                if (finalReq.getId() == null) {
+                    // Buscar por requisito
+                    RequisitosEspeciales existing = requisitosEspecialesRepository.findAll().stream()
+                        .filter(r -> r.getRequisito().equals(finalReq.getRequisito()))
+                        .findFirst().orElse(null);
+                    if (existing != null) {
+                        updatedRequisitos.add(existing);
+                    } else {
+                        RequisitosEspeciales saved = requisitosEspecialesRepository.save(finalReq);
+                        updatedRequisitos.add(saved);
+                    }
+                } else {
+                    updatedRequisitos.add(finalReq);
+                }
+            }
+            clasificacion.setRequisitosEspeciales(updatedRequisitos);
+        }
+
+        // Determinar el nombre del país: usar paisDestino si no es null, sino lugarInicio
+        String countryName = clasificacion.getPaisDestino();
+        if (countryName == null || countryName.isEmpty()) {
+            countryName = clasificacion.getLugarInicio();
+        }
+
+        // Si hay un nombre de país, hacer petición a la API externa
+        if (countryName != null && !countryName.isEmpty()) {
+            try {
+                String url = "https://restcountries.com/v3.1/name/" + countryName;
+                CountryResponse[] responses = restTemplate.getForObject(url, CountryResponse[].class);
+                if (responses != null && responses.length > 0) {
+                    CountryResponse country = responses[0];
+                    clasificacion.setFlag(country.getFlag());
+                    clasificacion.setPopulation(country.getPopulation());
+                    clasificacion.setFifa(country.getFifa());
+                    if (country.getGini() != null && !country.getGini().isEmpty()) {
+                        // Tomar el último valor de gini
+                        Double giniValue = country.getGini().values().iterator().next();
+                        clasificacion.setGini(giniValue);
+                    }
+                    if (country.getMaps() != null) {
+                        Maps maps = new Maps();
+                        maps.setGoogleMaps(country.getMaps().get("googleMaps"));
+                        maps.setOpenStreetMaps(country.getMaps().get("openStreetMaps"));
+                        clasificacion.setMaps(maps);
+                    }
+                }
+            } catch (Exception e) {
+                // Log error but don't fail the creation
+                System.err.println("Error fetching country data: " + e.getMessage());
+            }
+        }
+
         return clasificacionRepository.save(clasificacion);
     }
 
@@ -50,19 +118,19 @@ public class ClasificacionService {
         if (existingOpt.isEmpty()) {
             throw new RuntimeException("Clasificacion not found");
         }
-        
+
         Clasificacion existing = existingOpt.get();
         String currentUserId = jwtSecurityContext.getCurrentUserId();
-        
+
         // Verificar que el usuario actual es el propietario de la clasificación
         if (!existing.getUsuarioId().equals(currentUserId)) {
             throw new InvalidProviderException("Solo puedes actualizar tus propias clasificaciones");
         }
-        
+
         // Mantener el usuarioId original (no permitir cambio de propietario)
         clasificacion.setId(id);
         clasificacion.setUsuarioId(existing.getUsuarioId());
-        
+
         return clasificacionRepository.save(clasificacion);
     }
 
@@ -71,15 +139,15 @@ public class ClasificacionService {
         if (existingOpt.isEmpty()) {
             throw new RuntimeException("Clasificacion not found");
         }
-        
+
         Clasificacion existing = existingOpt.get();
         String currentUserId = jwtSecurityContext.getCurrentUserId();
-        
+
         // Verificar que el usuario actual es el propietario de la clasificación
         if (!existing.getUsuarioId().equals(currentUserId)) {
             throw new InvalidProviderException("Solo puedes eliminar tus propias clasificaciones");
         }
-        
+
         clasificacionRepository.deleteById(id);
     }
 

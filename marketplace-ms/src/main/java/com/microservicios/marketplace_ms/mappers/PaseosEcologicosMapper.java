@@ -1,7 +1,9 @@
 package com.microservicios.marketplace_ms.mappers;
 
 import com.microservicios.marketplace_ms.dtos.PaseosEcologicosDTO;
+import com.microservicios.marketplace_ms.dtos.MapsDTO;
 import com.microservicios.marketplace_ms.entities.PaseosEcologicos;
+import com.microservicios.marketplace_ms.entities.Maps;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,9 +18,9 @@ public class PaseosEcologicosMapper {
         if (entity == null) {
             return null;
         }
-        
+
         PaseosEcologicosDTO dto = new PaseosEcologicosDTO();
-        
+
         // Mapear campos de la clase padre
         dto.setId(entity.getId());
         dto.setTipo(entity.getTipo());
@@ -28,8 +30,19 @@ public class PaseosEcologicosMapper {
         dto.setFechaDisponibilidadFin(entity.getFechaDisponibilidadFin());
         dto.setCapacidadMaxima(entity.getCapacidadMaxima());
         dto.setUsuarioId(entity.getUsuarioId());
+        dto.setPaisDestino(entity.getPaisDestino());
+        dto.setFlag(entity.getFlag());
+        dto.setPopulation(entity.getPopulation());
+        dto.setGini(entity.getGini());
+        dto.setFifa(entity.getFifa());
+        if (entity.getMaps() != null) {
+            MapsDTO mapsDTO = new MapsDTO();
+            mapsDTO.setGoogleMaps(entity.getMaps().getGoogleMaps());
+            mapsDTO.setOpenStreetMaps(entity.getMaps().getOpenStreetMaps());
+            dto.setMaps(mapsDTO);
+        }
         dto.setRequisitosEspeciales(requisitosEspecialesMapper.toDtoList(entity.getRequisitosEspeciales()));
-        
+
         // Mapear campos específicos de PaseosEcologicos
         dto.setDuracionHoras(entity.getDuracionHoras());
         dto.setNivelDificultad(entity.getNivelDificultad());
@@ -38,7 +51,7 @@ public class PaseosEcologicosMapper {
         dto.setEdadMinima(entity.getEdadMinima());
         dto.setPuntoEncuentro(entity.getPuntoEncuentro());
         dto.setRutaEncuentro(entity.getRutaEncuentro());
-        
+
         return dto;
     }
 
@@ -46,9 +59,9 @@ public class PaseosEcologicosMapper {
         if (dto == null) {
             return null;
         }
-        
+
         PaseosEcologicos entity = new PaseosEcologicos();
-        
+
         // Mapear campos de la clase padre
         entity.setId(dto.getId());
         entity.setTipo(dto.getTipo());
@@ -58,8 +71,19 @@ public class PaseosEcologicosMapper {
         entity.setFechaDisponibilidadFin(dto.getFechaDisponibilidadFin());
         entity.setCapacidadMaxima(dto.getCapacidadMaxima());
         entity.setUsuarioId(dto.getUsuarioId());
+        entity.setPaisDestino(dto.getPaisDestino());
+        entity.setFlag(dto.getFlag());
+        entity.setPopulation(dto.getPopulation());
+        entity.setGini(dto.getGini());
+        entity.setFifa(dto.getFifa());
+        if (dto.getMaps() != null) {
+            Maps maps = new Maps();
+            maps.setGoogleMaps(dto.getMaps().getGoogleMaps());
+            maps.setOpenStreetMaps(dto.getMaps().getOpenStreetMaps());
+            entity.setMaps(maps);
+        }
         entity.setRequisitosEspeciales(requisitosEspecialesMapper.toEntityList(dto.getRequisitosEspeciales()));
-        
+
         // Mapear campos específicos de PaseosEcologicos
         entity.setDuracionHoras(dto.getDuracionHoras());
         entity.setNivelDificultad(dto.getNivelDificultad());
@@ -68,7 +92,7 @@ public class PaseosEcologicosMapper {
         entity.setEdadMinima(dto.getEdadMinima());
         entity.setPuntoEncuentro(dto.getPuntoEncuentro());
         entity.setRutaEncuentro(dto.getRutaEncuentro());
-        
+
         return entity;
     }
 }
