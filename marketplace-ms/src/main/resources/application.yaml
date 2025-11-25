@@ -3,7 +3,7 @@ spring:
     name: marketplace-ms
 
   config:
-    import: configserver:http://localhost:8888
+    import: configserver:http://config-server:8888
 
   # Configuración de seguridad OAuth2 para Keycloak
   security:
@@ -14,3 +14,8 @@ spring:
           jwk-set-uri: http://localhost:8081/realms/proyect-ms-realm/protocol/openid-connect/certs
           # Issuer URI de Keycloak
           issuer-uri: http://localhost:8081/realms/proyect-ms-realm
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:9989/eureka/
