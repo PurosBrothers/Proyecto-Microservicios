@@ -14,6 +14,12 @@ public class AlojamientoDTO extends ClasificacionDTO {
     private Optional<BigDecimal> lat;
     private Optional<BigDecimal> lng;
     private String direccion;
+    private Double temperaturaActual;
+    private Double viento;
+    private Integer codigoClima;
+    private Double lluvia;
+    private Double precipitacion;
+    private Integer probabilidadPrecipitacion;
 
     // Constructors
     public AlojamientoDTO() {
@@ -83,5 +89,53 @@ public class AlojamientoDTO extends ClasificacionDTO {
 
     public void setDireccion(String direccion) {
         this.direccion = direccion;
+    }
+
+    public Double getTemperaturaActual() {
+        return temperaturaActual;
+    }
+
+    public void setTemperaturaActual(Double temperaturaActual) {
+        this.temperaturaActual = temperaturaActual;
+    }
+
+    public Double getViento() {
+        return viento;
+    }
+
+    public void setViento(Double viento) {
+        this.viento = viento;
+    }
+
+    public Integer getCodigoClima() {
+        return codigoClima;
+    }
+
+    public void setCodigoClima(Integer codigoClima) {
+        this.codigoClima = codigoClima;
+    }
+
+    public Double getLluvia() {
+        return lluvia;
+    }
+
+    public void setLluvia(Double lluvia) {
+        this.lluvia = lluvia;
+    }
+
+    public Double getPrecipitacion() {
+        return precipitacion;
+    }
+
+    public void setPrecipitacion(Double precipitacion) {
+        this.precipitacion = precipitacion;
+    }
+
+    public Integer getProbabilidadPrecipitacion() {
+        return probabilidadPrecipitacion;
+    }
+
+    public void setProbabilidadPrecipitacion(Integer probabilidadPrecipitacion) {
+        this.probabilidadPrecipitacion = probabilidadPrecipitacion;
     }
 }

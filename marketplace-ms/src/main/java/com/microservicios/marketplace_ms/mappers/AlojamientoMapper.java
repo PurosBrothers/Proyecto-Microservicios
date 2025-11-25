@@ -54,6 +54,12 @@ public class AlojamientoMapper {
         dto.setLat(Optional.ofNullable(entity.getLat()));
         dto.setLng(Optional.ofNullable(entity.getLng()));
         dto.setDireccion(entity.getDireccion());
+        dto.setTemperaturaActual(entity.getTemperaturaActual());
+        dto.setViento(entity.getViento());
+        dto.setCodigoClima(entity.getCodigoClima());
+        dto.setLluvia(entity.getLluvia());
+        dto.setPrecipitacion(entity.getPrecipitacion());
+        dto.setProbabilidadPrecipitacion(entity.getProbabilidadPrecipitacion());
 
         return dto;
     }
@@ -96,6 +102,12 @@ public class AlojamientoMapper {
         entity.setLat(dto.getLat().orElse(null));
         entity.setLng(dto.getLng().orElse(null));
         entity.setDireccion(dto.getDireccion());
+        entity.setTemperaturaActual(dto.getTemperaturaActual());
+        entity.setViento(dto.getViento());
+        entity.setCodigoClima(dto.getCodigoClima());
+        entity.setLluvia(dto.getLluvia());
+        entity.setPrecipitacion(dto.getPrecipitacion());
+        entity.setProbabilidadPrecipitacion(dto.getProbabilidadPrecipitacion());
 
         return entity;
     }

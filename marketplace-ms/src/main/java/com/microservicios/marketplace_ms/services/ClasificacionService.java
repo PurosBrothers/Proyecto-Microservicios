@@ -1,5 +1,6 @@
 package com.microservicios.marketplace_ms.services;
 
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -112,6 +113,70 @@ public class ClasificacionService {
         String address = null;
         if (clasificacion instanceof Alojamiento) {
             address = ((Alojamiento) clasificacion).getDireccion();
+            System.out.println("Es Alojamiento, dirección: " + address);
+            if (address != null && !address.isEmpty()) {
+                System.out.println("Iniciando obtención de datos del clima para dirección: " + address);
+                // Extraer la ciudad de la dirección (asumiendo formato: Calle, Ciudad, País)
+                String city = extractCityFromAddress(address);
+                if (city == null || city.isEmpty()) {
+                    System.out.println("No se pudo extraer la ciudad de la dirección, omitiendo obtención de clima");
+                } else {
+                String encodedCity = URLEncoder.encode(city, StandardCharsets.UTF_8);
+                String urlGeocoding = "https://geocoding-api.open-meteo.com/v1/search?name=" + encodedCity;
+                System.out.println("URL de geocoding para ciudad: " + urlGeocoding);
+
+                try {
+                    GeocodingResponse geocodingResponse = restTemplate.getForObject(urlGeocoding, GeocodingResponse.class);
+                    if (geocodingResponse != null && geocodingResponse.getResults() != null && !geocodingResponse.getResults().isEmpty()) {
+                        GeocodingResponse.GeocodingResult result = geocodingResponse.getResults().get(0);
+                        double lat = result.getLatitude();
+                        double lng = result.getLongitude();
+                        System.out.println("Coordenadas obtenidas: lat=" + lat + ", lng=" + lng);
+                        ((Alojamiento) clasificacion).setLat(BigDecimal.valueOf(lat));
+                        ((Alojamiento) clasificacion).setLng(BigDecimal.valueOf(lng));
+
+                        // Fechas en formato YYYY-MM-DD
+                        String startDate = ((Alojamiento) clasificacion).getFechaCheckin().toLocalDate().toString();
+                        String endDate = ((Alojamiento) clasificacion).getFechaCheckout().toLocalDate().toString();
+
+                        // URL de forecast
+                        String urlForecast = "https://api.open-meteo.com/v1/forecast?"
+                                + "latitude=" + lat
+                                + "&longitude=" + lng
+                                + "&start_date=" + startDate
+                                + "&end_date=" + endDate
+                                + "&hourly=temperature_2m,apparent_temperature,rain,precipitation,precipitation_probability"
+                                + "&current_weather=true";
+
+                        System.out.println("URL de forecast: " + urlForecast);
+
+                        ForecastResponse forecastResponse = restTemplate.getForObject(urlForecast, ForecastResponse.class);
+                        if (forecastResponse != null) {
+                            // Datos actuales
+                            ForecastResponse.CurrentWeather current = forecastResponse.getCurrent_weather();
+                            ((Alojamiento) clasificacion).setTemperaturaActual(current.getTemperature());
+                            ((Alojamiento) clasificacion).setViento(current.getWindspeed());
+                            ((Alojamiento) clasificacion).setCodigoClima(current.getWeathercode());
+
+                            // Para lluvia y probabilidad, usamos el primer dato horario
+                            if (forecastResponse.getHourly() != null) {
+                                ((Alojamiento) clasificacion).setLluvia(forecastResponse.getHourly().getRain().get(0));
+                                ((Alojamiento) clasificacion).setPrecipitacion(forecastResponse.getHourly().getPrecipitation().get(0));
+                                ((Alojamiento) clasificacion).setProbabilidadPrecipitacion(forecastResponse.getHourly().getPrecipitation_probability().get(0));
+                            }
+
+                            System.out.println("Datos del clima obtenidos correctamente");
+                        } else {
+                            System.out.println("No se obtuvieron datos del forecast");
+                        }
+                    } else {
+                        System.out.println("No se encontraron resultados de geocoding");
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error fetching weather data: " + e.getMessage());
+                }
+            }
+        }
         } else if (clasificacion instanceof Transporte) {
             address = ((Transporte) clasificacion).getLugarDestino();
             System.out.println("Es Transporte, lugar destino: " + address);
@@ -150,6 +215,19 @@ public class ClasificacionService {
         List<Clasificacion> list = clasificacionRepository.findAll();
         list.forEach(this::populateCountryDataIfMissing);
         return list;
+    }
+
+    private String extractCityFromAddress(String address) {
+        if (address == null || address.isEmpty()) {
+            return null;
+        }
+        String[] parts = address.split(",");
+        if (parts.length >= 2) {
+            // Asumiendo que la ciudad es la penúltima parte antes del país
+            return parts[parts.length - 2].trim();
+        }
+        // Si no hay comas, intentar usar la dirección completa como ciudad (aunque no ideal)
+        return address.trim();
     }
 
     private void populateCountryDataIfMissing(Clasificacion clasificacion) {
