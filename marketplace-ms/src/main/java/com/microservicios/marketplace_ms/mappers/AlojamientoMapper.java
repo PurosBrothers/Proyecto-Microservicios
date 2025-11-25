@@ -8,6 +8,8 @@ import com.microservicios.marketplace_ms.entities.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class AlojamientoMapper {
 
@@ -49,8 +51,9 @@ public class AlojamientoMapper {
         dto.setTipoInmueble(entity.getTipoInmueble());
         dto.setNumeroBanos(entity.getNumeroBanos());
         dto.setNumeroHabitaciones(entity.getNumeroHabitaciones());
-        dto.setLat(entity.getLat());
-        dto.setLng(entity.getLng());
+        dto.setLat(Optional.ofNullable(entity.getLat()));
+        dto.setLng(Optional.ofNullable(entity.getLng()));
+        dto.setDireccion(entity.getDireccion());
 
         return dto;
     }
@@ -90,8 +93,9 @@ public class AlojamientoMapper {
         entity.setTipoInmueble(dto.getTipoInmueble());
         entity.setNumeroBanos(dto.getNumeroBanos());
         entity.setNumeroHabitaciones(dto.getNumeroHabitaciones());
-        entity.setLat(dto.getLat());
-        entity.setLng(dto.getLng());
+        entity.setLat(dto.getLat().orElse(null));
+        entity.setLng(dto.getLng().orElse(null));
+        entity.setDireccion(dto.getDireccion());
 
         return entity;
     }

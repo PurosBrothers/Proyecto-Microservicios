@@ -2,6 +2,7 @@ package com.microservicios.marketplace_ms.dtos;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public class AlojamientoDTO extends ClasificacionDTO {
     
@@ -10,8 +11,9 @@ public class AlojamientoDTO extends ClasificacionDTO {
     private String tipoInmueble;
     private Integer numeroBanos;
     private Integer numeroHabitaciones;
-    private BigDecimal lat;
-    private BigDecimal lng;
+    private Optional<BigDecimal> lat;
+    private Optional<BigDecimal> lng;
+    private String direccion;
 
     // Constructors
     public AlojamientoDTO() {
@@ -59,19 +61,27 @@ public class AlojamientoDTO extends ClasificacionDTO {
         this.numeroHabitaciones = numeroHabitaciones;
     }
 
-    public BigDecimal getLat() {
+    public Optional<BigDecimal> getLat() {
         return lat;
     }
 
-    public void setLat(BigDecimal lat) {
+    public void setLat(Optional<BigDecimal> lat) {
         this.lat = lat;
     }
 
-    public BigDecimal getLng() {
+    public Optional<BigDecimal> getLng() {
         return lng;
     }
 
-    public void setLng(BigDecimal lng) {
+    public void setLng(Optional<BigDecimal> lng) {
         this.lng = lng;
+    }
+
+    public String getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
     }
 }

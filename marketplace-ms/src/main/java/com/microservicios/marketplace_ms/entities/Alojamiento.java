@@ -17,6 +17,7 @@ public class Alojamiento extends Clasificacion {
     private Integer numeroHabitaciones;
     private BigDecimal lat;
     private BigDecimal lng;
+    private String direccion;
 
     // Getters and Setters for specific fields
     public LocalDateTime getFechaCheckin() {
@@ -73,6 +74,14 @@ public class Alojamiento extends Clasificacion {
 
     public void setLng(BigDecimal lng) {
         this.lng = lng;
+    }
+
+    public String getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
     }
 
 }

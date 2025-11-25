@@ -1,5 +1,7 @@
 package com.microservicios.marketplace_ms.services;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +38,8 @@ public class ClasificacionService {
     private RestTemplate restTemplate;
 
     public Clasificacion createClasificacion(Clasificacion clasificacion) {
+        System.out.println("Iniciando creación de clasificación de tipo: " + clasificacion.getTipo());
+
         // Establecer el usuarioId desde el JWT del usuario autenticado
         String currentUserId = jwtSecurityContext.getCurrentUserId();
         if (currentUserId == null) {
@@ -44,6 +48,7 @@ public class ClasificacionService {
 
         // La validación de PROVEEDOR ya se hace a nivel de Spring Security
         clasificacion.setUsuarioId(currentUserId);
+        System.out.println("Usuario autenticado: " + currentUserId);
 
         // Asegurar que los RequisitosEspeciales existan en la BD
         if (clasificacion.getRequisitosEspeciales() != null) {
@@ -74,7 +79,7 @@ public class ClasificacionService {
             countryName = clasificacion.getLugarInicio();
         }
 
-        // Si hay un nombre de país, hacer petición a la API externa
+        // Siempre hacer petición a la API de países si hay nombre de país
         if (countryName != null && !countryName.isEmpty()) {
             try {
                 String url = "https://restcountries.com/v3.1/name/" + countryName;
@@ -89,6 +94,7 @@ public class ClasificacionService {
                         Double giniValue = country.getGini().values().iterator().next();
                         clasificacion.setGini(giniValue);
                     }
+                    // Setear mapas desde el país por defecto
                     if (country.getMaps() != null) {
                         Maps maps = new Maps();
                         maps.setGoogleMaps(country.getMaps().get("googleMaps"));
@@ -102,7 +108,37 @@ public class ClasificacionService {
             }
         }
 
-        return clasificacionRepository.save(clasificacion);
+        // Determinar la dirección para mapas según el tipo
+        String address = null;
+        if (clasificacion instanceof Alojamiento) {
+            address = ((Alojamiento) clasificacion).getDireccion();
+            System.out.println("Es Alojamiento, dirección: " + address);
+        } else if (clasificacion instanceof Transporte) {
+            address = ((Transporte) clasificacion).getLugarDestino();
+            System.out.println("Es Transporte, lugar destino: " + address);
+        } else {
+            System.out.println("Es otro tipo, usando datos de país");
+        }
+
+        // Si hay dirección específica, crear enlace de Google Maps para la dirección (sobrescribe los mapas del país)
+        if (address != null && !address.isEmpty()) {
+            try {
+                String encodedAddress = URLEncoder.encode(address, StandardCharsets.UTF_8);
+                String googleMapsUrl = "https://www.google.com/maps/search/?api=1&query=" + encodedAddress;
+                Maps maps = new Maps();
+                maps.setGoogleMaps(googleMapsUrl);
+                // openStreetMaps puede dejarse null o asignar algo similar
+                clasificacion.setMaps(maps);
+                System.out.println("Enlace de Google Maps creado: " + googleMapsUrl);
+            } catch (Exception e) {
+                // Log error but don't fail the creation
+                System.err.println("Error creating maps link: " + e.getMessage());
+            }
+        }
+
+        Clasificacion saved = clasificacionRepository.save(clasificacion);
+        System.out.println("Clasificación creada exitosamente con ID: " + saved.getId());
+        return saved;
     }
 
     public Optional<Clasificacion> getClasificacionById(Long id) {
