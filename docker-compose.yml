@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   config-server:
     build: ./config-server
@@ -5,6 +7,9 @@ services:
     ports:
       - "8888:8888"
     restart: on-failure
+    networks:
+      my_network:
+        ipv4_address: 172.25.0.2
 
   eureka-server:
     build: ./eureka_server
@@ -12,6 +17,9 @@ services:
     ports:
       - "9989:9989"
     restart: on-failure
+    networks:
+      my_network:
+        ipv4_address: 172.25.0.3
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -23,6 +31,9 @@ services:
       - "5672:5672"
       - "15672:15672"
     restart: on-failure
+    networks:
+      my_network:
+        ipv4_address: 172.25.0.4
 
   postgres:
     image: postgres:15
@@ -35,12 +46,15 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      my_network:
+        ipv4_address: 172.25.0.5
 
   marketplace-ms:
     build: ./marketplace-ms
     container_name: marketplace-ms
     environment:
-      SPRING_PROFILES_ACTIVE: default
+      SPRING_PROFILES_ACTIVE: docker
       DB_USERNAME: postgres
       DB_PASSWORD: password
     ports:
@@ -51,6 +65,16 @@ services:
       - rabbitmq
       - postgres
     restart: on-failure
+    networks:
+      my_network:
+        ipv4_address: 172.25.0.6
 
 volumes:
   postgres_data:
+
+networks:
+  my_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
