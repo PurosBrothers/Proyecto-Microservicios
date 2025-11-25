@@ -1,5 +1,7 @@
 package com.microservicios.marketplace_ms.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,6 +20,7 @@ public class ServiciosIncluidos {
 
     @ManyToOne
     @JoinColumn(name = "item_id")
+    @JsonBackReference("item-servicios")
     private Item item;
 
     // Getters and Setters

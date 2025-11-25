@@ -1,5 +1,7 @@
 package com.microservicios.marketplace_ms.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,6 +18,7 @@ public class ItemFoto {
 
     @ManyToOne
     @JoinColumn(name = "item_id", nullable = false)
+    @JsonBackReference("item-fotos")
     private Item item;
 
     private String url;

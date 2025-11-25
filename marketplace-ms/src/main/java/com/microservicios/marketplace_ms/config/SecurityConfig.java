@@ -47,6 +47,11 @@ public class SecurityConfig {
                 .requestMatchers("GET", "/paseos-ecologicos").permitAll()
                 .requestMatchers("GET", "/paseos-ecologicos/{id}").permitAll()
                 
+                // Endpoints de reviews y calificaciones - lectura pública
+                .requestMatchers("GET", "/items/*/reviews").permitAll()
+                .requestMatchers("GET", "/items/*/reviews/stats").permitAll()
+                .requestMatchers("GET", "/comentarios/*").permitAll()
+                
                 // Endpoints de escritura - solo proveedores autenticados
                 .requestMatchers("POST", "/alojamiento").hasRole("PROVEEDOR")
                 .requestMatchers("PUT", "/alojamiento/**").hasRole("PROVEEDOR")
@@ -63,6 +68,12 @@ public class SecurityConfig {
                 .requestMatchers("POST", "/paseos-ecologicos").hasRole("PROVEEDOR")
                 .requestMatchers("PUT", "/paseos-ecologicos/**").hasRole("PROVEEDOR")
                 .requestMatchers("DELETE", "/paseos-ecologicos/**").hasRole("PROVEEDOR")
+                
+                // Endpoints de reviews y calificaciones - escritura requiere autenticación
+                .requestMatchers("POST", "/items/*/reviews").authenticated()
+                .requestMatchers("POST", "/items/*/reviews/*/replies").authenticated()
+                .requestMatchers("DELETE", "/items/*/reviews/*").authenticated()
+                .requestMatchers("POST", "/comentarios/*/like").authenticated()
                 
                 // Endpoints por usuario - requiere autenticación
                 .requestMatchers("/*/usuario/**").authenticated()

@@ -1,0 +1,183 @@
+### PRUEBAS CORREGIDAS - Sistema de Calificaciones y Comentarios
+### Después de corregir la configuración de seguridad
+
+###
+### ✅ PRUEBAS PÚBLICAS (SIN AUTENTICACIÓN) - Solo lectura
+###
+
+### 1. Ver datos existentes (PÚBLICO)
+GET http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+
+###
+### 2. Ver estadísticas (PÚBLICO)
+GET http://localhost:8080/marketplace-ms/items/1/reviews/stats
+Content-Type: application/json
+
+###
+### 3. Ver comentario específico (PÚBLICO)
+GET http://localhost:8080/marketplace-ms/comentarios/1
+Content-Type: application/json
+
+###
+### 4. Ver item inexistente (PÚBLICO)
+GET http://localhost:8080/marketplace-ms/items/999/reviews
+Content-Type: application/json
+
+###
+### 🔐 PRUEBAS CON AUTENTICACIÓN (Escritura)
+### ⚠️ IMPORTANTE: Necesitas obtener un JWT token válido primero
+### 
+### Para obtener el token:
+### 1. Ve al frontend y haz login
+### 2. Abre DevTools (F12) → Network
+### 3. Haz cualquier acción que requiera autenticación
+### 4. Busca "Authorization: Bearer ..." en los headers
+### 5. Copia el token y reemplaza YOUR_JWT_TOKEN_HERE
+
+###
+### 5. Crear calificación (REQUIERE AUTH)
+POST http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 999,
+  "puntuacion": 5,
+  "titulo": "Excelente lugar",
+  "comentario": "Superó todas mis expectativas. Muy recomendado!"
+}
+
+###
+### 6. Responder a comentario (REQUIERE AUTH)
+POST http://localhost:8080/marketplace-ms/items/1/reviews/1/replies
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 888,
+  "titulo": "De acuerdo",
+  "cuerpo": "Comparto totalmente tu opinión, yo también tuve una experiencia increíble."
+}
+
+###
+### 7. Dar like a comentario (REQUIERE AUTH)
+POST http://localhost:8080/marketplace-ms/comentarios/1/like
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+###
+### 8. Eliminar calificación - solo el autor (REQUIERE AUTH)
+DELETE http://localhost:8080/marketplace-ms/items/1/reviews/1
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+###
+### 🧪 PRUEBAS DE VALIDACIÓN
+###
+
+### 9. Error: Puntuación inválida (>5)
+POST http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 999,
+  "puntuacion": 6,
+  "titulo": "Error puntuación",
+  "comentario": "Esto debe fallar"
+}
+
+###
+### 10. Error: Puntuación inválida (<1)
+POST http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 999,
+  "puntuacion": 0,
+  "titulo": "Error puntuación",
+  "comentario": "Esto también debe fallar"
+}
+
+###
+### 11. Error: Título vacío
+POST http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 999,
+  "puntuacion": 4,
+  "titulo": "",
+  "comentario": "Sin título debe fallar"
+}
+
+###
+### 12. Error: UID nulo
+POST http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "puntuacion": 4,
+  "titulo": "Sin UID",
+  "comentario": "Debe fallar por falta de UID"
+}
+
+###
+### 🔄 VERIFICAR CAMBIOS (PÚBLICO)
+###
+
+### 13. Ver todas las calificaciones actualizadas
+GET http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+
+### 14. Ver estadísticas actualizadas
+GET http://localhost:8080/marketplace-ms/items/1/reviews/stats
+Content-Type: application/json
+
+###
+### 🎯 PRUEBAS CON DATOS REALES DEL DbInitializer
+###
+
+### Datos precargados:
+### - Comentario ID=1: UID=1, 5 estrellas, "Excelente experiencia"
+### - Respuesta ID=2: UID=2, responde al comentario 1
+### - Comentario ID=3: UID=3, 4 estrellas, "Buena relación calidad-precio"
+
+### 15. Responder al comentario precargado (ID=1)
+POST http://localhost:8080/marketplace-ms/items/1/reviews/1/replies
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 777,
+  "titulo": "Experiencia similar",
+  "cuerpo": "Yo también estuve allí y confirmo que es excelente. El servicio es de primera."
+}
+
+### 16. Dar like al comentario precargado (actualmente tiene 10 likes)
+POST http://localhost:8080/marketplace-ms/comentarios/1/like
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 17. Verificar que se incrementó el like
+GET http://localhost:8080/marketplace-ms/comentarios/1
+Content-Type: application/json
+
+###
+### 🚨 ERRORES COMUNES Y SOLUCIONES:
+###
+### - 500 "Access Denied": Token JWT inválido o expirado
+### - 401 Unauthorized: Falta token o token mal formateado
+### - 403 Forbidden: Token válido pero sin permisos
+### - 400 Bad Request: Datos de entrada inválidos
+### - 404 Not Found: ID de item o comentario no existe
+###
+### SOLUCION PARA OBTENER TOKEN:
+### 1. Frontend → Login → DevTools → Network → Cualquier request autenticada
+### 2. Headers → Authorization → Copiar todo después de "Bearer "
+### 3. Reemplazar YOUR_JWT_TOKEN_HERE con el token completo
+###

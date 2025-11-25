@@ -1,0 +1,41 @@
+### 🚀 PRUEBAS SIN AUTENTICACIÓN - Solo endpoints públicos GET
+
+### 1. Ver reviews existentes (PÚBLICO - Sin token)
+GET http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+
+###
+### 2. Ver estadísticas de reviews (PÚBLICO - Sin token)
+GET http://localhost:8080/marketplace-ms/items/1/reviews/stats
+Content-Type: application/json
+
+###
+### 3. Ver comentario específico (PÚBLICO - Sin token)
+GET http://localhost:8080/marketplace-ms/comentarios/1
+Content-Type: application/json
+
+###
+### 4. Probar item que no existe (PÚBLICO - Sin token)
+GET http://localhost:8080/marketplace-ms/items/999/reviews
+Content-Type: application/json
+
+###
+### 5. Verificar respuesta de health check
+GET http://localhost:8080/marketplace-ms/actuator/health
+Content-Type: application/json
+
+###
+### ⚠️ IMPORTANTE: 
+### - Estos tests NO requieren autenticación
+### - Si alguno falla con 401/403, hay problema en SecurityConfig
+### - El test #4 del archivo anterior falla porque usa token malformado
+### - Primero prueba ESTOS tests, luego obten token JWT válido para escribura
+###
+
+### 📝 PARA OBTENER TOKEN JWT VÁLIDO (solo cuando necesites escribir):
+### 1. Ve al frontend y haz login
+### 2. DevTools (F12) → Network tab
+### 3. Haz cualquier acción autenticada
+### 4. Busca "Authorization: Bearer ..." en headers
+### 5. Copia SOLO la parte después de "Bearer " (sin espacios extra)
+###

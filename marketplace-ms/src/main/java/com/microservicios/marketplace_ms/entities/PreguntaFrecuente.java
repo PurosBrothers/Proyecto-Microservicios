@@ -1,5 +1,7 @@
 package com.microservicios.marketplace_ms.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,6 +17,7 @@ public class PreguntaFrecuente {
     private String pregunta;
 
     @ManyToOne
+    @JsonBackReference("item-preguntas")
     private Item item;
 
     // Getters and Setters

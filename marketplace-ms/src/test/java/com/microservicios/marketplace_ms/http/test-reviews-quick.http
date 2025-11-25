@@ -1,0 +1,157 @@
+### PRUEBAS RÁPIDAS - Sistema de Calificaciones y Comentarios
+### Para desarrollo y testing rápido
+
+###
+### ✅ PRUEBAS BÁSICAS (SIN AUTENTICACIÓN)
+###
+
+### 1. Ver datos existentes
+GET http://localhost:8080/marketplace-ms/items/1/reviews
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTWdvZ0pJN3JPRi1OWlY1anVjRkx6Mjh0TlB3eHNsbVlBbG1ORTZZMDNRIn0.eyJleHAiOjE3NjQwNDgzNDIsImlhdCI6MTc2NDA0NzQ0MiwianRpIjoib25ydHJvOjI0ODQyZWEyLTlmNzYtN2FkNC0wYzE1LTU3MDk3YjAxNDhlNCIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MS9yZWFsbXMvcHJveWVjdC1tcy1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyM2FlN2Y0Yi1lNTA3LTRlOWMtOGVkNi1kZWMyMGJmOWQwNGEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ1c2VyLW1zLWNsaWVudCIsInNpZCI6IjVhZjcxY2ZhLThiNmYtNGM1ZC04ZGEwLWJlMDJiNGMyNDJiOCIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyoiLCJodHRwOi8vbG9jYWxob3N0OjgwODMvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiUFJPVkVFRE9SIiwib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLXByb3llY3QtbXMtcmVhbG0iLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiRGljayBHcmF5c29uIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiZGlja2dyYXlzb25AZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6IkRpY2siLCJmYW1pbHlfbmFtZSI6IkdyYXlzb24iLCJlbWFpbCI6ImRpY2tncmF5c29uQGdtYWlsLmNvbSJ9.fZyigmx6_i__VWYmjp1Bqsy3rGhnWOaHeNO8T_4czOkwUx6hIGxn7KWwtp9e7xddNeJ_6vTBNyk8amJQ7SyBQEKWDGmLachoR4alP3E73akqaX0uw_CYEjRnUA1ig_5eP3WUmYrNAOKSv3DegJV1qeT_-JPArPIiAVBeikzTa1Y3Cb-TNu121vW_yKEfgi75ItJn71adNOtlJKBanUTFTQW5tO7wb9d9cAy8ijgpotz9Qs3OFImY8QcLs1MVEinDbC5bkm58pqHvBVxlY7ArKyDJeRJ9KxrgxvT8lp6bRdZ8Jsm1Jlq99d6Fhj4Zwshu7GN71wJzgsSg4jjwMegguw
+
+###
+### 2. Ver estadísticas
+GET http://localhost:8080/marketplace-ms/items/1/reviews/stats
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+###
+### 3. Ver comentario específico
+GET http://localhost:8080/marketplace-ms/comentarios/1
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+###
+### ⚠️ PRUEBAS CON AUTENTICACIÓN (Necesita JWT Token válido)
+###
+
+### 4. Crear calificación rápida
+POST http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTWdvZ0pJN3JPRi1OWlY1anVjRkx6Mjh0TlB3eHNsbVlBbG1ORTZZMDNRIn0.eyJleHAiOjE3NjQwNDkyMzMsImlhdCI6MTc2NDA0ODMzMywianRpIjoib25ydHJvOmZhMTlhMGJhLWI5NWMtMjk1OC1iY2RjLTY1MzNhZDY1YTI0MyIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MS9yZWFsbXMvcHJveWVjdC1tcy1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyM2FlN2Y0Yi1lNTA3LTRlOWMtOGVkNi1kZWMyMGJmOWQwNGEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ1c2VyLW1zLWNsaWVudCIsInNpZCI6ImUzOGNlZGVjLTdkODYtNGJlYi04NTI0LTRkNmFmOWFmZjgwMyIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyoiLCJodHRwOi8vbG9jYWxob3N0OjgwODMvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiUFJPVkVFRE9SIiwib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLXByb3llY3QtbXMtcmVhbG0iLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiRGljayBHcmF5c29uIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiZGlja2dyYXlzb25AZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6IkRpY2siLCJmYW1pbHlfbmFtZSI6IkdyYXlzb24iLCJlbWFpbCI6ImRpY2tncmF5c29uQGdtYWlsLmNvbSJ9.g2ljCnnmqiAH_S_nukKUX2Pk2gbC69C45M9KF-vNmbCsBBB177nNgUzPDEkpRa5lrI4XW9bDx860DDggG5CHIYEQuUHaGlsy_uaxMtBh82D2CkVfvdH70algn73Srrqu2Mb0j0FPqaH4sB5OKZXUo3CsrPqHKOHno2_CEJW7IhA06sjS056YhrcJm8EQra9aX0jNQqP-9tZPD1whioZ9gI4wLItGBPRnsRwNc9DzMPyj0L4C2aRRS5XmLA1H5mrSJh_ugO8G-UkdzaEsuPsEuNAs9PF7tylX1qAx3rKVQ7EkWkTURQ6GcMFABmEAf4BhYJ7GRxNShf7gcLL0VgqvtA
+
+{
+  "uid": 999,
+  "puntuacion": 5,
+  "titulo": "Test rápido",
+  "comentario": "Prueba de desarrollo"
+}
+
+###
+### 5. Responder rápidamente (al comentario ID=1)
+POST http://localhost:8080/marketplace-ms/items/1/reviews/1/replies
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTWdvZ0pJN3JPRi1OWlY1anVjRkx6Mjh0TlB3eHNsbVlBbG1ORTZZMDNRIn0.eyJleHAiOjE3NjQwNDczNjUsImlhdCI6MTc2NDA0NjQ2NSwianRpIjoib25ydHJvOmYxMmRmZDJlLTJiNGUtYTNjNC03MzAzLTk2MmJkNjhhMWQ1NyIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MS9yZWFsbXMvcHJveWVjdC1tcy1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyM2FlN2Y0Yi1lNTA3LTRlOWMtOGVkNi1kZWMyMGJmOWQwNGEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ1c2VyLW1zLWNsaWVudCIsInNpZCI6ImUxMzgwN2I3LWE3MWQtNGFhYS04MjEwLWJmZDkzMDM3YTY3NiIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyoiLCJodHRwOi8vbG9jYWxob3N0OjgwODMvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiUFJPVkVFRE9SIiwib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLXByb3llY3QtbXMtcmVhbG0iLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiRGljayBHcmF5c29uIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiZGlja2dyYXlzb25AZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6IkRpY2siLCJmYW1pbHlfbmFtZSI6IkdyYXlzb24iLCJlbWFpbCI6ImRpY2tncmF5c29uQGdtYWlsLmNvbSJ9.jKtParozesUiK-u4473ZgAIvtCZEh4Wdx5hWG27EkNxJ4vio8eqRy2zidkfITTpVDvIr7j9ptd5b2n-u3a_zp9bqJcL26I_mkHSlfiLgrdM2Ryv1VYDSSkGmApZwDqUSVqhzU5q4cuQtlepDdO5Uq8VbRPi4FtIAI8Ei0Aqt_MBzbNygHXTYm2GCmGwuKixltCAGhkmj9DmJ3bnIg41sc2EPh-nE4xZM3Lj-oCxxiLZ03W9pvXX4RkRuA915muFBlVzU4HaGpUwDTpmARyDeMXd1lztr-xd2pFza6yLiLwKpwQ_3Q3dhXrwjuAOOtui87gKt6JTrf27ArA7QOrKA4A
+
+
+{
+  "uid": 888,
+  "cuerpo": "Respuesta de prueba"
+}
+
+###
+### 6. Dar like rápido
+POST http://localhost:8080/marketplace-ms/comentarios/1/like
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+###
+### 🔥 PRUEBAS DE ERRORES COMUNES
+###
+
+### Error: Puntuación inválida
+POST http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 999,
+  "puntuacion": 6,
+  "titulo": "Error",
+  "comentario": "Esto debe fallar"
+}
+
+###
+### Error: Sin título
+POST http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 999,
+  "puntuacion": 5,
+  "titulo": "",
+  "comentario": "Sin título"
+}
+
+###
+### Error: Item inexistente
+GET http://localhost:8080/marketplace-ms/items/999/reviews
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+###
+### 🧪 DATOS DE PRUEBA VARIADOS
+###
+
+### Calificación 1 estrella
+POST http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 111,
+  "puntuacion": 1,
+  "titulo": "Muy malo",
+  "comentario": "Decepcionante totalmente"
+}
+
+###
+### Calificación 3 estrellas
+POST http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 222,
+  "puntuacion": 3,
+  "titulo": "Regular",
+  "comentario": "Ni bueno ni malo"
+}
+
+###
+### Calificación sin comentario
+POST http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 333,
+  "puntuacion": 4,
+  "titulo": "Bueno"
+}
+
+###
+### 📊 VERIFICAR RESULTADOS
+###
+
+### Ver todos los reviews actualizados
+GET http://localhost:8080/marketplace-ms/items/1/reviews
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### Ver estadísticas actualizadas  
+GET http://localhost:8080/marketplace-ms/items/1/reviews/stats
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+###
+### 🎯 PARA OBTENER JWT TOKEN:
+### 1. Inicia sesión en el frontend
+### 2. Abre DevTools (F12) → Network
+### 3. Haz una llamada autenticada
+### 4. Busca Authorization: Bearer <token>
+### 5. Copia el token y reemplaza YOUR_JWT_TOKEN_HERE
+###
+
+###
+### 📝 IDS COMUNES (pueden variar):
+### - Item Alojamiento: ID = 1
+### - Comentario Padre 1: ID = 1 (UID=1, 5 estrellas)
+### - Respuesta 1: ID = 2 (UID=2)  
+### - Comentario Padre 2: ID = 3 (UID=3, 4 estrellas)
+###

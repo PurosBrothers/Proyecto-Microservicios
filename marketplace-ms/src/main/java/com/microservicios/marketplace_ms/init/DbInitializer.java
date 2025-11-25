@@ -314,24 +314,65 @@ public class DbInitializer implements CommandLineRunner {
         preguntaPaseos2.setItem(itemPaseos);
         preguntaFrecuenteRepository.save(preguntaPaseos2);
 
-        // Create Comentario
-        Comentario comentario = new Comentario();
-        comentario.setUid(1L);
-        comentario.setTitulo("Great experience");
-        comentario.setCuerpo("Loved the place!");
-        comentario.setLikes(10);
+        // Create Comentario PADRE con Calificación
+        Comentario comentarioPadre = new Comentario();
+        comentarioPadre.setUid(1L);
+        comentarioPadre.setTitulo("Excelente experiencia");
+        comentarioPadre.setCuerpo("El alojamiento superó mis expectativas. Muy recomendado!");
+        comentarioPadre.setLikes(10);
+        comentarioPadre.setParent(null); // Es comentario padre
+        comentarioPadre.setItem(itemAlojamiento); // Asociar al item
 
-        comentario = comentarioRepository.save(comentario);
+        comentarioPadre = comentarioRepository.save(comentarioPadre);
 
-        // Create Calificacion
+        // Create Calificacion para el comentario padre
         Calificacion calificacion = new Calificacion();
         calificacion.setUid(1L);
         calificacion.setPuntuacion(5);
-        calificacion.setComentario(comentario);
+        calificacion.setComentario(comentarioPadre);
         calificacion.setFechaCalificacion(LocalDateTime.now());
         calificacion.setItem(itemAlojamiento);
 
-        calificacionRepository.save(calificacion);
+        calificacion = calificacionRepository.save(calificacion);
+
+        // Actualizar relación bidireccional
+        comentarioPadre.setCalificacion(calificacion);
+        comentarioPadre = comentarioRepository.save(comentarioPadre);
+
+        // Create respuesta al comentario (SIN calificación)
+        Comentario respuesta1 = new Comentario();
+        respuesta1.setUid(2L);
+        respuesta1.setTitulo("Totalmente de acuerdo");
+        respuesta1.setCuerpo("Yo también tuve una experiencia increíble allí. El servicio es de primera.");
+        respuesta1.setLikes(3);
+        respuesta1.setParent(comentarioPadre); // Es respuesta
+        respuesta1.setItem(null); // Las respuestas no se asocian al item
+        respuesta1.setCalificacion(null); // Sin calificación
+
+        comentarioRepository.save(respuesta1);
+
+        // Create otra calificación padre para el mismo item
+        Comentario comentarioPadre2 = new Comentario();
+        comentarioPadre2.setUid(3L);
+        comentarioPadre2.setTitulo("Buena relación calidad-precio");
+        comentarioPadre2.setCuerpo("Aunque hay algunos detalles que mejorar, en general cumple con lo prometido.");
+        comentarioPadre2.setLikes(5);
+        comentarioPadre2.setParent(null);
+        comentarioPadre2.setItem(itemAlojamiento);
+
+        comentarioPadre2 = comentarioRepository.save(comentarioPadre2);
+
+        // Calificación para el segundo comentario padre
+        Calificacion calificacion2 = new Calificacion();
+        calificacion2.setUid(3L);
+        calificacion2.setPuntuacion(4);
+        calificacion2.setComentario(comentarioPadre2);
+        calificacion2.setFechaCalificacion(LocalDateTime.now());
+        calificacion2.setItem(itemAlojamiento);
+
+        calificacion2 = calificacionRepository.save(calificacion2);
+        comentarioPadre2.setCalificacion(calificacion2);
+        comentarioRepository.save(comentarioPadre2);
 
         // Create ItemTag
         ItemTag tag = new ItemTag();

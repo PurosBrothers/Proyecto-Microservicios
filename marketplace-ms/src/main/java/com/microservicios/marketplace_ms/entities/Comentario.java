@@ -3,6 +3,9 @@ package com.microservicios.marketplace_ms.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,6 +14,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+
 
 @Entity
 public class Comentario {
@@ -29,10 +34,22 @@ public class Comentario {
 
     @ManyToOne
     @JoinColumn(name = "parent_id")
+    @JsonBackReference
     private Comentario parent;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Comentario> replies = new ArrayList<>();
+
+    // Relación con Item - solo para comentarios padre
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private Item item;
+
+    // Relación con Calificacion - solo para comentarios padre
+    @OneToOne(mappedBy = "comentario", cascade = CascadeType.ALL)
+    @JsonManagedReference("comentario-calificacion")
+    private Calificacion calificacion;
 
     // Getters and Setters
     public Long getId() {
@@ -89,6 +106,32 @@ public class Comentario {
 
     public void setReplies(List<Comentario> replies) {
         this.replies = replies;
+    }
+
+    public Item getItem() {
+        return item;
+    }
+
+    public void setItem(Item item) {
+        this.item = item;
+    }
+
+    public Calificacion getCalificacion() {
+        return calificacion;
+    }
+
+    public void setCalificacion(Calificacion calificacion) {
+        this.calificacion = calificacion;
+    }
+
+    // Método helper para verificar si es comentario padre
+    public boolean isComentarioPadre() {
+        return this.parent == null;
+    }
+
+    // Método helper para verificar si debe tener calificación obligatoria
+    public boolean debeEstarCalificado() {
+        return isComentarioPadre() && this.item != null;
     }
 
 }

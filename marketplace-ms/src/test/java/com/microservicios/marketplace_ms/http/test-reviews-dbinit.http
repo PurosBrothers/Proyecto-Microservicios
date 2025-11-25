@@ -1,0 +1,270 @@
+### Pruebas HTTP con Datos Específicos del DbInitializer
+### Estas pruebas usan los datos exactos que se cargan en la base de datos
+
+### DATOS PRECARGADOS EN DbInitializer:
+### 
+### COMENTARIO PADRE 1:
+### - ID: 1 (generado automáticamente)
+### - UID: 1
+### - Título: "Excelente experiencia"  
+### - Cuerpo: "El alojamiento superó mis expectativas. Muy recomendado!"
+### - Likes: 10
+### - Calificación: 5 estrellas
+### - Item: itemAlojamiento (ID probablemente 1)
+###
+### RESPUESTA 1:
+### - ID: 2 (generado automáticamente)
+### - UID: 2
+### - Título: "Totalmente de acuerdo"
+### - Cuerpo: "Yo también tuve una experiencia increíble allí. El servicio es de primera."
+### - Likes: 3
+### - Parent: Comentario ID 1
+###
+### COMENTARIO PADRE 2:
+### - ID: 3 (generado automáticamente) 
+### - UID: 3
+### - Título: "Buena relación calidad-precio"
+### - Cuerpo: "Aunque hay algunos detalles que mejorar, en general cumple con lo prometido."
+### - Likes: 5
+### - Calificación: 4 estrellas
+### - Item: itemAlojamiento (ID probablemente 1)
+
+###
+### 1. VER TODAS LAS CALIFICACIONES PRECARGADAS
+###
+
+GET http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+
+### Respuesta esperada: 2 comentarios padre con sus respectivas calificaciones
+
+###
+### 2. VER ESTADÍSTICAS INICIALES
+###
+
+GET http://localhost:8080/marketplace-ms/items/1/reviews/stats
+Content-Type: application/json
+
+### Respuesta esperada:
+### - totalReviews: 2
+### - promedioCalificacion: 4.5 (promedio de 5 y 4)
+### - cincoEstrellas: 1
+### - cuatroEstrellas: 1
+### - tresEstrellas: 0
+### - dosEstrellas: 0
+### - unaEstrella: 0
+
+###
+### 3. VER COMENTARIO PADRE 1 CON SUS RESPUESTAS
+###
+
+GET http://localhost:8080/marketplace-ms/comentarios/1
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### Respuesta esperada: Comentario "Excelente experiencia" con 1 respuesta
+
+###
+### 4. DAR LIKE AL COMENTARIO PADRE 1 (actualmente tiene 10 likes)
+###
+
+POST http://localhost:8080/marketplace-ms/comentarios/1/like
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### Respuesta esperada: "Like agregado. Total: 11"
+
+###
+### 5. DAR LIKE A LA RESPUESTA (ID=2, actualmente tiene 3 likes)
+###
+
+POST http://localhost:8080/marketplace-ms/comentarios/2/like
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### Respuesta esperada: "Like agregado. Total: 4"
+
+###
+### 6. AGREGAR NUEVA RESPUESTA AL COMENTARIO PADRE 1
+###
+
+POST http://localhost:8080/marketplace-ms/items/1/reviews/1/replies
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTWdvZ0pJN3JPRi1OWlY1anVjRkx6Mjh0TlB3eHNsbVlBbG1ORTZZMDNRIn0.eyJleHAiOjE3NjQwNDc3MzcsImlhdCI6MTc2NDA0NjgzNywianRpIjoib25ydHJvOmVjNGE3ZGFkLTg2NjEtMDE1Ni1jMmRlLWViNTk0OGQyYWRlYSIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MS9yZWFsbXMvcHJveWVjdC1tcy1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyYTM2Y2E4NC0wMTY2LTQ2YjItODBiNC0wODM4OTg3Mzg4YmYiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ1c2VyLW1zLWNsaWVudCIsInNpZCI6ImMxZTFmOTQ0LTJmMDAtNDIwZi04ZjNjLTk5YTJhMjE5ZDc3NiIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyoiLCJodHRwOi8vbG9jYWxob3N0OjgwODMvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLXByb3llY3QtbXMtcmVhbG0iLCJ1bWFfYXV0aG9yaXphdGlvbiIsIkNMSUVOVEUiXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6InByb2ZpbGUgZW1haWwiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6IkxhdXJhIE1hcnTDrW5leiIsInByZWZlcnJlZF91c2VybmFtZSI6ImxhdXJhLm1hcnRpbmV6QGdtYWlsLmNvbSIsImdpdmVuX25hbWUiOiJMYXVyYSIsImZhbWlseV9uYW1lIjoiTWFydMOtbmV6IiwiZW1haWwiOiJsYXVyYS5tYXJ0aW5lekBnbWFpbC5jb20ifQ.rNSUv179cG04CzSvyXJ7LRLXg3jRK8dzwdJzJvF5dr3GO5Re7KiTUNJZzehbYK0ZLOc2syWHl0Yltez2sg8xt9NUI4qGmGCkzwxOJSuhPYqLONN9Kkr1_RTH7o14vRdKi3ngaZJb0K6PBRfJRd7YOqkSW0C6TjyGWKrCNAYtaX4R9x7s5IE7um9YU-IOl9URmgfVVZFMdq9L6fG3WriEuO8jHOR1V5MWgdesj4QTlTuYd9KxJpvUR09FygQr1i0j5gurXrXJupf3-wBucbn7pp-jg0gbjtl5BEQe1KhKSLff0EaREtynSs_Xd3JtWujPxUcAiIF4TQ1KX4-MXIHO-w
+
+{
+  "uid": 999,
+  "titulo": "Confirmo la excelencia",
+  "cuerpo": "Estuve allí la semana pasada y efectivamente es tal como lo describes. La vista es espectacular."
+}
+
+###
+### 7. AGREGAR NUEVA RESPUESTA AL COMENTARIO PADRE 2
+###
+
+POST http://localhost:8080/marketplace-ms/items/1/reviews/2/replies
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 888,
+  "titulo": "¿Qué detalles?",
+  "cuerpo": "Hola, me podrías especificar qué detalles crees que se pueden mejorar? Estoy pensando en reservar."
+}
+
+###
+### 8. AGREGAR NUEVA CALIFICACIÓN (POSITIVA)
+###
+
+POST http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 777,
+  "puntuacion": 5,
+  "titulo": "Perfecta ubicación",
+  "comentario": "La ubicación es inmejorable, cerca de todo lo importante. Instalaciones impecables."
+}
+
+###
+### 9. AGREGAR CALIFICACIÓN NEGATIVA PARA BALANCEAR
+###
+
+POST http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 666,
+  "puntuacion": 2,
+  "titulo": "Expectativas vs realidad",
+  "comentario": "Las fotos no reflejan la realidad. El lugar necesita mantenimiento urgente."
+}
+
+###
+### 10. VER ESTADÍSTICAS ACTUALIZADAS (después de agregar 2 calificaciones más)
+###
+
+GET http://localhost:8080/marketplace-ms/items/1/reviews/stats
+Content-Type: application/json
+
+### Respuesta esperada:
+### - totalReviews: 4
+### - promedioCalificacion: 4.0 (promedio de 5, 4, 5, 2)
+### - cincoEstrellas: 2
+### - cuatroEstrellas: 1
+### - tresEstrellas: 0
+### - dosEstrellas: 1
+### - unaEstrella: 0
+
+###
+### 11. VER TODAS LAS CALIFICACIONES ACTUALIZADAS
+###
+
+GET http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### Respuesta esperada: 4 comentarios padre + sus respectivas respuestas
+
+###
+### 12. RESPONDER A LA CALIFICACIÓN NEGATIVA
+###
+
+POST http://localhost:8080/marketplace-ms/items/1/reviews/5/replies
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 555,
+  "titulo": "Experiencia diferente",
+  "cuerpo": "Yo estuve el mes pasado y mi experiencia fue totalmente diferente. Quizás dependía de la temporada."
+}
+
+###
+### PRUEBAS DE ERRORES CON IDS REALES
+###
+
+###
+### 13. ERROR: Intentar responder a una respuesta (no a comentario padre)
+###
+
+POST http://localhost:8080/marketplace-ms/items/1/reviews/2/replies
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 444,
+  "cuerpo": "Esto debería fallar porque ID 2 es una respuesta, no un comentario padre"
+}
+
+###
+### 14. ERROR: Intentar eliminar comentario que no es tuyo
+###
+
+DELETE http://localhost:8080/marketplace-ms/items/1/reviews/1
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### (Esto debería fallar si el token no corresponde al UID=1)
+
+###
+### 15. SECUENCIA COMPLETA: CREAR → RESPONDER → DAR LIKES
+###
+
+### Paso 1: Crear nueva calificación
+POST http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 123,
+  "puntuacion": 3,
+  "titulo": "Experiencia promedio",
+  "comentario": "Ni bueno ni malo, cumple con lo básico pero nada excepcional."
+}
+
+###
+### Paso 2: Responder a la calificación recién creada (asumiendo que tiene ID 6)
+POST http://localhost:8080/marketplace-ms/items/1/reviews/6/replies
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 321,
+  "titulo": "Perspectiva diferente",
+  "cuerpo": "Creo que también hay que valorar la relación precio-calidad. Para el precio que pagas, está bien."
+}
+
+###
+### Paso 3: Dar like al comentario original
+POST http://localhost:8080/marketplace-ms/comentarios/6/like
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+###
+### Paso 4: Dar like a la respuesta
+POST http://localhost:8080/marketplace-ms/comentarios/7/like
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+###
+### VERIFICACIÓN FINAL
+###
+
+GET http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+
+### Y ver las estadísticas finales
+GET http://localhost:8080/marketplace-ms/items/1/reviews/stats
+Content-Type: application/json
+
+###
+### NOTAS DE USO:
+### 1. Ejecuta las pruebas en orden para que los IDs sean predecibles
+### 2. Los IDs pueden variar si reinicias la aplicación
+### 3. Usa el token JWT de un usuario autenticado
+### 4. Verifica los IDs reales ejecutando GET primero
+### 5. Los datos del DbInitializer se cargan al iniciar la aplicación
+###

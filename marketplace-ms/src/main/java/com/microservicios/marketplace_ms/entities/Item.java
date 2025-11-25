@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -37,24 +39,31 @@ public class Item {
     private Long calificacionPromedio;
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    @JsonManagedReference("item-tags")
     private List<ItemTag> tags = new ArrayList<>();
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    @JsonManagedReference("item-fotos")
     private List<ItemFoto> fotos = new ArrayList<>();
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    @JsonManagedReference("item-videos")
     private List<ItemVideo> videos = new ArrayList<>();
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    @JsonManagedReference("item-links")
     private List<ItemLink> links = new ArrayList<>();
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    @JsonManagedReference("item-calificaciones")
     private List<Calificacion> calificaciones = new ArrayList<>();
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    @JsonManagedReference("item-servicios")
     private List<ServiciosIncluidos> serviciosIncluidos = new ArrayList<>();
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    @JsonManagedReference("item-preguntas")
     private List<PreguntaFrecuente> preguntasFrecuentes = new ArrayList<>();
 
     // Getters and Setters

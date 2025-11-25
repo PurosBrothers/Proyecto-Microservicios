@@ -2,6 +2,8 @@ package com.microservicios.marketplace_ms.entities;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,12 +24,14 @@ public class Calificacion {
 
     @ManyToOne
     @JoinColumn(name = "comentario_id")
+    @JsonBackReference("comentario-calificacion")
     private Comentario comentario;
 
     private LocalDateTime fechaCalificacion;
 
     @ManyToOne
     @JoinColumn(name = "item_id", nullable = false)
+    @JsonBackReference("item-calificaciones")
     private Item item;
 
     // Getters and Setters
