@@ -1,72 +1,38 @@
-cloud:
-  config:
-    enabled: false
-    import-check:
-      enabled: false
-
-datasource:
-  url: jdbc:h2:file:./data/paymentDB;DB_CLOSE_DELAY=-1;AUTO_SERVER=TRUE
-  driverClassName: org.h2.Driver
-  username: farito
-  password: 123
-
-jpa:
-  database-platform: org.hibernate.dialect.H2Dialect
-  hibernate:
-    ddl-auto: create-drop
-  show-sql: true
-
-h2:
-  console:
-    enabled: true
-    path: /h2-console
-    settings:
-      web-allow-others: true
-      trace: false
-
-graphql:
-  graphiql:
-    enabled: true
-
 server:
   port: 8085
 
+spring:
+  application:
+    name: payment-ms
+  cloud:
+    config:
+      enabled: true
+  datasource:
+    url: jdbc:postgresql://postgres:5432/marketplace_db
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:password}
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+  graphql:
+    graphiql:
+      enabled: true
+
 eureka:
   client:
-    register-with-eureka: true
     service-url:
-      defaultZone: ${EUREKA_SERVER_URL:http://localhost:9989/eureka/}
+      defaultZone: http://eureka-server:9989/eureka/
   instance:
     prefer-ip-address: true
-
-## Actuator configuration
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-  endpoint:
-    health:
-      show-details: always
-    prometheus:
-      enabled: true
-  info:
-    env:
-      enabled: true
-  prometheus:
-    metrics:
-      export:
-        enabled: true
+    hostname: payment-ms
 
 rabbitmq:
-  host: localhost
+  host: rabbitmq
   port: 5672
   username: guest
   password: guest
-
-
-
-info:
-  app:
-    name: Microservicios de Pagos
-    description: Servicio para gestionar pagos

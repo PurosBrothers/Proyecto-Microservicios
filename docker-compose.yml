@@ -138,6 +138,44 @@ services:
       my_network:
         ipv4_address: 172.25.0.9
 
+  payment-ms:
+    build: ./payment-ms
+    container_name: payment-ms
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_USERNAME: postgres
+      DB_PASSWORD: password
+    ports:
+      - "8085:8085"
+    depends_on:
+      - config-server
+      - eureka-server
+      - postgres
+      - rabbitmq
+    restart: on-failure
+    networks:
+      my_network:
+        ipv4_address: 172.25.0.10
+
+  transaction-ms:
+    build: ./transaction-ms
+    container_name: transaction-ms
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_USERNAME: postgres
+      DB_PASSWORD: password
+    ports:
+      - "8086:8086"
+    depends_on:
+      - config-server
+      - eureka-server
+      - postgres
+      - rabbitmq
+    restart: on-failure
+    networks:
+      my_network:
+        ipv4_address: 172.25.0.11
+
 volumes:
   postgres_data:
 
