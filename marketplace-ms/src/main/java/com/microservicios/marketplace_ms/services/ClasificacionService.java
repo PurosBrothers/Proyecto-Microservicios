@@ -338,6 +338,32 @@ public class ClasificacionService {
             clasificacion.setMaps(maps);
         }
         
+        // Si es un Alojamiento, proporcionar datos de clima por defecto para Bogotá
+        if (clasificacion instanceof Alojamiento) {
+            Alojamiento alojamiento = (Alojamiento) clasificacion;
+            
+            if (alojamiento.getTemperaturaActual() == null) {
+                alojamiento.setTemperaturaActual(17.0); // Temperatura promedio Bogotá
+            }
+            if (alojamiento.getViento() == null) {
+                alojamiento.setViento(10.0); // Velocidad del viento típica km/h
+            }
+            if (alojamiento.getCodigoClima() == null) {
+                alojamiento.setCodigoClima(2); // Código para clima parcialmente nublado
+            }
+            if (alojamiento.getLluvia() == null) {
+                alojamiento.setLluvia(1.5); // Lluvia en mm
+            }
+            if (alojamiento.getPrecipitacion() == null) {
+                alojamiento.setPrecipitacion(1.2); // Precipitación en mm
+            }
+            if (alojamiento.getProbabilidadPrecipitacion() == null) {
+                alojamiento.setProbabilidadPrecipitacion(30); // 30% probabilidad de lluvia
+            }
+            
+            System.out.println("Datos de clima por defecto para Bogotá aplicados");
+        }
+        
         System.out.println("Datos de respaldo para Colombia aplicados exitosamente");
     }
 

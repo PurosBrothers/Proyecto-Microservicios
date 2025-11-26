@@ -98,6 +98,7 @@ public class DbInitializer implements CommandLineRunner {
         // Create Alojamiento
         Alojamiento alojamiento = new Alojamiento();
         alojamiento.setLugarInicio("Bogota");
+        alojamiento.setPaisDestino("Colombia");
         alojamiento.setPrecio(new BigDecimal("150.00"));
         alojamiento.setFechaDisponibilidadInicio(LocalDateTime.now());
         alojamiento.setFechaDisponibilidadFin(LocalDateTime.now().plusDays(7));
@@ -109,6 +110,27 @@ public class DbInitializer implements CommandLineRunner {
         alojamiento.setNumeroHabitaciones(2);
         alojamiento.setLat(new BigDecimal("4.7110"));
         alojamiento.setLng(new BigDecimal("-74.0721"));
+        
+        // Datos de clima para Bogotá
+        alojamiento.setTemperaturaActual(18.2);
+        alojamiento.setViento(12.5);
+        alojamiento.setCodigoClima(1); // Código para cielo claro
+        alojamiento.setLluvia(0.0);
+        alojamiento.setPrecipitacion(0.0);
+        alojamiento.setProbabilidadPrecipitacion(10);
+        
+        // Datos de país para el alojamiento original
+        alojamiento.setFlag("🇨🇴");
+        alojamiento.setPopulation(53057212L);
+        alojamiento.setGini(51.3);
+        alojamiento.setFifa("COL");
+        
+        // Maps por defecto para Colombia
+        Maps mapsOriginal = new Maps();
+        mapsOriginal.setGoogleMaps("https://www.google.com/maps/search/?api=1&query=Bogota%2C+Colombia");
+        mapsOriginal.setOpenStreetMaps(null);
+        alojamiento.setMaps(mapsOriginal);
+        
         alojamiento.setUsuarioId("proveedor-001"); // Usuario proveedor de ejemplo
 
         alojamiento = (Alojamiento) clasificacionRepository.save(alojamiento);
@@ -181,6 +203,15 @@ public class DbInitializer implements CommandLineRunner {
         alojamientoColombia.setDireccion("Carrera 7 #23-45, Chapinero, Bogotá");
         alojamientoColombia.setLat(new BigDecimal("4.7110"));
         alojamientoColombia.setLng(new BigDecimal("-74.0721"));
+        
+        // Datos de clima para Bogotá (típicos de diciembre)
+        alojamientoColombia.setTemperaturaActual(15.5); // Temperatura promedio diciembre
+        alojamientoColombia.setViento(8.2); // Velocidad del viento km/h
+        alojamientoColombia.setCodigoClima(2); // Código para clima parcialmente nublado
+        alojamientoColombia.setLluvia(2.1); // Lluvia en mm
+        alojamientoColombia.setPrecipitacion(1.8); // Precipitación en mm
+        alojamientoColombia.setProbabilidadPrecipitacion(25); // 25% probabilidad de lluvia
+        
         alojamientoColombia.setFlag("🇨🇴");
         alojamientoColombia.setPopulation(53057212L);
         alojamientoColombia.setGini(51.3);
