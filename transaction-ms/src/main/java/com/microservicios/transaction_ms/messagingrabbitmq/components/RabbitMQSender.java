@@ -41,8 +41,9 @@ public class RabbitMQSender {
             System.out.println("Intentando enviar mensaje a RabbitMQ (update-item)...");
             System.out.println("Host configurado: " + rabbitTemplate.getConnectionFactory().getHost());
             System.out.println("Puerto configurado: " + rabbitTemplate.getConnectionFactory().getPort());
-            rabbitTemplate.convertAndSend(RabbitMQConfig.TOPIC_EXCHANGE_NAME, "marketplace.update-item", message);
-            System.out.println("Mensaje enviado a update-item: " + message);
+            // Usar el exchange con routing key correcto para mantener consistencia
+            rabbitTemplate.convertAndSend(RabbitMQConfig.TOPIC_EXCHANGE_NAME, "update-item", message);
+            System.out.println("Mensaje enviado a update-item via exchange: " + message);
         } catch (Exception e) {
             System.out.println("Error enviando mensaje a update-item: " + e.getMessage());
             if (rabbitTemplate.getConnectionFactory() != null) {
