@@ -1,104 +1,174 @@
 package com.microservicios.marketplace_ms.mappers;
 
-import com.microservicios.marketplace_ms.dtos.AlimentacionDTO;
-import com.microservicios.marketplace_ms.dtos.AlojamientoDTO;
-import com.microservicios.marketplace_ms.dtos.ClasificacionDTO;
-import com.microservicios.marketplace_ms.dtos.PaseosEcologicosDTO;
-import com.microservicios.marketplace_ms.dtos.TransporteDTO;
-import com.microservicios.marketplace_ms.entities.Alimentacion;
-import com.microservicios.marketplace_ms.entities.Alojamiento;
-import com.microservicios.marketplace_ms.entities.Clasificacion;
-import com.microservicios.marketplace_ms.entities.PaseosEcologicos;
-import com.microservicios.marketplace_ms.entities.Transporte;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
+import org.springframework.stereotype.Service;
+
+import com.microservicios.marketplace_ms.dtos.*;
+import com.microservicios.marketplace_ms.entities.*;
+
+@Service
 public class ClasificacionMapper {
-
-    @Autowired
-    private AlojamientoMapper alojamientoMapper;
     
-    @Autowired
-    private AlimentacionMapper alimentacionMapper;
-    
-    @Autowired
-    private TransporteMapper transporteMapper;
-    
-    @Autowired
-    private PaseosEcologicosMapper paseosEcologicosMapper;
-
-    /**
-     * Convierte una entidad Clasificacion a su DTO correspondiente usando polimorfismo
-     */
-    public ClasificacionDTO toDto(Clasificacion entity) {
-        if (entity == null) {
-            return null;
-        }
-
-        // Usar instanceof para determinar el tipo específico y delegar al mapper apropiado
-        if (entity instanceof Alojamiento) {
-            return alojamientoMapper.toDto((Alojamiento) entity);
-        } else if (entity instanceof Alimentacion) {
-            return alimentacionMapper.toDto((Alimentacion) entity);
-        } else if (entity instanceof Transporte) {
-            return transporteMapper.toDto((Transporte) entity);
-        } else if (entity instanceof PaseosEcologicos) {
-            return paseosEcologicosMapper.toDto((PaseosEcologicos) entity);
-        }
-
-        throw new IllegalArgumentException("Tipo de clasificación no soportado: " + entity.getClass().getSimpleName());
-    }
-
-    /**
-     * Convierte un DTO ClasificacionDTO a su entidad correspondiente usando polimorfismo
-     */
-    public Clasificacion toEntity(ClasificacionDTO dto) {
-        if (dto == null) {
-            return null;
-        }
-
-        // Usar instanceof para determinar el tipo específico y delegar al mapper apropiado
-        if (dto instanceof AlojamientoDTO) {
-            return alojamientoMapper.toEntity((AlojamientoDTO) dto);
-        } else if (dto instanceof AlimentacionDTO) {
-            return alimentacionMapper.toEntity((AlimentacionDTO) dto);
-        } else if (dto instanceof TransporteDTO) {
-            return transporteMapper.toEntity((TransporteDTO) dto);
-        } else if (dto instanceof PaseosEcologicosDTO) {
-            return paseosEcologicosMapper.toEntity((PaseosEcologicosDTO) dto);
-        }
-
-        throw new IllegalArgumentException("Tipo de clasificación DTO no soportado: " + dto.getClass().getSimpleName());
-    }
-
-    /**
-     * Convierte una lista de entidades a DTOs
-     */
-    public List<ClasificacionDTO> toDtoList(List<Clasificacion> entities) {
-        if (entities == null) {
+    public ClasificacionDTO toDTO(Clasificacion clasificacion) {
+        if (clasificacion == null) {
             return null;
         }
         
-        return entities.stream()
-                .map(this::toDto)
+        ClasificacionDTO dto = null;
+        
+        if (clasificacion instanceof Alojamiento) {
+            dto = toAlojamientoDTO((Alojamiento) clasificacion);
+        } else if (clasificacion instanceof Alimentacion) {
+            dto = toAlimentacionDTO((Alimentacion) clasificacion);
+        } else if (clasificacion instanceof Transporte) {
+            dto = toTransporteDTO((Transporte) clasificacion);
+        } else if (clasificacion instanceof PaseosEcologicos) {
+            dto = toPaseosEcologicosDTO((PaseosEcologicos) clasificacion);
+        }
+        
+        return dto;
+    }
+    
+    public AlojamientoDTO toAlojamientoDTO(Alojamiento alojamiento) {
+        if (alojamiento == null) {
+            return null;
+        }
+        
+        AlojamientoDTO dto = new AlojamientoDTO();
+        populateCommonFields(dto, alojamiento);
+        
+        dto.setFechaCheckin(alojamiento.getFechaCheckin());
+        dto.setFechaCheckout(alojamiento.getFechaCheckout());
+        dto.setTipoInmueble(alojamiento.getTipoInmueble());
+        dto.setNumeroBanos(alojamiento.getNumeroBanos());
+        dto.setNumeroHabitaciones(alojamiento.getNumeroHabitaciones());
+        dto.setLat(alojamiento.getLat() != null ? java.util.Optional.of(alojamiento.getLat()) : java.util.Optional.empty());
+        dto.setLng(alojamiento.getLng() != null ? java.util.Optional.of(alojamiento.getLng()) : java.util.Optional.empty());
+        dto.setDireccion(alojamiento.getDireccion());
+        dto.setTemperaturaActual(alojamiento.getTemperaturaActual());
+        dto.setViento(alojamiento.getViento());
+        dto.setCodigoClima(alojamiento.getCodigoClima());
+        dto.setLluvia(alojamiento.getLluvia());
+        dto.setPrecipitacion(alojamiento.getPrecipitacion());
+        dto.setProbabilidadPrecipitacion(alojamiento.getProbabilidadPrecipitacion());
+        
+        return dto;
+    }
+    
+    public AlimentacionDTO toAlimentacionDTO(Alimentacion alimentacion) {
+        if (alimentacion == null) {
+            return null;
+        }
+        
+        AlimentacionDTO dto = new AlimentacionDTO();
+        populateCommonFields(dto, alimentacion);
+        
+        dto.setHoraInicio(alimentacion.getHoraInicio());
+        dto.setHoraFinal(alimentacion.getHoraFinal());
+        dto.setTipoComida(alimentacion.getTipoComida());
+        dto.setMenuIncluido(alimentacion.getMenuIncluido());
+        dto.setLatitud(alimentacion.getLatitud());
+        dto.setLongitud(alimentacion.getLongitud());
+        dto.setRestriccionesDieteticas(toRestriccionesDieteticasDTOList(alimentacion.getRestriccionesDieteticas()));
+        
+        return dto;
+    }
+    
+    public TransporteDTO toTransporteDTO(Transporte transporte) {
+        if (transporte == null) {
+            return null;
+        }
+        
+        TransporteDTO dto = new TransporteDTO();
+        populateCommonFields(dto, transporte);
+        
+        dto.setLugarDestino(transporte.getLugarDestino());
+        dto.setHoraSalida(transporte.getHoraSalida());
+        dto.setHoraLlegada(transporte.getHoraLlegada());
+        dto.setTipoTransporte(transporte.getTipoTransporte());
+        dto.setDuracionViaje(transporte.getDuracionViaje());
+        dto.setRutaGps(transporte.getRutaGps());
+        
+        return dto;
+    }
+    
+    public PaseosEcologicosDTO toPaseosEcologicosDTO(PaseosEcologicos paseosEcologicos) {
+        if (paseosEcologicos == null) {
+            return null;
+        }
+        
+        PaseosEcologicosDTO dto = new PaseosEcologicosDTO();
+        populateCommonFields(dto, paseosEcologicos);
+        
+        dto.setDuracionHoras(paseosEcologicos.getDuracionHoras());
+        dto.setNivelDificultad(paseosEcologicos.getNivelDificultad());
+        dto.setEquipoIncluido(paseosEcologicos.getEquipoIncluido());
+        dto.setGuiaIncluido(paseosEcologicos.getGuiaIncluido());
+        dto.setEdadMinima(paseosEcologicos.getEdadMinima());
+        dto.setPuntoEncuentro(paseosEcologicos.getPuntoEncuentro());
+        dto.setRutaEncuentro(paseosEcologicos.getRutaEncuentro());
+        
+        return dto;
+    }
+    
+    private void populateCommonFields(ClasificacionDTO dto, Clasificacion entity) {
+        dto.setId(entity.getId());
+        dto.setTipo(entity.getTipo());
+        dto.setLugarInicio(entity.getLugarInicio());
+        dto.setPrecio(entity.getPrecio());
+        dto.setFechaDisponibilidadInicio(entity.getFechaDisponibilidadInicio());
+        dto.setFechaDisponibilidadFin(entity.getFechaDisponibilidadFin());
+        dto.setCapacidadMaxima(entity.getCapacidadMaxima());
+        dto.setUsuarioId(entity.getUsuarioId());
+        dto.setPaisDestino(entity.getPaisDestino());
+        dto.setFlag(entity.getFlag());
+        dto.setPopulation(entity.getPopulation());
+        dto.setGini(entity.getGini());
+        dto.setFifa(entity.getFifa());
+        dto.setMaps(toMapsDTO(entity.getMaps()));
+        dto.setRequisitosEspeciales(toRequisitosEspecialesDTOList(entity.getRequisitosEspeciales()));
+    }
+    
+    private MapsDTO toMapsDTO(Maps maps) {
+        if (maps == null) {
+            return null;
+        }
+        return new MapsDTO(maps.getGoogleMaps(), maps.getOpenStreetMaps());
+    }
+    
+    private List<RequisitosEspecialesDTO> toRequisitosEspecialesDTOList(List<RequisitosEspeciales> requisitosEspeciales) {
+        if (requisitosEspeciales == null) {
+            return null;
+        }
+        return requisitosEspeciales.stream()
+                .map(req -> new RequisitosEspecialesDTO(req.getId(), req.getRequisito()))
                 .collect(Collectors.toList());
     }
-
-    /**
-     * Convierte una lista de DTOs a entidades
-     */
-    public List<Clasificacion> toEntityList(List<ClasificacionDTO> dtos) {
-        if (dtos == null) {
+    
+    public List<ClasificacionDTO> toDTOList(List<Clasificacion> clasificaciones) {
+        if (clasificaciones == null) {
             return null;
         }
-        
-        return dtos.stream()
-                .map(this::toEntity)
+        return clasificaciones.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+    
+    private RestriccionesDieteticasDTO toRestriccionesDieteticasDTO(RestriccionesDieteticas restriccionesDieteticas) {
+        if (restriccionesDieteticas == null) {
+            return null;
+        }
+        return new RestriccionesDieteticasDTO(restriccionesDieteticas.getId(), restriccionesDieteticas.getNombre());
+    }
+    
+    private List<RestriccionesDieteticasDTO> toRestriccionesDieteticasDTOList(List<RestriccionesDieteticas> restriccionesDieteticas) {
+        if (restriccionesDieteticas == null) {
+            return null;
+        }
+        return restriccionesDieteticas.stream()
+                .map(this::toRestriccionesDieteticasDTO)
                 .collect(Collectors.toList());
     }
 }

@@ -10,7 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.microservicios.marketplace_ms.dtos.ItemDTO;
 import com.microservicios.marketplace_ms.dtos.ItemResponseDTO;
+import com.microservicios.marketplace_ms.mappers.ClasificacionMapper;
 import com.microservicios.marketplace_ms.repositories.ClasificacionRepository;
+import com.microservicios.marketplace_ms.services.ClasificacionService;
 import com.microservicios.marketplace_ms.entities.Alojamiento;
 import com.microservicios.marketplace_ms.entities.Alimentacion;
 import com.microservicios.marketplace_ms.entities.Item;
@@ -30,6 +32,12 @@ public class ItemService {
 
     @Autowired
     private ItemMapper itemMapper;
+
+    @Autowired
+    private ClasificacionMapper clasificacionMapper;
+
+    @Autowired
+    private ClasificacionService clasificacionService;
 
     public ResponseEntity<ItemDTO> createItemFromDTO(ItemDTO itemDTO) {
         // Validar que clasificacionId esté presente
@@ -145,10 +153,19 @@ public class ItemService {
         Item item = itemOpt.get();
         ItemDTO itemDTO = itemMapper.entityToDto(item);
 
+        // Obtener la clasificación a través del ClasificacionService para poblar datos de país
+        com.microservicios.marketplace_ms.entities.Clasificacion clasificacion = null;
+        if (item.getClasificacion() != null) {
+            Optional<com.microservicios.marketplace_ms.entities.Clasificacion> clasificacionOpt = 
+                clasificacionService.getClasificacionById(item.getClasificacion().getId());
+            if (clasificacionOpt.isPresent()) {
+                clasificacion = clasificacionOpt.get();
+            }
+        }
+
         ItemResponseDTO response = new ItemResponseDTO();
         response.setItem(itemDTO);
-
-        response.setClasificacionData(item.getClasificacion());
+        response.setClasificacionData(clasificacionMapper.toDTO(clasificacion));
         return ResponseEntity.ok(response);
     }
 
@@ -182,7 +199,7 @@ public class ItemService {
                     ItemDTO itemDTO = itemMapper.entityToDto(item);
                     ItemResponseDTO response = new ItemResponseDTO();
                     response.setItem(itemDTO);
-                    response.setClasificacionData(item.getClasificacion());
+                    response.setClasificacionData(clasificacionMapper.toDTO(item.getClasificacion()));
                     return response;
                 })
                 .toList();
@@ -206,7 +223,7 @@ public class ItemService {
                     ItemDTO itemDTO = itemMapper.entityToDto(item);
                     ItemResponseDTO response = new ItemResponseDTO();
                     response.setItem(itemDTO);
-                    response.setClasificacionData(item.getClasificacion());
+                    response.setClasificacionData(clasificacionMapper.toDTO(item.getClasificacion()));
                     return response;
                 })
                 .toList();
