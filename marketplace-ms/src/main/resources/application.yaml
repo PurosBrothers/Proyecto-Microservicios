@@ -11,9 +11,9 @@ spring:
       resourceserver:
         jwt:
           # URL del JWK Set de Keycloak - ajustar según configuración
-          jwk-set-uri: http://localhost:8081/realms/proyect-ms-realm/protocol/openid-connect/certs
+          jwk-set-uri: http://keycloak:8080/realms/proyect-ms-realm/protocol/openid-connect/certs
           # Issuer URI de Keycloak
-          issuer-uri: http://localhost:8081/realms/proyect-ms-realm
+          issuer-uri: http://keycloak:8080/realms/proyect-ms-realm
 
 eureka:
   client:

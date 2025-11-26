@@ -31,7 +31,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(jwt -> jwt.jwkSetUri("http://localhost:8081/realms/proyect-ms-realm/protocol/openid-connect/certs"))
+                .jwt(jwt -> jwt.jwkSetUri("http://keycloak:8080/realms/proyect-ms-realm/protocol/openid-connect/certs"))
             )
             .csrf(csrf -> csrf
                 .ignoringRequestMatchers("/h2-console/**", "/users/**") // Deshabilitar CSRF para H2 y users

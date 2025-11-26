@@ -24,7 +24,7 @@ import java.util.Arrays;
 @EnableWebFluxSecurity
 public class SecurityConfig {
 
-    @Value("${keycloak.auth-server-url:http://localhost:8081}")
+    @Value("${keycloak.auth-server-url:http://keycloak:8080}")
     private String keycloakUrl;
 
     @Value("${keycloak.realm:proyect-ms-realm}")

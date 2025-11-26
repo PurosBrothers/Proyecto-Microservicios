@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 @Service
 public class UserValidationService {
 
-    @Value("${user-service.url:http://localhost:8081}")
+    @Value("${user-service.url:http://user-ms:8083}")
     private String userServiceUrl;
 
     private final RestTemplate restTemplate;

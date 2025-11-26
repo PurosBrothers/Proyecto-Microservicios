@@ -14,6 +14,12 @@ spring:
       ddl-auto: create-drop
     show-sql: true
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://keycloak:8080/realms/proyect-ms-realm/protocol/openid-connect/certs
+
 eureka:
   client:
     service-url:
