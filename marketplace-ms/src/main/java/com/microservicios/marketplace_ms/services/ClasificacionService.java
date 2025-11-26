@@ -200,6 +200,17 @@ public class ClasificacionService {
             }
         }
 
+        // Asegurar datos del clima para alojamientos colombianos si no se obtuvieron
+        if (clasificacion instanceof Alojamiento) {
+            String countryForWeather = clasificacion.getPaisDestino();
+            if (countryForWeather == null) {
+                countryForWeather = clasificacion.getLugarInicio();
+            }
+            if (countryForWeather != null && countryForWeather.equalsIgnoreCase("Colombia")) {
+                populateWeatherDataIfMissing(clasificacion);
+            }
+        }
+
         Clasificacion saved = clasificacionRepository.save(clasificacion);
         System.out.println("Clasificación creada exitosamente con ID: " + saved.getId());
         return saved;
@@ -292,12 +303,16 @@ public class ClasificacionService {
                     }
                     
                     System.out.println("Datos del país completados para: " + countryName);
+                    
+                    // También obtener datos del clima para alojamientos de Colombia
+                    populateWeatherDataIfMissing(clasificacion);
                 } else {
                     System.out.println("No se encontraron datos para el país: " + countryName);
                     
                     // Proporcionar datos de respaldo para Colombia específicamente
                     if (countryName.equalsIgnoreCase("Colombia")) {
                         provideColombiaFallbackData(clasificacion);
+                        populateWeatherDataIfMissing(clasificacion);
                     }
                 }
             } catch (Exception e) {
@@ -306,6 +321,7 @@ public class ClasificacionService {
                 // En caso de error de API, proporcionar datos de respaldo para Colombia
                 if (countryName.equalsIgnoreCase("Colombia")) {
                     provideColombiaFallbackData(clasificacion);
+                    populateWeatherDataIfMissing(clasificacion);
                 }
             }
         }
@@ -365,6 +381,140 @@ public class ClasificacionService {
         }
         
         System.out.println("Datos de respaldo para Colombia aplicados exitosamente");
+    }
+    
+    private void populateWeatherDataIfMissing(Clasificacion clasificacion) {
+        // Solo procesar alojamientos que necesiten datos del clima
+        if (!(clasificacion instanceof Alojamiento)) {
+            return;
+        }
+        
+        Alojamiento alojamiento = (Alojamiento) clasificacion;
+        boolean missingWeatherData = alojamiento.getTemperaturaActual() == null 
+                                   || alojamiento.getViento() == null
+                                   || alojamiento.getCodigoClima() == null
+                                   || alojamiento.getLluvia() == null
+                                   || alojamiento.getPrecipitacion() == null
+                                   || alojamiento.getProbabilidadPrecipitacion() == null;
+        
+        if (!missingWeatherData) {
+            return; // Ya tiene todos los datos del clima
+        }
+        
+        System.out.println("Obteniendo datos del clima para alojamiento");
+        
+        // Si es Colombia, usar datos de respaldo directamente
+        String countryName = clasificacion.getPaisDestino();
+        if (countryName == null) {
+            countryName = clasificacion.getLugarInicio();
+        }
+        
+        if (countryName != null && countryName.equalsIgnoreCase("Colombia")) {
+            System.out.println("Usando datos de clima por defecto para Colombia");
+            applyWeatherFallbackForColombia(alojamiento);
+            return;
+        }
+        
+        // Si tiene dirección, intentar obtener datos reales del clima
+        String address = alojamiento.getDireccion();
+        if (address != null && !address.isEmpty()) {
+            try {
+                String city = extractCityFromAddress(address);
+                if (city == null || city.isEmpty()) {
+                    city = "Bogota"; // Fallback para Colombia
+                }
+                
+                String encodedCity = URLEncoder.encode(city, StandardCharsets.UTF_8);
+                String urlGeocoding = "https://geocoding-api.open-meteo.com/v1/search?name=" + encodedCity;
+                System.out.println("URL de geocoding para clima: " + urlGeocoding);
+
+                try {
+                    GeocodingResponse geocodingResponse = restTemplate.getForObject(urlGeocoding, GeocodingResponse.class);
+                    if (geocodingResponse != null && geocodingResponse.getResults() != null && !geocodingResponse.getResults().isEmpty()) {
+                        GeocodingResponse.GeocodingResult result = geocodingResponse.getResults().get(0);
+                        double lat = result.getLatitude();
+                        double lng = result.getLongitude();
+                        System.out.println("Coordenadas para clima: lat=" + lat + ", lng=" + lng);
+
+                        // Fechas en formato YYYY-MM-DD
+                        String startDate = alojamiento.getFechaCheckin().toLocalDate().toString();
+                        String endDate = alojamiento.getFechaCheckout().toLocalDate().toString();
+
+                        // URL de forecast
+                        String urlForecast = "https://api.open-meteo.com/v1/forecast?"
+                                + "latitude=" + lat
+                                + "&longitude=" + lng
+                                + "&start_date=" + startDate
+                                + "&end_date=" + endDate
+                                + "&hourly=temperature_2m,apparent_temperature,rain,precipitation,precipitation_probability"
+                                + "&current_weather=true";
+
+                        System.out.println("URL de forecast: " + urlForecast);
+
+                        ForecastResponse forecastResponse = restTemplate.getForObject(urlForecast, ForecastResponse.class);
+                        if (forecastResponse != null) {
+                            // Datos actuales
+                            ForecastResponse.CurrentWeather current = forecastResponse.getCurrent_weather();
+                            if (alojamiento.getTemperaturaActual() == null) {
+                                alojamiento.setTemperaturaActual(current.getTemperature());
+                            }
+                            if (alojamiento.getViento() == null) {
+                                alojamiento.setViento(current.getWindspeed());
+                            }
+                            if (alojamiento.getCodigoClima() == null) {
+                                alojamiento.setCodigoClima(current.getWeathercode());
+                            }
+
+                            // Para lluvia y probabilidad, usamos el primer dato horario
+                            if (forecastResponse.getHourly() != null) {
+                                if (alojamiento.getLluvia() == null) {
+                                    alojamiento.setLluvia(forecastResponse.getHourly().getRain().get(0));
+                                }
+                                if (alojamiento.getPrecipitacion() == null) {
+                                    alojamiento.setPrecipitacion(forecastResponse.getHourly().getPrecipitation().get(0));
+                                }
+                                if (alojamiento.getProbabilidadPrecipitacion() == null) {
+                                    alojamiento.setProbabilidadPrecipitacion(forecastResponse.getHourly().getPrecipitation_probability().get(0));
+                                }
+                            }
+
+                            System.out.println("Datos del clima obtenidos correctamente");
+                            return; // Salir si se obtuvieron datos exitosamente
+                        }
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error fetching weather data: " + e.getMessage());
+                }
+            } catch (Exception e) {
+                System.err.println("Error in weather data processing: " + e.getMessage());
+            }
+        }
+        
+        // Si llegamos aquí, usar datos de respaldo para Colombia
+        System.out.println("Aplicando datos de clima de respaldo para Colombia");
+        applyWeatherFallbackForColombia(alojamiento);
+    }
+    
+    private void applyWeatherFallbackForColombia(Alojamiento alojamiento) {
+        if (alojamiento.getTemperaturaActual() == null) {
+            alojamiento.setTemperaturaActual(17.0); // Temperatura promedio Bogotá
+        }
+        if (alojamiento.getViento() == null) {
+            alojamiento.setViento(10.0); // Velocidad del viento típica km/h
+        }
+        if (alojamiento.getCodigoClima() == null) {
+            alojamiento.setCodigoClima(2); // Código para clima parcialmente nublado
+        }
+        if (alojamiento.getLluvia() == null) {
+            alojamiento.setLluvia(1.5); // Lluvia en mm
+        }
+        if (alojamiento.getPrecipitacion() == null) {
+            alojamiento.setPrecipitacion(1.2); // Precipitación en mm
+        }
+        if (alojamiento.getProbabilidadPrecipitacion() == null) {
+            alojamiento.setProbabilidadPrecipitacion(30); // 30% probabilidad de lluvia
+        }
+        System.out.println("Datos de clima por defecto para Bogotá aplicados");
     }
 
     public Clasificacion updateClasificacion(Long id, Clasificacion clasificacion) {
