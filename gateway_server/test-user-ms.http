@@ -1,0 +1,44 @@
+### Get User by ID
+GET http://localhost:8080/user-ms/users/1
+
+### Get All Users
+GET http://localhost:8080/user-ms/users
+
+### Update User
+PUT http://localhost:8080/user-ms/users/1
+Content-Type: application/json
+
+{
+  "nombre": "Test User Updated",
+  "email": "testupdate@example.com",
+  "password": "newpassword123"
+}
+
+### Delete User
+DELETE http://localhost:8080/user-ms/users/1
+
+### Get User Info
+GET http://localhost:8080/user-ms/users/info
+
+### Create User Internal
+POST http://localhost:8080/user-ms/users/internal/create
+Content-Type: application/json
+
+{
+  "nombre": "Internal User",
+  "email": "internal@example.com",
+  "password": "password123"
+}
+
+### Upload User Image
+POST http://localhost:8080/user-ms/users/1/image
+Content-Type: multipart/form-data
+
+### Get User Image
+GET http://localhost:8080/user-ms/users/1/image
+
+### Get Image by User ID
+GET http://localhost:8080/user-ms/images/1
+
+### Delete User Image
+DELETE http://localhost:8080/user-ms/users/1/image

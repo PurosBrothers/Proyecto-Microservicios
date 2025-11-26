@@ -1,0 +1,79 @@
+package com.microservicios.marketplace_ms.dtos;
+
+import java.math.BigDecimal;
+
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+
+public class AddToCartMessageDTO {
+    @NotBlank(message = "El UID es obligatorio")
+    private String uid;
+    private Long idItem; // Se setea desde el path
+    @Min(value = 1, message = "La cantidad debe ser al menos 1")
+    private int cantidad;
+    private BigDecimal precioUnitario; // Opcional, se obtiene del backend si no viene
+    private String tipoClasificacion; // opcional
+    private String nombreItem;
+
+    public AddToCartMessageDTO() {
+    }
+
+    public AddToCartMessageDTO(String uid, Long idItem, int cantidad, BigDecimal precioUnitario,
+            String tipoClasificacion, String nombreItem) {
+        this.uid = uid;
+        this.idItem = idItem;
+        this.cantidad = cantidad;
+        this.precioUnitario = precioUnitario;
+        this.tipoClasificacion = tipoClasificacion;
+        this.nombreItem = nombreItem;
+    }
+
+    // Getters and Setters
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public Long getIdItem() {
+        return idItem;
+    }
+
+    public void setIdItem(Long idItem) {
+        this.idItem = idItem;
+    }
+
+    public int getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(int cantidad) {
+        this.cantidad = cantidad;
+    }
+
+    public BigDecimal getPrecioUnitario() {
+        return precioUnitario;
+    }
+
+    public void setPrecioUnitario(BigDecimal precioUnitario) {
+        this.precioUnitario = precioUnitario;
+    }
+
+    public String getTipoClasificacion() {
+        return tipoClasificacion;
+    }
+
+    public void setTipoClasificacion(String tipoClasificacion) {
+        this.tipoClasificacion = tipoClasificacion;
+    }
+
+    public String getNombreItem() {
+        return nombreItem;
+    }
+
+    public void setNombreItem(String nombreItem) {
+        this.nombreItem = nombreItem;
+    }
+}

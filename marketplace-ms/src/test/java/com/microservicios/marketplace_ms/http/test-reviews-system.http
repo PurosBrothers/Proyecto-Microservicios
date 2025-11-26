@@ -1,0 +1,307 @@
+### Pruebas HTTP para Sistema de Calificaciones y Comentarios
+### Base URL: http://localhost:8080/marketplace-ms
+### Datos de prueba del DbInitializer:
+### - Item ID: 1 (Hotel Bogotá - itemAlojamiento)
+### - Comentario Padre 1: uid=1, puntuacion=5, "Excelente experiencia"
+### - Comentario Padre 2: uid=3, puntuacion=4, "Buena relación calidad-precio"
+### - Respuesta 1: uid=2, responde al comentario padre 1
+
+###
+### 1. OBTENER TODAS LAS CALIFICACIONES DE UN ITEM
+###
+
+GET http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+###
+### 2. CREAR NUEVA CALIFICACIÓN + COMENTARIO PADRE
+### (Requiere autenticación)
+###
+
+POST http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 123,
+  "puntuacion": 5,
+  "titulo": "Experiencia inolvidable",
+  "comentario": "El lugar es espectacular, el servicio excelente y la ubicación perfecta. Definitivamente regresaré!"
+}
+
+###
+### 3. CREAR CALIFICACIÓN MÍNIMA (1 ESTRELLA)
+###
+
+POST http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 456,
+  "puntuacion": 1,
+  "titulo": "Muy decepcionante",
+  "comentario": "No cumplió para nada con las expectativas. Servicio pésimo."
+}
+
+###
+### 4. CREAR CALIFICACIÓN CON COMENTARIO OPCIONAL VACÍO
+###
+
+POST http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 789,
+  "puntuacion": 3,
+  "titulo": "Regular",
+  "comentario": ""
+}
+
+###
+### 5. RESPONDER A COMENTARIO PADRE (ID=1 del DbInitializer)
+### (Sin calificación)
+###
+
+POST http://localhost:8080/marketplace-ms/items/1/reviews/1/replies
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 555,
+  "titulo": "Comparto la opinión",
+  "cuerpo": "Estuve allí el mes pasado y confirmo que es excelente. El desayuno es espectacular."
+}
+
+###
+### 6. RESPONDER A COMENTARIO PADRE (ID=2 del DbInitializer)
+###
+
+POST http://localhost:8080/marketplace-ms/items/1/reviews/2/replies
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 666,
+  "titulo": "Detalles que mejorar",
+  "cuerpo": "¿Podrías ser más específico sobre qué detalles mencionas? Estoy considerando reservar."
+}
+
+###
+### 7. RESPUESTA SIN TÍTULO (OPCIONAL)
+###
+
+POST http://localhost:8080/marketplace-ms/items/1/reviews/1/replies
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 777,
+  "cuerpo": "Yo también recomiendo este lugar. La atención al cliente es de 10!"
+}
+
+###
+### 8. OBTENER ESTADÍSTICAS DE CALIFICACIONES
+###
+
+GET http://localhost:8080/marketplace-ms/items/1/reviews/stats
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+###
+### 9. DAR LIKE A UN COMENTARIO (ID=1 del DbInitializer)
+###
+
+POST http://localhost:8080/marketplace-ms/comentarios/1/like
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+###
+### 10. DAR LIKE A UNA RESPUESTA
+###
+
+POST http://localhost:8080/marketplace-ms/comentarios/3/like
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+###
+### 11. OBTENER COMENTARIO CON SUS RESPUESTAS
+###
+
+GET http://localhost:8080/marketplace-ms/comentarios/1
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+###
+### 12. ELIMINAR CALIFICACIÓN COMPLETA (Solo el autor)
+###
+
+DELETE http://localhost:8080/marketplace-ms/items/1/reviews/1
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+###
+### CASOS DE ERROR PARA PROBAR VALIDACIONES
+###
+
+###
+### 13. ERROR: Puntuación inválida (mayor a 5)
+###
+
+POST http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 999,
+  "puntuacion": 6,
+  "titulo": "Puntuación inválida",
+  "comentario": "Esto debería fallar"
+}
+
+###
+### 14. ERROR: Puntuación inválida (menor a 1)
+###
+
+POST http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 999,
+  "puntuacion": 0,
+  "titulo": "Puntuación inválida",
+  "comentario": "Esto también debería fallar"
+}
+
+###
+### 15. ERROR: Título vacío
+###
+
+POST http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 999,
+  "puntuacion": 4,
+  "titulo": "",
+  "comentario": "Falta título"
+}
+
+###
+### 16. ERROR: UID nulo
+###
+
+POST http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "puntuacion": 4,
+  "titulo": "Sin UID",
+  "comentario": "Falta UID"
+}
+
+###
+### 17. ERROR: Responder a comentario inexistente
+###
+
+POST http://localhost:8080/marketplace-ms/items/1/reviews/999/replies
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 888,
+  "cuerpo": "Comentario padre no existe"
+}
+
+###
+### 18. ERROR: Item inexistente
+###
+
+POST http://localhost:8080/marketplace-ms/items/999/reviews
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 999,
+  "puntuacion": 5,
+  "titulo": "Item inexistente",
+  "comentario": "Esto debería fallar"
+}
+
+###
+### 19. PROBAR SIN AUTENTICACIÓN (Debería fallar)
+###
+
+POST http://localhost:8080/marketplace-ms/items/1/reviews
+Content-Type: application/json
+
+{
+  "uid": 999,
+  "puntuacion": 5,
+  "titulo": "Sin token",
+  "comentario": "Sin autenticación"
+}
+
+###
+### 20. OBTENER CALIFICACIONES DE ITEM SIN REVIEWS
+###
+
+GET http://localhost:8080/marketplace-ms/items/2/reviews
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+###
+### 21. ESTADÍSTICAS DE ITEM SIN REVIEWS
+###
+
+GET http://localhost:8080/marketplace-ms/items/2/reviews/stats
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+###
+### PRUEBAS CON OTROS ITEMS (si existen en DbInitializer)
+###
+
+###
+### 22. Calificación para item de Alimentación (si existe ID=2)
+###
+
+POST http://localhost:8080/marketplace-ms/items/2/reviews
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 111,
+  "puntuacion": 4,
+  "titulo": "Comida deliciosa",
+  "comentario": "Los sabores auténticos y el ambiente acogedor hacen de este lugar una excelente opción."
+}
+
+###
+### 23. Calificación para item de Transporte (si existe ID=3)
+###
+
+POST http://localhost:8080/marketplace-ms/items/3/reviews
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "uid": 222,
+  "puntuacion": 5,
+  "titulo": "Transporte confiable",
+  "comentario": "Puntualidad perfecta y vehículos en excelente estado. Conductor muy amable."
+}
+
+###
+### NOTAS IMPORTANTES:
+### 1. Reemplaza YOUR_JWT_TOKEN_HERE con un token JWT válido
+### 2. Los IDs de comentarios pueden cambiar según el orden de creación
+### 3. Para obtener token JWT: inicia sesión en el frontend y copia el token
+### 4. Los IDs de items corresponden a los del DbInitializer
+### 5. Prueba primero los GET para ver la estructura de datos existente
+###

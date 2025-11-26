@@ -1,0 +1,11 @@
+@host=http://localhost:8083
+
+GET {{host}}/actuator/health
+
+GET {{host}}/actuator/info
+
+GET {{host}}/actuator/metrics
+
+GET {{host}}/actuator/configprops
+
+GET {{host}}/actuator/loggers

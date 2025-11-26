@@ -1,0 +1,31 @@
+@gateway_url = http://localhost:8080
+@userId = 2a36ca84-0166-46b2-80b4-0838987388bf
+
+# @name auth
+POST http://localhost:8081/realms/proyect-ms-realm/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password&client_id=user-ms-client&client_secret=Aq3vK9EfTGwoWpK3j48RkN6Q0yCUZqGd&username=laura.martinez@gmail.com&password=password123
+
+GET {{gateway_url}}/api/users
+Authorization: Bearer {{auth.response.body.access_token}}
+
+GET {{gateway_url}}/api/images/{{userId}}
+Authorization: Bearer {{auth.response.body.access_token}}
+
+POST {{gateway_url}}/api/users/{{userId}}/image
+Authorization: Bearer {{auth.response.body.access_token}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="ranapb.png"
+Content-Type: image/png
+
+< ./ranapb.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+GET {{gateway_url}}/api/images/{{userId}}
+Authorization: Bearer {{auth.response.body.access_token}}
+
+GET {{gateway_url}}/api/users
+Authorization: Bearer {{auth.response.body.access_token}}

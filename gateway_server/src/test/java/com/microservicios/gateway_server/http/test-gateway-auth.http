@@ -1,0 +1,112 @@
+@gatewayUrl = http://localhost:8080
+
+GET {{gatewayUrl}}/actuator/health
+
+GET {{gatewayUrl}}/auth/tipos-usuario
+
+GET {{gatewayUrl}}/auth/verificar-correo?correo=nuevo.usuario@gmail.com
+
+POST {{gatewayUrl}}/auth/register
+Content-Type: application/json
+
+{
+    "nombre": "Juan Carlos Pérez",
+    "correo": "juan.cliente@gmail.com",
+    "password": "password123",
+    "tipoUsuario": "CLIENTE",
+    "edad": 28,
+    "descripcion": "Cliente interesado en servicios de desarrollo web",
+    "telefono": "+573001234567",
+    "direccion": "Calle 123 #45-67, Bogota, Colombia"
+}
+
+POST {{gatewayUrl}}/auth/register
+Content-Type: application/json
+
+{
+    "nombre": "María Fernanda García",
+    "correo": "maria.proveedor@gmail.com",
+    "password": "password123",
+    "tipoUsuario": "PROVEEDOR",
+    "edad": 35,
+    "descripcion": "Desarrolladora Full Stack con 10 años de experiencia en React y Node.js",
+    "telefono": "+573019876543",
+    "direccion": "Carrera 15 #67-89, Medellin, Colombia"
+}
+
+POST {{gatewayUrl}}/auth/register
+Content-Type: application/json
+
+{
+    "nombre": "Pedro Sin Tipo",
+    "correo": "pedro.sintipo@gmail.com",
+    "password": "password123",
+    "edad": 30,
+    "descripcion": "Usuario sin tipo especificado"
+}
+
+POST {{gatewayUrl}}/auth/register
+Content-Type: application/json
+
+{
+    "nombre": "Ana Tipo Null",
+    "correo": "ana.tiponull@gmail.com",
+    "password": "password123",
+    "tipoUsuario": null,
+    "edad": 28
+}
+
+POST {{gatewayUrl}}/auth/register
+Content-Type: application/json
+
+{
+    "nombre": "Usuario Duplicado",
+    "correo": "juan.cliente@gmail.com",
+    "password": "password123",
+    "tipoUsuario": "PROVEEDOR",
+    "edad": 25
+}
+
+POST {{gatewayUrl}}/auth/register
+Content-Type: application/json
+
+{
+    "nombre": "U",
+    "correo": "correo-invalido",
+    "password": "123",
+    "tipoUsuario": "CLIENTE",
+    "edad": 15
+}
+###
+
+GET {{gatewayUrl}}/auth/verificar-correo?correo=juan.cliente@gmail.com
+
+### cliente
+POST {{gatewayUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "laura.martinez@gmail.com",
+    "password": "password123"
+}
+
+### proveedor
+POST {{gatewayUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "dickgrayson@gmail.com",
+    "password": "password123"
+}
+
+POST {{gatewayUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "usuario.inexistente@gmail.com",
+    "password": "password123"
+}
+
+GET {{gatewayUrl}}/auth/debug-keycloak
+
+GET {{gatewayUrl}}/api/users

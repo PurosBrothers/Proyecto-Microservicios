@@ -1,0 +1,29 @@
+### Health Check - Gateway
+GET http://localhost:8080/actuator/health
+
+### Gateway Routes Info
+GET http://localhost:8080/actuator/gateway/routes
+
+### Refresh Configuration
+POST http://localhost:8080/actuator/refresh
+
+### Gateway Info
+GET http://localhost:8080/actuator/info
+
+### Config Server Health
+GET http://localhost:8888/actuator/health
+
+### Eureka Server Health
+GET http://localhost:9989/
+
+### User MS Health via Gateway
+GET http://localhost:8080/user-ms/actuator/health
+
+### Payment MS Health via Gateway
+GET http://localhost:8080/payment-ms/actuator/health
+
+### Transaction MS Health via Gateway
+GET http://localhost:8080/transaction-ms/actuator/health
+
+### Marketplace MS Health via Gateway
+GET http://localhost:8080/marketplace-ms/actuator/health

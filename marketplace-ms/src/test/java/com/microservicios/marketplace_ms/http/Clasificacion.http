@@ -1,0 +1,105 @@
+@baseUrl = http://localhost:8084/clasificaciones
+
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "tipo": "Alojamiento",
+  "lugarInicio": "Cartagena",
+  "precio": 500,
+  "fechaDisponibilidadInicio": "2025-10-05T10:00:00",
+  "fechaDisponibilidadFin": "2025-12-20T20:00:00",
+  "capacidadMaxima": 100,
+  "fechaCheckin": "2025-10-05T15:00:00",
+  "fechaCheckout": "2025-10-10T11:00:00",
+  "tipoInmueble": "Hotel",
+  "numeroBanos": 2,
+  "numeroHabitaciones": 2,
+  "lat": 10.3997,
+  "lng": -75.5144
+}
+
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "tipo": "Alimentacion",
+  "lugarInicio": "Medellin",
+  "precio": 25,
+  "fechaDisponibilidadInicio": "2025-09-26T12:00:00",
+  "fechaDisponibilidadFin": "2025-09-26T15:00:00",
+  "capacidadMaxima": 50,
+  "horaInicio": "12:00",
+  "horaFinal": "15:00",
+  "tipoComida": "Lunch",
+  "menuIncluido": "Pasta, Salad, Dessert",
+  "latitud": 6.2442,
+  "longitud": -75.5812
+}
+
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "tipo": "Transporte",
+  "lugarInicio": "Cali",
+  "precio": 50,
+  "fechaDisponibilidadInicio": "2025-09-27T08:00:00",
+  "fechaDisponibilidadFin": "2025-09-27T12:00:00",
+  "capacidadMaxima": 20,
+  "lugarDestino": "Bogota",
+  "horaSalida": "2025-09-27T08:00:00",
+  "horaLlegada": "2025-09-27T10:00:00",
+  "tipoTransporte": "Bus",
+  "duracionViaje": 120,
+  "rutaGps": "Route 1"
+}
+
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "tipo": "PaseosEcologicos",
+  "lugarInicio": "Cartagena",
+  "precio": 75,
+  "fechaDisponibilidadInicio": "2025-09-28T09:00:00",
+  "fechaDisponibilidadFin": "2025-09-28T13:00:00",
+  "capacidadMaxima": 15,
+  "duracionHoras": 4,
+  "nivelDificultad": "Medium",
+  "equipoIncluido": true,
+  "guiaIncluido": true,
+  "edadMinima": 12,
+  "puntoEncuentro": "Central Park",
+  "rutaEncuentro": "Street 123"
+}
+
+GET {{baseUrl}}
+Accept: application/json
+
+GET {{baseUrl}}/1
+Accept: application/json
+
+PUT {{baseUrl}}/1
+Content-Type: application/json
+
+{
+  "tipo": "Alojamiento",
+  "lugarInicio": "Barranquilla",
+  "precio": 600,
+  "fechaDisponibilidadInicio": "2025-10-10T10:00:00",
+  "fechaDisponibilidadFin": "2025-12-25T20:00:00",
+  "capacidadMaxima": 120,
+  "fechaCheckin": "2025-10-10T15:00:00",
+  "fechaCheckout": "2025-10-15T11:00:00",
+  "tipoInmueble": "Resort",
+  "numeroBanos": 3,
+  "numeroHabitaciones": 3,
+  "lat": 11.0041,
+  "lng": -74.8070
+}
+
+DELETE {{baseUrl}}/2
+
+GET {{baseUrl}}/2
+Accept: application/json

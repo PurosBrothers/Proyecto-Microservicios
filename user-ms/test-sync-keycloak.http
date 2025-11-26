@@ -1,0 +1,54 @@
+@userms_url = http://localhost:8083
+@gateway_url = http://localhost:8080
+
+GET {{userms_url}}/users/info
+
+GET {{userms_url}}/users
+
+POST {{userms_url}}/users
+Content-Type: application/json
+
+{
+    "nombre": "Test Usuario",
+    "apellido": "Sincronizacion",
+    "correo": "test.sync@gmail.com",
+    "password": "password123",
+    "tipoUsuario": "CLIENTE",
+    "edad": 30,
+    "descripcion": "Usuario para probar sincronización",
+    "telefono": "+573001234567",
+    "direccion": "Calle Test 123, Bogota"
+}
+
+PUT {{userms_url}}/users/[ID_DEL_USUARIO_CREADO]
+Content-Type: application/json
+Authorization: Bearer [TOKEN_JWT]
+
+{
+    "nombre": "Test Usuario",
+    "apellido": "Actualizado",
+    "correo": "test.sync.actualizado@gmail.com",
+    "edad": 31,
+    "descripcion": "Usuario actualizado para probar sincronización",
+    "telefono": "+573001234567",
+    "direccion": "Calle Test 456, Medellin"
+}
+
+GET {{userms_url}}/users/[ecfc323f-4f2b-458d-b7ed-5cd6f2989574]
+
+POST http://localhost:8081/realms/proyect-ms-realm/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password&client_id=user-ms-client&client_secret=Aq3vK9EfTGwoWpK3j48RkN6Q0yCUZqGd&username=brucewayne@gmail.com&password=password123
+
+DELETE {{userms_url}}/users/[ecfc323f-4f2b-458d-b7ed-5cd6f2989574]
+Authorization: Bearer [eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTWdvZ0pJN3JPRi1OWlY1anVjRkx6Mjh0TlB3eHNsbVlBbG1ORTZZMDNRIn0.eyJleHAiOjE3NTkxODI1ODAsImlhdCI6MTc1OTE4MjI4MCwianRpIjoib25ydHJvOjk1MTNhOTk2LWU1NDItMzhiOS1jMDEwLWU1MDBlODVkNGI0NyIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MS9yZWFsbXMvcHJveWVjdC1tcy1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiJlY2ZjMzIzZi00ZjJiLTQ1OGQtYjdlZC01Y2Q2ZjI5ODk1NzQiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ1c2VyLW1zLWNsaWVudCIsInNpZCI6ImVmMmYwNjU5LTllMDEtNGZkOC1iMzI5LTJjMzViYzg4ZDZlZCIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyoiLCJodHRwOi8vbG9jYWxob3N0OjgwODMvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLXByb3llY3QtbXMtcmVhbG0iLCJ1bWFfYXV0aG9yaXphdGlvbiIsIkNMSUVOVEUiXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6InByb2ZpbGUgZW1haWwiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6IkJydWNlIFdheW5lIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYnJ1Y2V3YXluZUBnbWFpbC5jb20iLCJnaXZlbl9uYW1lIjoiQnJ1Y2UiLCJmYW1pbHlfbmFtZSI6IldheW5lIiwiZW1haWwiOiJicnVjZXdheW5lQGdtYWlsLmNvbSJ9.cXvlLKl--FF8iySiPZAi7ubdq7TcA3_M6h9hOmoxYUG2NgdXHL20chbjyGy0N_ulWgFnaVPXIXn9ZkRhaYwXjTOB-ySUva6TS_AZdW1iY1Ppn9-AAct3JcFA3fMmsT__lXwTTiEjAtGl02B2-5fs-59U4g6lQdcdohhKqx4NqYq6wRloPw_bchgOrWH-IXydCUTFkh-oWzDyDSSV9DZCQIlTsnLvIg6-51-gwKvB5n8D2uvOAJZDQ1rDyjLk4d2WpY5ij2edu1FqSpG8trqSjvpjhHNdROCyDmZExBlVha_LQOARkFUT3wa2vpMH-XW6sbH9Z5t26koi5jzSYRrHKg]
+
+POST http://localhost:8081/realms/proyect-ms-realm/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password&client_id=user-ms-client&client_secret=Aq3vK9EfTGwoWpK3j48RkN6Q0yCUZqGd&username=test.sync.actualizado@gmail.com&password=password123
+
+GET {{userms_url}}/users/[ID_DEL_USUARIO_CREADO]
+
+GET {{userms_url}}/users

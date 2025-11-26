@@ -1,0 +1,39 @@
+# global:
+#   # Set the update interval to 15 seconds
+#   scrape_interval: 15s  
+
+# scrape_configs:
+#   # It's recommended to have the same name as the microservice
+#   - job_name: 'simple-microservice'
+#     # This is the the prometheus endpoint in simple-microservice
+#     # In this case it is accesible through http://localhost:8081/actuator/prometheus
+#     metrics_path: '/actuator/prometheus'
+
+#     static_configs:
+#       # simple-microservice's host and port
+#       - targets: ['localhost:8081'] 
+
+
+# To run prometheus with this config file
+#wsl ./prometheus --config.file=prometheus.yml
+
+
+
+global:
+  # Set the update interval to 15 seconds
+  scrape_interval: 15s  
+
+scrape_configs:
+  - job_name: 'eureka-discovery'
+    eureka_sd_configs:
+      - server: 'http://192.168.48.1:9989/eureka'
+        refresh_interval: 30s
+    # To let prometheus use the correct endpoint
+    # To scrap each microservice        
+    relabel_configs:
+      - source_labels: [__metrics_path__]
+        separator: ;
+        regex: (.*)
+        target_label: __metrics_path__
+        replacement: /actuator/prometheus
+        action: replace

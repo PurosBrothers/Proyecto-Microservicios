@@ -1,0 +1,117 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway-server
+  
+  # Configuración para manejar archivos multipart
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+      
+  # Configuración de buffers para el gateway
+  webflux:
+    multipart:
+      max-in-memory-size: 1MB
+      max-disk-usage-per-part: 10MB
+      max-parts: 128
+      
+  cloud:
+    config:
+      enabled: true
+    gateway:
+      
+      # Configuración de buffers para el gateway
+      httpclient:
+        max-initial-line-length: 4096
+        max-header-size: 8192
+        max-chunk-size: 8192
+        pool:
+          max-connections: 500
+          max-idle-time: 30s
+      
+      # Configuración global de CORS
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:3000"  # React
+              - "http://localhost:4200"  # Angular
+              - "http://localhost:8080"  # Vue
+              - "http://localhost:5173"  # Vite
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+
+      # Descubrimiento automático de servicios
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+          url-expression: "'lb://' + serviceId"
+
+# Configuración de Keycloak para el gateway
+keycloak:
+  auth-server-url: http://keycloak:8080
+  realm: proyect-ms-realm
+  admin:
+    username: admin
+    password: admin123
+    client-id: admin-cli
+  client:
+    secret: Aq3vK9EfTGwoWpK3j48RkN6Q0yCUZqGd
+
+# Configuración de user-ms para comunicación interna
+user-ms:
+  url: http://user-ms:8083
+
+# Configuración OAuth2 para JWT
+security:
+  oauth2:
+    resourceserver:
+      jwt:
+        issuer-uri: http://keycloak:8080/realms/proyect-ms-realm
+
+# Configuración de Eureka
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://eureka-server:9989/eureka/
+  instance:
+    prefer-ip-address: true
+    hostname: gateway-server
+
+# Configuración de logging
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.web.reactive: DEBUG
+    org.springframework.cloud.loadbalancer: DEBUG
+
+# Actuator endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: 
+          - health
+          - info  
+          - gateway
+          - routes
+          - refresh
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      access: read-only

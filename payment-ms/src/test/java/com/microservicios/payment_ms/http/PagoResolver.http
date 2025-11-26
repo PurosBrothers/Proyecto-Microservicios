@@ -1,0 +1,52 @@
+@host=http://localhost:8085
+
+POST {{host}}/graphql
+Content-Type: application/json
+
+{
+  "query": "query { pagos { id uid reservaId monto fechaPago estadoPago referencia } }"
+}
+
+POST {{host}}/graphql
+Content-Type: application/json
+
+{
+  "query": "query { pago(id: 1) { id uid reservaId monto fechaPago estadoPago referencia } }"
+}
+
+POST {{host}}/graphql
+Content-Type: application/json
+
+{
+  "query": "query { pagoByUid(uid: \"1\") { id uid reservaId monto fechaPago estadoPago referencia } }"
+}
+
+POST {{host}}/graphql
+Content-Type: application/json
+
+{
+  "query": "query { pagosByReserva(reservaId: 1) { id uid reservaId monto fechaPago estadoPago referencia } }"
+}
+
+POST {{host}}/graphql
+Content-Type: application/json
+
+{
+  "query": "mutation { createPago(uid: \"1\", reservaId: 1, monto: 100.00, fechaPago: \"2023-01-01T00:00:00Z\", estadoPago: PENDIENTE, referencia: \"ref123\") { id uid reservaId monto estadoPago } }"
+}
+
+POST {{host}}/graphql
+Content-Type: application/json
+
+{
+  "query": "mutation { updateEstadoPago(id: 1, estadoPago: COMPLETADO) { id estadoPago } }"
+}
+
+POST {{host}}/graphql
+Content-Type: application/json
+
+{
+  "query": "mutation { deletePago(id: 1) }"
+}
+
+GET {{host}}/actuator/info

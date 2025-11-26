@@ -1,0 +1,103 @@
+### Pruebas de endpoints de comentarios con extracción automática de UID del token JWT
+### El UID ya no se envía en el body, se extrae del token automaticamente
+
+### CONFIGURACIÓN DE SERVICIOS REQUERIDOS:
+### 1. Config Server en puerto 8888
+### 2. Eureka Server en puerto 9989  
+### 3. Keycloak en puerto 8081 (ejecutar: $env:PATH += ";C:\Windows\System32"; .\kc.bat start-dev --http-port=8081)
+### 4. Gateway Server en puerto 8080
+### 5. User-MS en puerto 8083
+### 6. Marketplace-MS en puerto 8084
+
+@baseUrl = http://localhost:8084
+@gatewayUrl = http://localhost:8080
+@itemId = 1
+
+### PASO 1: Obtener token JWT válido desde el gateway (puerto 8080)
+POST {{gatewayUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "dickgrayson@gmail.com",
+    "password": "password123"
+}
+
+### PASO 2: Copiar el access_token de la respuesta anterior y pegarlo aquí
+@accessToken = PEGAR_TOKEN_AQUI
+
+### PASO 2.5: Debug - Verificar información del token JWT
+GET {{baseUrl}}/api/debug/token-info
+Authorization: Bearer {{accessToken}}
+
+### PASO 3: Obtener todas las calificaciones/comentarios de un item (directo al marketplace-ms)
+GET {{baseUrl}}/items/{{itemId}}/reviews
+Authorization: Bearer {{accessToken}}
+
+### Crear una nueva calificación + comentario (comentario padre)
+### Nota: El UID se extrae automáticamente del token JWT
+POST {{baseUrl}}/items/{{itemId}}/reviews
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTWdvZ0pJN3JPRi1OWlY1anVjRkx6Mjh0TlB3eHNsbVlBbG1ORTZZMDNRIn0.eyJleHAiOjE3NjQxNDY0NjYsImlhdCI6MTc2NDE0NTU2NiwianRpIjoib25ydHJvOjYyMzJhNmQxLTVmZGItNjg2Zi1iNmYyLTA0ZDE2NjU3YjJlNSIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MS9yZWFsbXMvcHJveWVjdC1tcy1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyM2FlN2Y0Yi1lNTA3LTRlOWMtOGVkNi1kZWMyMGJmOWQwNGEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ1c2VyLW1zLWNsaWVudCIsInNpZCI6ImZhNDI1NWZiLTBkZWYtNDU1Zi04MGI3LTdjMzg2ODk4Y2FkYyIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyoiLCJodHRwOi8vbG9jYWxob3N0OjgwODMvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiUFJPVkVFRE9SIiwib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLXByb3llY3QtbXMtcmVhbG0iLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiRGljayBHcmF5c29uIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiZGlja2dyYXlzb25AZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6IkRpY2siLCJmYW1pbHlfbmFtZSI6IkdyYXlzb24iLCJlbWFpbCI6ImRpY2tncmF5c29uQGdtYWlsLmNvbSJ9.UfZHLLDDfsdXCN-9KrfosG-olFRgLQmAIPns7OhilB__fgrtYlRt5jemD0Ck7dANw88K1798-_8rkx0srm9O7xYmg5daIklA0f5D7JvyyCCQH3PeZUdZX9HZAuQ1japUd0mF4jAdlwkzVF3S3k-gUP6ZLvoCkiU6qN1XsCHD-szrW8tcvszBncEiZeAxmljbHVA_JzPHbZ5b5I4NzY-aGMs3KQWF2NpqLb0HwQI6GuabB0DUcd6pG1rBGGtlnZF2FmE_hRcHKKJc_L2uO58OjT-vu9-Nc3ZrnTy3qgac7L47IUHugqbSw6ZX36Vp-EVAAr3jLxHSPqjTfQwWB-mTiQ
+
+{
+    "puntuacion": 5,
+    "titulo": "Excelente servicio!",
+    "comentario": "Muy satisfecho con la calidad del servicio. Lo recomiendo altamente."
+}
+
+### Responder a un comentario existente (sin calificación)
+### Nota: El UID se extrae automáticamente del token JWT
+POST {{baseUrl}}/items/{{itemId}}/reviews/1/replies
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "titulo": "Gracias por tu comentario",
+    "cuerpo": "Me alegra saber que tuviste una buena experiencia!"
+}
+
+### Obtener estadísticas de calificaciones de un item
+GET {{baseUrl}}/items/{{itemId}}/reviews/stats
+Authorization: Bearer {{accessToken}}
+
+### Dar like a un comentario
+### Nota: El UID se extrae automáticamente del token JWT
+POST {{baseUrl}}/comentarios/1/like
+Authorization: Bearer {{accessToken}}
+
+### Obtener comentario específico con sus respuestas
+GET {{baseUrl}}/comentarios/1
+Authorization: Bearer {{accessToken}}
+
+### Eliminar una calificación/comentario (solo el autor puede hacerlo)
+### Nota: Se valida automáticamente que el UID del token coincida con el propietario
+DELETE {{baseUrl}}/items/{{itemId}}/reviews/1
+Authorization: Bearer {{accessToken}}
+
+### Ejemplos de respuestas esperadas:
+
+# Crear comentario - Respuesta exitosa:
+# {
+#     "id": 1,
+#     "uid": "extraido-del-token-automaticamente",
+#     "titulo": "Excelente servicio!",
+#     "cuerpo": "Muy satisfecho con la calidad del servicio...",
+#     "likes": 0,
+#     "fechaComentario": "2025-11-26T08:30:00",
+#     "parent": null,
+#     "calificacion": {
+#         "id": 1,
+#         "puntuacion": 5,
+#         "fechaCalificacion": "2025-11-26T08:30:00"
+#     }
+# }
+
+# Error por token inválido:
+# {
+#     "error": "Token JWT inválido o expirado"
+# }
+
+# Error por intentar eliminar comentario de otro usuario:
+# {
+#     "error": "Solo puedes eliminar tus propios comentarios"
+# }

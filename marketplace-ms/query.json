@@ -1,0 +1,1 @@
+{"query": "query { itemsExcluyendoClasificacion(clasificacion: \"Alojamiento\") { id titulo descripcion clasificacion { tipo } } }"} 

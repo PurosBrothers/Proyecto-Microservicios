@@ -1,0 +1,75 @@
+type Query {
+  itemsPorClasificacion(clasificacion: String!): [Item!]!
+}
+
+type Item {
+  id: ID!
+  titulo: String!
+  descripcion: String
+  lugarInicio: String
+  precio: Float
+  fechaDisponibilidadInicio: String
+  fechaDisponibilidadFin: String
+  capacidadMaxima: Int
+  fechaPublicacion: String
+  stock: Int
+  visualizaciones: Int
+  calificacionPromedio: Int
+  clasificacion: Clasificacion
+  tags: [ItemTag]
+  fotos: [ItemFoto]
+  videos: [ItemVideo]
+  links: [ItemLink]
+  calificaciones: [Calificacion]
+  serviciosIncluidos: [ServicioIncluido]
+  preguntasFrecuentes: [PreguntaFrecuente]
+}
+
+type Clasificacion {
+  id: ID!
+  lugarInicio: String
+  precio: Float
+  fechaDisponibilidadInicio: String
+  fechaDisponibilidadFin: String
+  capacidadMaxima: Int
+  tipo: String
+}
+
+type ItemTag {
+  id: ID!
+  tag: String!
+}
+
+type ItemFoto {
+  id: ID!
+  url: String!
+}
+
+type ItemVideo {
+  id: ID!
+  url: String!
+}
+
+type ItemLink {
+  id: ID!
+  url: String!
+  descripcion: String
+}
+
+type Calificacion {
+  id: ID!
+  puntuacion: Int!
+  comentario: String
+}
+
+type ServicioIncluido {
+  id: ID!
+  nombre: String!
+  descripcion: String
+}
+
+type PreguntaFrecuente {
+  id: ID!
+  pregunta: String!
+  itemId: ID
+}

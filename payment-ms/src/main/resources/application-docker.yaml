@@ -1,0 +1,30 @@
+# Configuración para Docker con config-server
+spring:
+  config:
+    import: optional:configserver:http://config-server:8888
+  cloud:
+    config:
+      fail-fast: false
+  datasource:
+    url: jdbc:postgresql://postgres:5432/marketplace_db
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:password}
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:9989/eureka/
+
+# Configuración específica de RabbitMQ (forzada localmente)
+rabbitmq:
+  host: rabbitmq
+  port: 5672
+  username: guest
+  password: guest

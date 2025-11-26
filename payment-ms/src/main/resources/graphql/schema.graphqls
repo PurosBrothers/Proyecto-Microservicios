@@ -1,0 +1,52 @@
+type Pago {
+  id: ID!
+  uid: String!
+  reservaId: Int!
+  monto: Float!
+  fechaPago: String!
+  estadoPago: EstadoPago!
+  referencia: String!
+}
+
+type ClienteBanco {
+  id: ID!
+  uid: String!
+  cuentaBancariaEncrypted: String!
+  claveBancariaEncrypted: String!
+}
+
+enum EstadoPago {
+  PENDIENTE
+  COMPLETADO
+  CANCELADO
+}
+
+type Query {
+  pagos: [Pago!]!
+  pago(id: ID!): Pago
+  pagoByUid(uid: String!): Pago
+  pagosByReserva(reservaId: Int!): [Pago!]!
+  clienteBancos: [ClienteBanco!]!
+  clienteBanco(id: ID!): ClienteBanco
+  clienteBancoByUid(uid: String!): ClienteBanco
+}
+
+type Mutation {
+  createPago(
+    uid: String!
+    reservaId: Int!
+    monto: Float!
+    fechaPago: String!
+    estadoPago: EstadoPago!
+    referencia: String!
+  ): Pago!
+  updateEstadoPago(id: ID!, estadoPago: EstadoPago!): Pago
+  deletePago(id: ID!): Boolean!
+  createClienteBanco(
+    uid: String!
+    cuentaBancariaEncrypted: String!
+    claveBancariaEncrypted: String!
+  ): ClienteBanco!
+  updateCuentaBancaria(id: ID!, cuentaBancariaEncrypted: String!): ClienteBanco
+  deleteClienteBanco(id: ID!): Boolean!
+}

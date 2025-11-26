@@ -1,0 +1,69 @@
+@gatewayUrl = http://localhost:8080
+@userMsDirectUrl = http://localhost:8083
+
+GET {{gatewayUrl}}/actuator/health
+
+GET {{gatewayUrl}}/actuator/gateway/routes
+
+GET {{gatewayUrl}}/api/users
+
+GET {{gatewayUrl}}/api/users/info
+
+POST {{gatewayUrl}}/api/users/authenticate
+Content-Type: application/json
+
+{
+    "email": "laura.martinez@gmail.com",
+    "password": "password123"
+}
+
+GET {{gatewayUrl}}/api/users/2a36ca84-0166-46b2-80b4-0838987388bf
+
+POST {{gatewayUrl}}/api/users
+Content-Type: application/json
+
+{
+    "nombre": "Usuario via Gateway",
+    "edad": 25,
+    "fotoUrl": "https://randomuser.me/api/portraits/men/9.jpg",
+    "descripcion": "Usuario creado a través del gateway para probar la redirección",
+    "correo": "usuario.gateway@test.com",
+    "direccion": "Via Gateway #123, Colombia",
+    "telefono": "+57 300 999 8888",
+    "tipoUsuario": "CLIENTE",
+    "password": "password123"
+}
+
+GET {{userMsDirectUrl}}/users
+
+GET {{gatewayUrl}}/api/users
+
+OPTIONS {{gatewayUrl}}/api/users
+Origin: http://localhost:3000
+Access-Control-Request-Method: GET
+Access-Control-Request-Headers: Content-Type,Authorization
+
+GET {{gatewayUrl}}/api/users/info
+
+GET {{gatewayUrl}}/api/users/info
+
+GET {{gatewayUrl}}/api/users/info
+
+GET {{gatewayUrl}}/api/nonexistent
+
+GET {{gatewayUrl}}/api/fakems/test
+
+@jwtToken = eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6IC...
+
+PUT {{gatewayUrl}}/api/users/2a36ca84-0166-46b2-80b4-0838987388bf
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+{
+    "nombre": "Laura Martínez VIA GATEWAY",
+    "edad": 30,
+    "correo": "laura.martinez@gmail.com",
+    "descripcion": "Actualizada a través del gateway",
+    "direccion": "Carrera 15 #45-20, Bogotá, Colombia",
+    "telefono": "+57 301 456 7890"
+}

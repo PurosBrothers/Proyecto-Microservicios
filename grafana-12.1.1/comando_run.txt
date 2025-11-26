@@ -1,0 +1,2 @@
+cd /ruta/a/grafana-12.1.1
+wsl ./bin/grafana server

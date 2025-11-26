@@ -1,0 +1,85 @@
+@baseUrl = http://localhost:8083
+
+POST {{baseUrl}}/users/authenticate
+Content-Type: application/json
+
+{
+    "email": "laura.martinez@gmail.com",
+    "password": "password123"
+}
+
+POST {{baseUrl}}/users/authenticate  
+Content-Type: application/json
+
+{
+    "email": "andres.silva@hotmail.com",
+    "password": "password123"
+}
+
+POST {{baseUrl}}/users/authenticate
+Content-Type: application/json
+
+{
+    "email": "reservas@casaverde.com",
+    "password": "password123"
+}
+
+POST {{baseUrl}}/users/authenticate
+Content-Type: application/json
+
+{
+    "email": "info@saborcaribe.com", 
+    "password": "password123"
+}
+
+POST {{baseUrl}}/users/authenticate
+Content-Type: application/json
+
+{
+    "email": "usuario.inexistente@email.com",
+    "password": "wrongpassword"
+}
+
+GET {{baseUrl}}/users/info
+
+GET {{baseUrl}}/users
+
+@jwtToken = eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTWdvZ0pJN3JPRi1OWlY1anVjRkx6Mjh0TlB3eHNsbVlBbG1ORTZZMDNRIn0.eyJleHAiOjE3NTkwOTU4MzIsImlhdCI6MTc1OTA5NTUzMiwianRpIjoib25ydHJvOjNiMjk1YTFkLWJmMzUtODUwZi1iODliLWM2ZmUwZDE1MGFmOSIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MS9yZWFsbXMvcHJveWVjdC1tcy1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyYTM2Y2E4NC0wMTY2LTQ2YjItODBiNC0wODM4OTg3Mzg4YmYiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ1c2VyLW1zLWNsaWVudCIsInNpZCI6ImFkOTg1MDJkLTJiZjctNGNhNC1iNDAyLTcwN2YyNjIyN2E3YyIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyoiLCJodHRwOi8vbG9jYWxob3N0OjgwODMvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLXByb3llY3QtbXMtcmVhbG0iLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiTGF1cmEgTWFydMOtbmV6IiwicHJlZmVycmVkX3VzZXJuYW1lIjoibGF1cmEubWFydGluZXpAZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6IkxhdXJhIiwiZmFtaWx5X25hbWUiOiJNYXJ0w61uZXoiLCJlbWFpbCI6ImxhdXJhLm1hcnRpbmV6QGdtYWlsLmNvbSJ9.s1r29rNBZ1oXb43hIXqaknLPS5oz9ZEeQUrfh305BzsXXG5kR3yUWTexMtGk9JjtMyRD2oXMPMPLWf9huMsdyGG8rkA-1LyF4oOduN6KDjqDz7K9_0cNJYukFtTshI2u5Soz7rKgyqoQaZ1o-H-SBJczUWk263ezRp6aziZm8hqWGmdMBvUrHZBGo7HSh9M39Y-kfiBM3y95Pcd7i1WH-5J2YPUxPnuRrZucuC2dMZRf_sEzcFA5FGoHVmrVbjlgTJjyaj71VNGnWm-qEeVMqpihLRy42N50dl0IP8h6iEn7BRLlRfu3B-ahen7Q4a_Uo7zuo3GH6utiThvSUDP9Og
+###
+GET {{baseUrl}}/users/2a36ca84-0166-46b2-80b4-0838987388bf
+Authorization: Bearer {eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTWdvZ0pJN3JPRi1OWlY1anVjRkx6Mjh0TlB3eHNsbVlBbG1ORTZZMDNRIn0.eyJleHAiOjE3NjI0MDczOTMsImlhdCI6MTc2MjQwNjQ5MywianRpIjoib25ydHJvOmM3NjE3ZmE5LWVmYmUtY2QzMi1jYmU5LTYwOWQ5YmRiNmRhYSIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MS9yZWFsbXMvcHJveWVjdC1tcy1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyM2FlN2Y0Yi1lNTA3LTRlOWMtOGVkNi1kZWMyMGJmOWQwNGEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ1c2VyLW1zLWNsaWVudCIsInNpZCI6ImM3ZjI1ZGM2LWJlODYtNGY2YS1iNjU1LTVkOWYyNThlNmMzZSIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyoiLCJodHRwOi8vbG9jYWxob3N0OjgwODMvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiUFJPVkVFRE9SIiwib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLXByb3llY3QtbXMtcmVhbG0iLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiRGljayBHcmF5c29uIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiZGlja2dyYXlzb25AZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6IkRpY2siLCJmYW1pbHlfbmFtZSI6IkdyYXlzb24iLCJlbWFpbCI6ImRpY2tncmF5c29uQGdtYWlsLmNvbSJ9.OAmaGpVEXnh0O4AxUDxsEtxNVp_5Jz0zgbLHNUOPGH2sdOLvbaDnP_6EMF2Nz0IWRpsHWXArmZNTi2opKl3eW6V9-oS2mGLx8W76vorSo-m6dLj1PT5xKyR0JjMFrfKHIH3iiKkOKBv9mOsqqBDHAmPfCi-wWMDsMBNFCiTW1Ww2C1uoPSYvrvISzSgNY_NMaN7LlJJJXAtBtvFGtiMbWB6RC5AClp-kGeWSlGL72zv26auyTo-QJDvDZl60W8kwk9SsY6y9iskmGjuQUrsI9sg7ZyIvI3yE3BKwc1XN7qCKhFuM_fRQpE0RPXsz0C_k1UyQmINGK6JMQJtP3Gb9Ig}
+
+POST {{baseUrl}}/users
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+{
+    "nombre": "Pedro Turista",
+    "edad": 29,
+    "fotoUrl": "https://randomuser.me/api/portraits/men/8.jpg",
+    "descripcion": "Aventurero apasionado por descubrir destinos únicos en Colombia",
+    "correo": "pedro.turista@gmail.com",
+    "direccion": "Avenida 30 #50-25, Cali, Colombia",
+    "telefono": "+57 302 111 2222",
+    "tipoUsuario": "CLIENTE",
+    "password": "password123"
+}
+
+PUT {{baseUrl}}/users/2a36ca84-0166-46b2-80b4-0838987388bf
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+{
+    "nombre": "Laura Martínez Viajera",
+    "edad": 29,
+    "fotoUrl": "https://randomuser.me/api/portraits/women/1.jpg",
+    "descripcion": "Amante de la naturaleza y los viajes en familia. Exploradora de Colombia ✈️🌿🏔️",
+    "correo": "laura.martinez@gmail.com",
+    "direccion": "Carrera 15 #45-20, Bogotá, Colombia",
+    "telefono": "+57 301 456 7890"
+}
+
+GET {{baseUrl}}/users/2a36ca84-0166-46b2-80b4-0838987388bf
+
+GET {{baseUrl}}/users/2a36ca84-0166-46b2-80b4-0838987388bf
+Authorization: Bearer invalid_token_here

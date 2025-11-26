@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: user-ms
+  cloud:
+    config:
+      uri: http://localhost:8888
+      enabled: true
+      fail-fast: false
+      retry:
+        initial-interval: 1000
+        max-attempts: 6
+  config:
+    import: "optional:configserver:http://localhost:8888"
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+      enabled: true

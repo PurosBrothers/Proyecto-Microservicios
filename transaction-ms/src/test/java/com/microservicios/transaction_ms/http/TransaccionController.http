@@ -1,0 +1,18 @@
+@host=http://localhost:8082
+
+GET {{host}}/transaccion/list/1
+
+POST {{host}}/transaccion/create/1
+Content-Type: application/json
+
+[102]
+
+POST {{host}}/transaccion/process-payment
+Content-Type: application/json
+
+{
+  "uid": "2a36ca84-0166-46b2-80b4-0838987388bf",
+  "itemIds": [4]
+}
+
+GET {{host}}/actuator/info

@@ -1,0 +1,13 @@
+@host = http://localhost:8082
+
+GET {{host}}/actuator/info
+
+GET {{host}}/actuator/metrics
+
+GET {{host}}/actuator/metrics/jvm.memory.used
+
+GET {{host}}/actuator/health
+
+GET {{host}}/actuator/env
+
+GET {{host}}/actuator/prometheus

@@ -1,0 +1,112 @@
+@userms_url = http://localhost:8083
+@gateway_url = http://localhost:8080
+
+GET {{userms_url}}/users/info
+
+GET {{userms_url}}/users/tipos-usuario
+
+GET {{userms_url}}/users/verificar-correo?correo=nuevo.usuario@gmail.com
+
+POST {{userms_url}}/users
+Content-Type: application/json
+
+{
+    "nombre": "Juan Carlos Pérez",
+    "correo": "juan.cliente@gmail.com",
+    "password": "password123",
+    "tipoUsuario": "CLIENTE",
+    "edad": 28,
+    "descripcion": "Cliente interesado en servicios de desarrollo web",
+    "telefono": "+573001234567",
+    "direccion": "Calle 123 #45-67, Bogota, Colombia"
+}
+
+POST {{userms_url}}/users
+Content-Type: application/json
+
+{
+    "nombre": "María Fernanda García",
+    "correo": "maria.proveedor@gmail.com",
+    "password": "password123",
+    "tipoUsuario": "PROVEEDOR",
+    "edad": 35,
+    "descripcion": "Desarrolladora Full Stack con 10 años de experiencia en React y Node.js",
+    "telefono": "+573019876543",
+    "direccion": "Carrera 15 #67-89, Medellin, Colombia"
+}
+
+POST {{userms_url}}/users
+Content-Type: application/json
+
+{
+    "nombre": "Pedro Sin Tipo",
+    "correo": "pedro.sintipo@gmail.com",
+    "password": "password123",
+    "edad": 30,
+    "descripcion": "Usuario sin tipo especificado"
+}
+
+POST {{userms_url}}/users
+Content-Type: application/json
+
+{
+    "nombre": "Ana Tipo Null",
+    "correo": "ana.tiponull@gmail.com",
+    "password": "password123",
+    "tipoUsuario": null,
+    "edad": 28
+}
+
+POST {{userms_url}}/users
+Content-Type: application/json
+
+{
+    "nombre": "Usuario Duplicado",
+    "correo": "juan.cliente@gmail.com",
+    "password": "password123",
+    "tipoUsuario": "PROVEEDOR",
+    "edad": 25
+}
+
+POST {{userms_url}}/users
+Content-Type: application/json
+
+{
+    "nombre": "U",
+    "correo": "correo-invalido",
+    "password": "123",
+    "tipoUsuario": "CLIENTE",
+    "edad": 15
+}
+
+GET {{userms_url}}/users/verificar-correo?correo=juan.cliente@gmail.com
+
+GET {{userms_url}}/users
+
+POST http://localhost:8081/realms/proyect-ms-realm/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password&client_id=user-ms-client&client_secret=Aq3vK9EfTGwoWpK3j48RkN6Q0yCUZqGd&username=juan.cliente@gmail.com&password=password123
+
+POST http://localhost:8081/realms/proyect-ms-realm/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password&client_id=user-ms-client&client_secret=Aq3vK9EfTGwoWpK3j48RkN6Q0yCUZqGd&username=maria.proveedor@gmail.com&password=password123
+
+POST {{userms_url}}/users/authenticate
+Content-Type: application/json
+
+{
+    "email": "juan.cliente@gmail.com",
+    "password": "password123"
+}
+
+POST {{userms_url}}/users/authenticate
+Content-Type: application/json
+
+{
+    "email": "maria.proveedor@gmail.com",
+    "password": "password123"
+}
+
+GET {{userms_url}}/users/debug-keycloak

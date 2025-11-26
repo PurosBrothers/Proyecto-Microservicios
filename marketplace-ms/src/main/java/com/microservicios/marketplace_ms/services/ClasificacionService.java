@@ -1,0 +1,736 @@
+package com.microservicios.marketplace_ms.services;
+
+import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import com.microservicios.marketplace_ms.entities.Alimentacion;
+import com.microservicios.marketplace_ms.entities.Alojamiento;
+import com.microservicios.marketplace_ms.entities.Clasificacion;
+import com.microservicios.marketplace_ms.entities.Maps;
+import com.microservicios.marketplace_ms.entities.PaseosEcologicos;
+import com.microservicios.marketplace_ms.entities.RequisitosEspeciales;
+import com.microservicios.marketplace_ms.entities.Transporte;
+import com.microservicios.marketplace_ms.exceptions.InvalidProviderException;
+import com.microservicios.marketplace_ms.repositories.ClasificacionRepository;
+import com.microservicios.marketplace_ms.repositories.RequisitosEspecialesRepository;
+import com.microservicios.marketplace_ms.security.JwtSecurityContext;
+
+@Service
+public class ClasificacionService {
+
+    @Autowired
+    private ClasificacionRepository clasificacionRepository;
+
+    @Autowired
+    private RequisitosEspecialesRepository requisitosEspecialesRepository;
+
+    @Autowired
+    private JwtSecurityContext jwtSecurityContext;
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    public Clasificacion createClasificacion(Clasificacion clasificacion) {
+        System.out.println("Iniciando creación de clasificación de tipo: " + clasificacion.getTipo());
+
+        // Establecer el usuarioId desde el JWT del usuario autenticado
+        String currentUserId = jwtSecurityContext.getCurrentUserId();
+        if (currentUserId == null) {
+            throw new InvalidProviderException("Usuario no autenticado");
+        }
+
+        // La validación de PROVEEDOR ya se hace a nivel de Spring Security
+        clasificacion.setUsuarioId(currentUserId);
+        System.out.println("Usuario autenticado: " + currentUserId);
+
+        // Asegurar que los RequisitosEspeciales existan en la BD
+        if (clasificacion.getRequisitosEspeciales() != null) {
+            List<RequisitosEspeciales> updatedRequisitos = new ArrayList<>();
+            for (RequisitosEspeciales req : clasificacion.getRequisitosEspeciales()) {
+                final RequisitosEspeciales finalReq = req;
+                if (finalReq.getId() == null) {
+                    // Buscar por requisito
+                    RequisitosEspeciales existing = requisitosEspecialesRepository.findAll().stream()
+                        .filter(r -> r.getRequisito().equals(finalReq.getRequisito()))
+                        .findFirst().orElse(null);
+                    if (existing != null) {
+                        updatedRequisitos.add(existing);
+                    } else {
+                        RequisitosEspeciales saved = requisitosEspecialesRepository.save(finalReq);
+                        updatedRequisitos.add(saved);
+                    }
+                } else {
+                    updatedRequisitos.add(finalReq);
+                }
+            }
+            clasificacion.setRequisitosEspeciales(updatedRequisitos);
+        }
+
+        // Determinar el nombre del país: usar paisDestino si no es null, sino lugarInicio
+        String countryName = clasificacion.getPaisDestino();
+        if (countryName == null || countryName.isEmpty()) {
+            countryName = clasificacion.getLugarInicio();
+        }
+
+        // Siempre hacer petición a la API de países si hay nombre de país
+        if (countryName != null && !countryName.isEmpty()) {
+            try {
+                String url = "https://restcountries.com/v3.1/name/" + countryName;
+                CountryResponse[] responses = restTemplate.getForObject(url, CountryResponse[].class);
+                if (responses != null && responses.length > 0) {
+                    CountryResponse country = responses[0];
+                    clasificacion.setFlag(country.getFlag());
+                    clasificacion.setPopulation(country.getPopulation());
+                    clasificacion.setFifa(country.getFifa());
+                    if (country.getGini() != null && !country.getGini().isEmpty()) {
+                        // Tomar el último valor de gini
+                        Double giniValue = country.getGini().values().iterator().next();
+                        clasificacion.setGini(giniValue);
+                    }
+                    // Setear mapas desde el país por defecto
+                    if (country.getMaps() != null) {
+                        Maps maps = new Maps();
+                        maps.setGoogleMaps(country.getMaps().get("googleMaps"));
+                        maps.setOpenStreetMaps(country.getMaps().get("openStreetMaps"));
+                        clasificacion.setMaps(maps);
+                    }
+                }
+            } catch (Exception e) {
+                // Log error but don't fail the creation
+                System.err.println("Error fetching country data: " + e.getMessage());
+            }
+        }
+
+        // Determinar la dirección para mapas según el tipo
+        String address = null;
+        if (clasificacion instanceof Alojamiento) {
+            address = ((Alojamiento) clasificacion).getDireccion();
+            System.out.println("Es Alojamiento, dirección: " + address);
+            if (address != null && !address.isEmpty()) {
+                System.out.println("Iniciando obtención de datos del clima para dirección: " + address);
+                // Extraer la ciudad de la dirección (asumiendo formato: Calle, Ciudad, País)
+                String city = extractCityFromAddress(address);
+                if (city == null || city.isEmpty()) {
+                    System.out.println("No se pudo extraer la ciudad de la dirección, omitiendo obtención de clima");
+                } else {
+                String encodedCity = URLEncoder.encode(city, StandardCharsets.UTF_8);
+                String urlGeocoding = "https://geocoding-api.open-meteo.com/v1/search?name=" + encodedCity;
+                System.out.println("URL de geocoding para ciudad: " + urlGeocoding);
+
+                try {
+                    GeocodingResponse geocodingResponse = restTemplate.getForObject(urlGeocoding, GeocodingResponse.class);
+                    if (geocodingResponse != null && geocodingResponse.getResults() != null && !geocodingResponse.getResults().isEmpty()) {
+                        GeocodingResponse.GeocodingResult result = geocodingResponse.getResults().get(0);
+                        double lat = result.getLatitude();
+                        double lng = result.getLongitude();
+                        System.out.println("Coordenadas obtenidas: lat=" + lat + ", lng=" + lng);
+                        ((Alojamiento) clasificacion).setLat(BigDecimal.valueOf(lat));
+                        ((Alojamiento) clasificacion).setLng(BigDecimal.valueOf(lng));
+
+                        // Fechas en formato YYYY-MM-DD
+                        String startDate = ((Alojamiento) clasificacion).getFechaCheckin().toLocalDate().toString();
+                        String endDate = ((Alojamiento) clasificacion).getFechaCheckout().toLocalDate().toString();
+
+                        // URL de forecast
+                        String urlForecast = "https://api.open-meteo.com/v1/forecast?"
+                                + "latitude=" + lat
+                                + "&longitude=" + lng
+                                + "&start_date=" + startDate
+                                + "&end_date=" + endDate
+                                + "&hourly=temperature_2m,apparent_temperature,rain,precipitation,precipitation_probability"
+                                + "&current_weather=true";
+
+                        System.out.println("URL de forecast: " + urlForecast);
+
+                        ForecastResponse forecastResponse = restTemplate.getForObject(urlForecast, ForecastResponse.class);
+                        if (forecastResponse != null) {
+                            // Datos actuales
+                            ForecastResponse.CurrentWeather current = forecastResponse.getCurrent_weather();
+                            ((Alojamiento) clasificacion).setTemperaturaActual(current.getTemperature());
+                            ((Alojamiento) clasificacion).setViento(current.getWindspeed());
+                            ((Alojamiento) clasificacion).setCodigoClima(current.getWeathercode());
+
+                            // Para lluvia y probabilidad, usamos el primer dato horario
+                            if (forecastResponse.getHourly() != null) {
+                                ((Alojamiento) clasificacion).setLluvia(forecastResponse.getHourly().getRain().get(0));
+                                ((Alojamiento) clasificacion).setPrecipitacion(forecastResponse.getHourly().getPrecipitation().get(0));
+                                ((Alojamiento) clasificacion).setProbabilidadPrecipitacion(forecastResponse.getHourly().getPrecipitation_probability().get(0));
+                            }
+
+                            System.out.println("Datos del clima obtenidos correctamente");
+                        } else {
+                            System.out.println("No se obtuvieron datos del forecast");
+                        }
+                    } else {
+                        System.out.println("No se encontraron resultados de geocoding");
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error fetching weather data: " + e.getMessage());
+                }
+            }
+        }
+        } else if (clasificacion instanceof Transporte) {
+            address = ((Transporte) clasificacion).getLugarDestino();
+            System.out.println("Es Transporte, lugar destino: " + address);
+        } else {
+            System.out.println("Es otro tipo, usando datos de país");
+        }
+
+        // Si hay dirección específica, crear enlace de Google Maps para la dirección (sobrescribe los mapas del país)
+        if (address != null && !address.isEmpty()) {
+            try {
+                String encodedAddress = URLEncoder.encode(address, StandardCharsets.UTF_8);
+                String googleMapsUrl = "https://www.google.com/maps/search/?api=1&query=" + encodedAddress;
+                Maps maps = new Maps();
+                maps.setGoogleMaps(googleMapsUrl);
+                // openStreetMaps puede dejarse null o asignar algo similar
+                clasificacion.setMaps(maps);
+                System.out.println("Enlace de Google Maps creado: " + googleMapsUrl);
+            } catch (Exception e) {
+                // Log error but don't fail the creation
+                System.err.println("Error creating maps link: " + e.getMessage());
+            }
+        }
+
+        // Asegurar datos del clima para alojamientos colombianos si no se obtuvieron
+        if (clasificacion instanceof Alojamiento) {
+            String countryForWeather = clasificacion.getPaisDestino();
+            if (countryForWeather == null) {
+                countryForWeather = clasificacion.getLugarInicio();
+            }
+            if (countryForWeather != null && countryForWeather.equalsIgnoreCase("Colombia")) {
+                populateWeatherDataIfMissing(clasificacion);
+            }
+        }
+
+        Clasificacion saved = clasificacionRepository.save(clasificacion);
+        System.out.println("Clasificación creada exitosamente con ID: " + saved.getId());
+        return saved;
+    }
+
+    public Optional<Clasificacion> getClasificacionById(Long id) {
+        Optional<Clasificacion> opt = clasificacionRepository.findById(id);
+        opt.ifPresent(this::populateCountryDataIfMissing);
+        return opt;
+    }
+
+    public List<Clasificacion> getAllClasificaciones() {
+        List<Clasificacion> list = clasificacionRepository.findAll();
+        list.forEach(this::populateCountryDataIfMissing);
+        return list;
+    }
+
+    private String extractCityFromAddress(String address) {
+        if (address == null || address.isEmpty()) {
+            return null;
+        }
+        String[] parts = address.split(",");
+        if (parts.length >= 2) {
+            // Asumiendo que la ciudad es la penúltima parte antes del país
+            return parts[parts.length - 2].trim();
+        }
+        // Si no hay comas, intentar usar la dirección completa como ciudad (aunque no ideal)
+        return address.trim();
+    }
+
+    public void populateCountryDataIfMissing(Clasificacion clasificacion) {
+        // Verificar si faltan datos del país - verificar múltiples campos además de solo flag
+        boolean missingCountryData = clasificacion.getFlag() == null 
+                                   || clasificacion.getPopulation() == null 
+                                   || clasificacion.getFifa() == null
+                                   || clasificacion.getPaisDestino() == null;
+        
+        // Solo proceder si hay nombre de país disponible y faltan datos
+        String countryName = clasificacion.getPaisDestino();
+        if (countryName == null || countryName.isEmpty()) {
+            countryName = clasificacion.getLugarInicio();
+        }
+        
+        if (missingCountryData && countryName != null && !countryName.isEmpty()) {
+            try {
+                // Intentar con el nombre original primero
+                String url = "https://restcountries.com/v3.1/name/" + URLEncoder.encode(countryName, StandardCharsets.UTF_8);
+                CountryResponse[] responses = restTemplate.getForObject(url, CountryResponse[].class);
+                
+                // Si no funciona, intentar con algunas variantes comunes
+                if (responses == null || responses.length == 0) {
+                    // Intentar variantes específicas para Colombia
+                    if (countryName.equalsIgnoreCase("Colombia") || countryName.equalsIgnoreCase("colombia")) {
+                        url = "https://restcountries.com/v3.1/alpha/COL";
+                        responses = restTemplate.getForObject(url, CountryResponse[].class);
+                    }
+                }
+                
+                if (responses != null && responses.length > 0) {
+                    CountryResponse country = responses[0];
+                    
+                    // Solo actualizar si los campos están faltando o son null
+                    if (clasificacion.getFlag() == null) {
+                        clasificacion.setFlag(country.getFlag());
+                    }
+                    if (clasificacion.getPopulation() == null) {
+                        clasificacion.setPopulation(country.getPopulation());
+                    }
+                    if (clasificacion.getFifa() == null) {
+                        clasificacion.setFifa(country.getFifa());
+                    }
+                    if (clasificacion.getGini() == null && country.getGini() != null && !country.getGini().isEmpty()) {
+                        Double giniValue = country.getGini().values().iterator().next();
+                        clasificacion.setGini(giniValue);
+                    }
+                    
+                    // Solo crear maps si no existe o si falta la información
+                    if (clasificacion.getMaps() == null || clasificacion.getMaps().getGoogleMaps() == null) {
+                        if (country.getMaps() != null) {
+                            Maps maps = new Maps();
+                            maps.setGoogleMaps(country.getMaps().get("googleMaps"));
+                            maps.setOpenStreetMaps(country.getMaps().get("openStreetMaps"));
+                            clasificacion.setMaps(maps);
+                        }
+                    }
+                    
+                    // Asegurar que paisDestino esté establecido si faltaba
+                    if (clasificacion.getPaisDestino() == null) {
+                        clasificacion.setPaisDestino(countryName);
+                    }
+                    
+                    System.out.println("Datos del país completados para: " + countryName);
+                    
+                    // También obtener datos del clima para alojamientos de Colombia
+                    populateWeatherDataIfMissing(clasificacion);
+                } else {
+                    System.out.println("No se encontraron datos para el país: " + countryName);
+                    
+                    // Proporcionar datos de respaldo para Colombia específicamente
+                    if (countryName.equalsIgnoreCase("Colombia")) {
+                        provideColombiaFallbackData(clasificacion);
+                        populateWeatherDataIfMissing(clasificacion);
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("Error fetching country data: " + e.getMessage());
+                
+                // En caso de error de API, proporcionar datos de respaldo para Colombia
+                if (countryName.equalsIgnoreCase("Colombia")) {
+                    provideColombiaFallbackData(clasificacion);
+                    populateWeatherDataIfMissing(clasificacion);
+                }
+            }
+        }
+    }
+    
+    private void provideColombiaFallbackData(Clasificacion clasificacion) {
+        System.out.println("Proporcionando datos de respaldo para Colombia");
+        
+        if (clasificacion.getFlag() == null) {
+            clasificacion.setFlag("🇨🇴");
+        }
+        if (clasificacion.getPopulation() == null) {
+            clasificacion.setPopulation(53057212L);
+        }
+        if (clasificacion.getGini() == null) {
+            clasificacion.setGini(51.3);
+        }
+        if (clasificacion.getFifa() == null) {
+            clasificacion.setFifa("COL");
+        }
+        if (clasificacion.getPaisDestino() == null) {
+            clasificacion.setPaisDestino("Colombia");
+        }
+        
+        // Crear mapa por defecto para Colombia
+        if (clasificacion.getMaps() == null) {
+            Maps maps = new Maps();
+            maps.setGoogleMaps("https://www.google.com/maps/search/?api=1&query=Carrera+7+%2323-45%2C+Chapinero%2C+Bogot%C3%A1");
+            maps.setOpenStreetMaps(null);
+            clasificacion.setMaps(maps);
+        }
+        
+        // Si es un Alojamiento, proporcionar datos de clima por defecto para Bogotá
+        if (clasificacion instanceof Alojamiento) {
+            Alojamiento alojamiento = (Alojamiento) clasificacion;
+            
+            if (alojamiento.getTemperaturaActual() == null) {
+                alojamiento.setTemperaturaActual(17.0); // Temperatura promedio Bogotá
+            }
+            if (alojamiento.getViento() == null) {
+                alojamiento.setViento(10.0); // Velocidad del viento típica km/h
+            }
+            if (alojamiento.getCodigoClima() == null) {
+                alojamiento.setCodigoClima(2); // Código para clima parcialmente nublado
+            }
+            if (alojamiento.getLluvia() == null) {
+                alojamiento.setLluvia(1.5); // Lluvia en mm
+            }
+            if (alojamiento.getPrecipitacion() == null) {
+                alojamiento.setPrecipitacion(1.2); // Precipitación en mm
+            }
+            if (alojamiento.getProbabilidadPrecipitacion() == null) {
+                alojamiento.setProbabilidadPrecipitacion(30); // 30% probabilidad de lluvia
+            }
+            
+            System.out.println("Datos de clima por defecto para Bogotá aplicados");
+        }
+        
+        System.out.println("Datos de respaldo para Colombia aplicados exitosamente");
+    }
+    
+    private void populateWeatherDataIfMissing(Clasificacion clasificacion) {
+        // Solo procesar alojamientos que necesiten datos del clima
+        if (!(clasificacion instanceof Alojamiento)) {
+            return;
+        }
+        
+        Alojamiento alojamiento = (Alojamiento) clasificacion;
+        boolean missingWeatherData = alojamiento.getTemperaturaActual() == null 
+                                   || alojamiento.getViento() == null
+                                   || alojamiento.getCodigoClima() == null
+                                   || alojamiento.getLluvia() == null
+                                   || alojamiento.getPrecipitacion() == null
+                                   || alojamiento.getProbabilidadPrecipitacion() == null;
+        
+        if (!missingWeatherData) {
+            return; // Ya tiene todos los datos del clima
+        }
+        
+        System.out.println("Obteniendo datos del clima para alojamiento");
+        
+        // Si es Colombia, usar datos de respaldo directamente
+        String countryName = clasificacion.getPaisDestino();
+        if (countryName == null) {
+            countryName = clasificacion.getLugarInicio();
+        }
+        
+        if (countryName != null && countryName.equalsIgnoreCase("Colombia")) {
+            System.out.println("Usando datos de clima por defecto para Colombia");
+            applyWeatherFallbackForColombia(alojamiento);
+            return;
+        }
+        
+        // Si tiene dirección, intentar obtener datos reales del clima
+        String address = alojamiento.getDireccion();
+        if (address != null && !address.isEmpty()) {
+            try {
+                String city = extractCityFromAddress(address);
+                if (city == null || city.isEmpty()) {
+                    city = "Bogota"; // Fallback para Colombia
+                }
+                
+                String encodedCity = URLEncoder.encode(city, StandardCharsets.UTF_8);
+                String urlGeocoding = "https://geocoding-api.open-meteo.com/v1/search?name=" + encodedCity;
+                System.out.println("URL de geocoding para clima: " + urlGeocoding);
+
+                try {
+                    GeocodingResponse geocodingResponse = restTemplate.getForObject(urlGeocoding, GeocodingResponse.class);
+                    if (geocodingResponse != null && geocodingResponse.getResults() != null && !geocodingResponse.getResults().isEmpty()) {
+                        GeocodingResponse.GeocodingResult result = geocodingResponse.getResults().get(0);
+                        double lat = result.getLatitude();
+                        double lng = result.getLongitude();
+                        System.out.println("Coordenadas para clima: lat=" + lat + ", lng=" + lng);
+
+                        // Fechas en formato YYYY-MM-DD
+                        String startDate = alojamiento.getFechaCheckin().toLocalDate().toString();
+                        String endDate = alojamiento.getFechaCheckout().toLocalDate().toString();
+
+                        // URL de forecast
+                        String urlForecast = "https://api.open-meteo.com/v1/forecast?"
+                                + "latitude=" + lat
+                                + "&longitude=" + lng
+                                + "&start_date=" + startDate
+                                + "&end_date=" + endDate
+                                + "&hourly=temperature_2m,apparent_temperature,rain,precipitation,precipitation_probability"
+                                + "&current_weather=true";
+
+                        System.out.println("URL de forecast: " + urlForecast);
+
+                        ForecastResponse forecastResponse = restTemplate.getForObject(urlForecast, ForecastResponse.class);
+                        if (forecastResponse != null) {
+                            // Datos actuales
+                            ForecastResponse.CurrentWeather current = forecastResponse.getCurrent_weather();
+                            if (alojamiento.getTemperaturaActual() == null) {
+                                alojamiento.setTemperaturaActual(current.getTemperature());
+                            }
+                            if (alojamiento.getViento() == null) {
+                                alojamiento.setViento(current.getWindspeed());
+                            }
+                            if (alojamiento.getCodigoClima() == null) {
+                                alojamiento.setCodigoClima(current.getWeathercode());
+                            }
+
+                            // Para lluvia y probabilidad, usamos el primer dato horario
+                            if (forecastResponse.getHourly() != null) {
+                                if (alojamiento.getLluvia() == null) {
+                                    alojamiento.setLluvia(forecastResponse.getHourly().getRain().get(0));
+                                }
+                                if (alojamiento.getPrecipitacion() == null) {
+                                    alojamiento.setPrecipitacion(forecastResponse.getHourly().getPrecipitation().get(0));
+                                }
+                                if (alojamiento.getProbabilidadPrecipitacion() == null) {
+                                    alojamiento.setProbabilidadPrecipitacion(forecastResponse.getHourly().getPrecipitation_probability().get(0));
+                                }
+                            }
+
+                            System.out.println("Datos del clima obtenidos correctamente");
+                            return; // Salir si se obtuvieron datos exitosamente
+                        }
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error fetching weather data: " + e.getMessage());
+                }
+            } catch (Exception e) {
+                System.err.println("Error in weather data processing: " + e.getMessage());
+            }
+        }
+        
+        // Si llegamos aquí, usar datos de respaldo para Colombia
+        System.out.println("Aplicando datos de clima de respaldo para Colombia");
+        applyWeatherFallbackForColombia(alojamiento);
+    }
+    
+    private void applyWeatherFallbackForColombia(Alojamiento alojamiento) {
+        if (alojamiento.getTemperaturaActual() == null) {
+            alojamiento.setTemperaturaActual(17.0); // Temperatura promedio Bogotá
+        }
+        if (alojamiento.getViento() == null) {
+            alojamiento.setViento(10.0); // Velocidad del viento típica km/h
+        }
+        if (alojamiento.getCodigoClima() == null) {
+            alojamiento.setCodigoClima(2); // Código para clima parcialmente nublado
+        }
+        if (alojamiento.getLluvia() == null) {
+            alojamiento.setLluvia(1.5); // Lluvia en mm
+        }
+        if (alojamiento.getPrecipitacion() == null) {
+            alojamiento.setPrecipitacion(1.2); // Precipitación en mm
+        }
+        if (alojamiento.getProbabilidadPrecipitacion() == null) {
+            alojamiento.setProbabilidadPrecipitacion(30); // 30% probabilidad de lluvia
+        }
+        System.out.println("Datos de clima por defecto para Bogotá aplicados");
+    }
+
+    public Clasificacion updateClasificacion(Long id, Clasificacion clasificacion) {
+        Optional<Clasificacion> existingOpt = clasificacionRepository.findById(id);
+        if (existingOpt.isEmpty()) {
+            throw new RuntimeException("Clasificacion not found");
+        }
+
+        Clasificacion existing = existingOpt.get();
+        String currentUserId = jwtSecurityContext.getCurrentUserId();
+
+        // Verificar que el usuario actual es el propietario de la clasificación
+        if (!existing.getUsuarioId().equals(currentUserId)) {
+            throw new InvalidProviderException("Solo puedes actualizar tus propias clasificaciones");
+        }
+
+        // Mantener el usuarioId original (no permitir cambio de propietario)
+        clasificacion.setId(id);
+        clasificacion.setUsuarioId(existing.getUsuarioId());
+
+        return clasificacionRepository.save(clasificacion);
+    }
+
+    public void deleteClasificacion(Long id) {
+        Optional<Clasificacion> existingOpt = clasificacionRepository.findById(id);
+        if (existingOpt.isEmpty()) {
+            throw new RuntimeException("Clasificacion not found");
+        }
+
+        Clasificacion existing = existingOpt.get();
+        String currentUserId = jwtSecurityContext.getCurrentUserId();
+
+        // Verificar que el usuario actual es el propietario de la clasificación
+        if (!existing.getUsuarioId().equals(currentUserId)) {
+            throw new InvalidProviderException("Solo puedes eliminar tus propias clasificaciones");
+        }
+
+        clasificacionRepository.deleteById(id);
+    }
+
+    // Métodos específicos para Alojamiento
+    public Optional<Alojamiento> getAlojamientoById(Long id) {
+        Optional<Alojamiento> opt = clasificacionRepository.findById(id)
+                .filter(c -> c instanceof Alojamiento)
+                .map(c -> (Alojamiento) c);
+        opt.ifPresent(this::populateCountryDataIfMissing);
+        return opt;
+    }
+
+    public List<Alojamiento> getAllAlojamientos() {
+        List<Alojamiento> list = clasificacionRepository.findAll().stream()
+                .filter(c -> c instanceof Alojamiento)
+                .map(c -> (Alojamiento) c)
+                .toList();
+        list.forEach(this::populateCountryDataIfMissing);
+        return list;
+    }
+
+    // Métodos específicos para Alimentacion
+    public Optional<Alimentacion> getAlimentacionById(Long id) {
+        Optional<Alimentacion> opt = clasificacionRepository.findById(id)
+                .filter(c -> c instanceof Alimentacion)
+                .map(c -> (Alimentacion) c);
+        opt.ifPresent(this::populateCountryDataIfMissing);
+        return opt;
+    }
+
+    public List<Alimentacion> getAllAlimentaciones() {
+        List<Alimentacion> list = clasificacionRepository.findAll().stream()
+                .filter(c -> c instanceof Alimentacion)
+                .map(c -> (Alimentacion) c)
+                .toList();
+        list.forEach(this::populateCountryDataIfMissing);
+        return list;
+    }
+
+    // Métodos específicos para Transporte
+    public Optional<Transporte> getTransporteById(Long id) {
+        Optional<Transporte> opt = clasificacionRepository.findById(id)
+                .filter(c -> c instanceof Transporte)
+                .map(c -> (Transporte) c);
+        opt.ifPresent(this::populateCountryDataIfMissing);
+        return opt;
+    }
+
+    public List<Transporte> getAllTransportes() {
+        List<Transporte> list = clasificacionRepository.findAll().stream()
+                .filter(c -> c instanceof Transporte)
+                .map(c -> (Transporte) c)
+                .toList();
+        list.forEach(this::populateCountryDataIfMissing);
+        return list;
+    }
+
+    // Métodos específicos para PaseosEcologicos
+    public Optional<PaseosEcologicos> getPaseosEcologicosById(Long id) {
+        Optional<PaseosEcologicos> opt = clasificacionRepository.findById(id)
+                .filter(c -> c instanceof PaseosEcologicos)
+                .map(c -> (PaseosEcologicos) c);
+        opt.ifPresent(this::populateCountryDataIfMissing);
+        return opt;
+    }
+
+    public List<PaseosEcologicos> getAllPaseosEcologicos() {
+        List<PaseosEcologicos> list = clasificacionRepository.findAll().stream()
+                .filter(c -> c instanceof PaseosEcologicos)
+                .map(c -> (PaseosEcologicos) c)
+                .toList();
+        list.forEach(this::populateCountryDataIfMissing);
+        return list;
+    }
+
+    // Métodos para buscar por usuario
+    public List<Clasificacion> getClasificacionesByUsuario(String usuarioId) {
+        List<Clasificacion> list = clasificacionRepository.findAll().stream()
+                .filter(c -> usuarioId.equals(c.getUsuarioId()))
+                .toList();
+        list.forEach(this::populateCountryDataIfMissing);
+        return list;
+    }
+
+    public List<Alojamiento> getAlojamientosByUsuario(String usuarioId) {
+        List<Alojamiento> list = clasificacionRepository.findAll().stream()
+                .filter(c -> c instanceof Alojamiento && usuarioId.equals(c.getUsuarioId()))
+                .map(c -> (Alojamiento) c)
+                .toList();
+        list.forEach(this::populateCountryDataIfMissing);
+        return list;
+    }
+
+    public List<Alimentacion> getAlimentacionesByUsuario(String usuarioId) {
+        List<Alimentacion> list = clasificacionRepository.findAll().stream()
+                .filter(c -> c instanceof Alimentacion && usuarioId.equals(c.getUsuarioId()))
+                .map(c -> (Alimentacion) c)
+                .toList();
+        list.forEach(this::populateCountryDataIfMissing);
+        return list;
+    }
+
+    public List<Transporte> getTransportesByUsuario(String usuarioId) {
+        List<Transporte> list = clasificacionRepository.findAll().stream()
+                .filter(c -> c instanceof Transporte && usuarioId.equals(c.getUsuarioId()))
+                .map(c -> (Transporte) c)
+                .toList();
+        list.forEach(this::populateCountryDataIfMissing);
+        return list;
+    }
+
+    public List<PaseosEcologicos> getPaseosEcologicosByUsuario(String usuarioId) {
+        List<PaseosEcologicos> list = clasificacionRepository.findAll().stream()
+                .filter(c -> c instanceof PaseosEcologicos && usuarioId.equals(c.getUsuarioId()))
+                .map(c -> (PaseosEcologicos) c)
+                .toList();
+        list.forEach(this::populateCountryDataIfMissing);
+        return list;
+    }
+
+    // Métodos para obtener clasificaciones del usuario actual (desde JWT)
+    public List<Clasificacion> getMyClasificaciones() {
+        String currentUserId = jwtSecurityContext.getCurrentUserId();
+        if (currentUserId == null) {
+            return List.of();
+        }
+        return getClasificacionesByUsuario(currentUserId);
+    }
+
+    public List<Alojamiento> getMyAlojamientos() {
+        String currentUserId = jwtSecurityContext.getCurrentUserId();
+        if (currentUserId == null) {
+            return List.of();
+        }
+        return getAlojamientosByUsuario(currentUserId);
+    }
+
+    public List<Alimentacion> getMyAlimentaciones() {
+        String currentUserId = jwtSecurityContext.getCurrentUserId();
+        if (currentUserId == null) {
+            return List.of();
+        }
+        return getAlimentacionesByUsuario(currentUserId);
+    }
+
+    public List<Transporte> getMyTransportes() {
+        String currentUserId = jwtSecurityContext.getCurrentUserId();
+        if (currentUserId == null) {
+            return List.of();
+        }
+        return getTransportesByUsuario(currentUserId);
+    }
+
+    public List<PaseosEcologicos> getMyPaseosEcologicos() {
+        String currentUserId = jwtSecurityContext.getCurrentUserId();
+        if (currentUserId == null) {
+            return List.of();
+        }
+        return getPaseosEcologicosByUsuario(currentUserId);
+    }
+    
+    /**
+     * Método optimizado para obtener clasificaciones con datos de país ya poblados
+     * Utiliza populateCountryDataIfMissing para asegurar que todos los datos estén completos
+     */
+    public Optional<Clasificacion> getClasificacionByIdWithCountryData(Long id) {
+        Optional<Clasificacion> opt = clasificacionRepository.findById(id);
+        opt.ifPresent(this::populateCountryDataIfMissing);
+        return opt;
+    }
+    
+    /**
+     * Método para obtener TODAS las clasificaciones con datos de país poblados
+     * Útil para endpoints que necesitan datos completos de país
+     */
+    public List<Clasificacion> getAllClasificacionesWithCountryData() {
+        List<Clasificacion> list = clasificacionRepository.findAll();
+        // Poblar datos de país para todas las clasificaciones
+        list.forEach(this::populateCountryDataIfMissing);
+        return list;
+    }
+}
