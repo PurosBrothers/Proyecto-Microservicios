@@ -28,7 +28,7 @@ public abstract class Usuario {
     private String fotoUrl;
 
     @Lob
-    @Column(name = "foto_data", columnDefinition = "BLOB")
+    @Column(name = "foto_data", columnDefinition = "BYTEA")
     private byte[] fotoData;
 
     @Column(name = "foto_tipo")
