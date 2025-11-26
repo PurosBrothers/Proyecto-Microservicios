@@ -3,4 +3,4 @@ spring:
     name: payment-ms
 
   config:
-    import: configserver:http://config-server:8888
+    import: optional:configserver:http://config-server:8888

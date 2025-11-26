@@ -165,7 +165,7 @@ services:
       DB_USERNAME: postgres
       DB_PASSWORD: password
     ports:
-      - "8086:8086"
+      - "8082:8082"
     depends_on:
       - config-server
       - eureka-server
