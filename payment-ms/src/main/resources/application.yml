@@ -1,6 +1,8 @@
 spring:
   application:
     name: payment-ms
+  profiles:
+    active: docker
 
   config:
     import: optional:configserver:http://config-server:8888

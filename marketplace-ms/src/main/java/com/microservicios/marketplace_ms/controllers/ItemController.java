@@ -111,17 +111,28 @@ public class ItemController {
         }
 
         // Enviar mensaje a transaction-ms
-        Object clasificacionData = itemResponse.getBody().getClasificacionData();
-        String tipoClasificacion = clasificacionData.getClass().getSimpleName();
-        String nombreItem = itemResponse.getBody().getItem().getTitulo();
-        AddToCartMessageDTO message = new AddToCartMessageDTO(
-                request.getUid(),
-                id,
-                request.getCantidad(),
-                precioUnitario,
-                tipoClasificacion,
-                nombreItem);
-        rabbitMQSender.sendAddToCartMessage(message);
+        try {
+            Object clasificacionData = itemResponse.getBody().getClasificacionData();
+            if (clasificacionData == null) {
+                return ResponseEntity.badRequest().body("El item no tiene datos de clasificación válidos");
+            }
+            String tipoClasificacion = clasificacionData.getClass().getSimpleName();
+            String nombreItem = itemResponse.getBody().getItem().getTitulo();
+            AddToCartMessageDTO message = new AddToCartMessageDTO(
+                    request.getUid(),
+                    id,
+                    request.getCantidad(),
+                    precioUnitario,
+                    tipoClasificacion,
+                    nombreItem);
+            rabbitMQSender.sendAddToCartMessage(message);
+        } catch (Exception e) {
+            // Log the error but don't fail the request - the cart operation can be retried
+            System.err.println("Error al enviar mensaje a RabbitMQ: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al procesar la solicitud: " + e.getMessage());
+        }
 
         return ResponseEntity.ok("Mensaje enviado para agregar al carrito");
     }

@@ -36,3 +36,5 @@ rabbitmq:
   port: 5672
   username: guest
   password: guest
+
+# Updated: Force config server reload

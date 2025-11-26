@@ -20,10 +20,17 @@ public class RabbitMQSender {
     public void sendProcessPaymentMessage(ProcessPaymentMessageDTO messageDTO) {
         try {
             String message = objectMapper.writeValueAsString(messageDTO);
+            System.out.println("Intentando enviar mensaje a RabbitMQ (process-payment)...");
+            System.out.println("Host configurado: " + rabbitTemplate.getConnectionFactory().getHost());
+            System.out.println("Puerto configurado: " + rabbitTemplate.getConnectionFactory().getPort());
             rabbitTemplate.convertAndSend(RabbitMQConfig.TOPIC_EXCHANGE_NAME, "payment.process", message);
             System.out.println("Mensaje enviado a process-payment: " + message);
         } catch (Exception e) {
             System.out.println("Error enviando mensaje a process-payment: " + e.getMessage());
+            if (rabbitTemplate.getConnectionFactory() != null) {
+                System.err.println("Host de conexión: " + rabbitTemplate.getConnectionFactory().getHost());
+                System.err.println("Puerto de conexión: " + rabbitTemplate.getConnectionFactory().getPort());
+            }
             e.printStackTrace();
         }
     }
@@ -31,10 +38,17 @@ public class RabbitMQSender {
     public void sendUpdateItemMessage(UpdateItemMessageDTO messageDTO) {
         try {
             String message = objectMapper.writeValueAsString(messageDTO);
+            System.out.println("Intentando enviar mensaje a RabbitMQ (update-item)...");
+            System.out.println("Host configurado: " + rabbitTemplate.getConnectionFactory().getHost());
+            System.out.println("Puerto configurado: " + rabbitTemplate.getConnectionFactory().getPort());
             rabbitTemplate.convertAndSend(RabbitMQConfig.TOPIC_EXCHANGE_NAME, "marketplace.update-item", message);
             System.out.println("Mensaje enviado a update-item: " + message);
         } catch (Exception e) {
             System.out.println("Error enviando mensaje a update-item: " + e.getMessage());
+            if (rabbitTemplate.getConnectionFactory() != null) {
+                System.err.println("Host de conexión: " + rabbitTemplate.getConnectionFactory().getHost());
+                System.err.println("Puerto de conexión: " + rabbitTemplate.getConnectionFactory().getPort());
+            }
             e.printStackTrace();
         }
     }

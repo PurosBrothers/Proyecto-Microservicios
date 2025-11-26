@@ -42,3 +42,9 @@ eureka:
   instance:
     prefer-ip-address: true
     hostname: user-ms
+
+rabbitmq:
+  host: rabbitmq
+  port: 5672
+  username: guest
+  password: guest

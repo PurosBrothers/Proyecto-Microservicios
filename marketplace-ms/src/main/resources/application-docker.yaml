@@ -22,6 +22,7 @@ eureka:
     service-url:
       defaultZone: http://eureka-server:9989/eureka/
 
+# Configuración específica de RabbitMQ (forzada localmente)
 rabbitmq:
   host: rabbitmq
   port: 5672

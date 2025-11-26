@@ -47,6 +47,9 @@ public class SecurityConfig {
                 .requestMatchers("GET", "/paseos-ecologicos").permitAll()
                 .requestMatchers("GET", "/paseos-ecologicos/{id}").permitAll()
                 
+                // Endpoint para agregar al carrito - acceso público (UID viene en el body)
+                .requestMatchers("POST", "/items/*/add-to-cart").permitAll()
+                
                 // Endpoints de escritura - solo proveedores autenticados
                 .requestMatchers("POST", "/alojamiento").hasRole("PROVEEDOR")
                 .requestMatchers("PUT", "/alojamiento/**").hasRole("PROVEEDOR")

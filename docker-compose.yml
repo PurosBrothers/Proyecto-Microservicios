@@ -132,6 +132,7 @@ services:
       - config-server
       - eureka-server
       - postgres
+      - rabbitmq
       - keycloak
     restart: on-failure
     networks:
