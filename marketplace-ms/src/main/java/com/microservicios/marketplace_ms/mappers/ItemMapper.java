@@ -15,16 +15,16 @@ public class ItemMapper {
             return null;
         }
         Item item = new Item();
-        item.setId(itemDTO.getId());
+        // ID is not set here; for create, it will be generated; for update, the service loads by ID
         item.setTitulo(itemDTO.getTitulo());
         item.setDescripcion(itemDTO.getDescripcion());
         item.setFechaPublicacion(itemDTO.getFechaPublicacion());
         item.setStock(itemDTO.getStock());
         item.setVisualizaciones(itemDTO.getVisualizaciones());
         item.setCalificacionPromedio(itemDTO.getCalificacionPromedio());
-        
+
         // El servicio se encargará de cargar la clasificación usando clasificacionId
-        
+
         return item;
     }
 
