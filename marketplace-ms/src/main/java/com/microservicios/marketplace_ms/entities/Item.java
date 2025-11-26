@@ -9,6 +9,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,6 +28,16 @@ public class Item {
     private LocalDateTime fechaDisponibilidadInicio;
     private LocalDateTime fechaDisponibilidadFin;
     private Integer capacidadMaxima;
+    
+    // Campos de país para redundancia y mejor rendimiento
+    private String paisDestino;
+    private String flag;
+    private Long population;
+    private Double gini;
+    private String fifa;
+    
+    @Embedded
+    private Maps maps;
 
     @ManyToOne
     private Clasificacion clasificacion;
@@ -225,6 +236,55 @@ public class Item {
 
     public void setPreguntasFrecuentes(List<PreguntaFrecuente> preguntasFrecuentes) {
         this.preguntasFrecuentes = preguntasFrecuentes;
+    }
+
+    // Getters and Setters para campos de país
+    public String getPaisDestino() {
+        return paisDestino;
+    }
+
+    public void setPaisDestino(String paisDestino) {
+        this.paisDestino = paisDestino;
+    }
+
+    public String getFlag() {
+        return flag;
+    }
+
+    public void setFlag(String flag) {
+        this.flag = flag;
+    }
+
+    public Long getPopulation() {
+        return population;
+    }
+
+    public void setPopulation(Long population) {
+        this.population = population;
+    }
+
+    public Double getGini() {
+        return gini;
+    }
+
+    public void setGini(Double gini) {
+        this.gini = gini;
+    }
+
+    public String getFifa() {
+        return fifa;
+    }
+
+    public void setFifa(String fifa) {
+        this.fifa = fifa;
+    }
+
+    public Maps getMaps() {
+        return maps;
+    }
+
+    public void setMaps(Maps maps) {
+        this.maps = maps;
     }
 
 }

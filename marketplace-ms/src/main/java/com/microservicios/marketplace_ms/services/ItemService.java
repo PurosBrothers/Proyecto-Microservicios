@@ -126,12 +126,23 @@ public class ItemService {
     private void copyClasificacionDataToItem(Item item) {
         if (item.getClasificacion() == null) return;
         
+        // Asegurar que los datos de país estén poblados antes de copiar
+        clasificacionService.populateCountryDataIfMissing(item.getClasificacion());
+        
         // Copiar datos básicos de clasificación
         item.setLugarInicio(item.getClasificacion().getLugarInicio());
         item.setPrecio(item.getClasificacion().getPrecio());
         item.setFechaDisponibilidadInicio(item.getClasificacion().getFechaDisponibilidadInicio());
         item.setFechaDisponibilidadFin(item.getClasificacion().getFechaDisponibilidadFin());
         item.setCapacidadMaxima(item.getClasificacion().getCapacidadMaxima());
+        
+        // Copiar datos de país para que el item tenga información completa
+        item.setPaisDestino(item.getClasificacion().getPaisDestino());
+        item.setFlag(item.getClasificacion().getFlag());
+        item.setPopulation(item.getClasificacion().getPopulation());
+        item.setGini(item.getClasificacion().getGini());
+        item.setFifa(item.getClasificacion().getFifa());
+        item.setMaps(item.getClasificacion().getMaps());
         
         // Manejar stock según tipo de clasificación
         String tipoClasificacion = item.getClasificacion().getClass().getSimpleName();
@@ -199,7 +210,18 @@ public class ItemService {
                     ItemDTO itemDTO = itemMapper.entityToDto(item);
                     ItemResponseDTO response = new ItemResponseDTO();
                     response.setItem(itemDTO);
-                    response.setClasificacionData(clasificacionMapper.toDTO(item.getClasificacion()));
+                    
+                    // Obtener la clasificación a través del ClasificacionService para poblar datos de país
+                    com.microservicios.marketplace_ms.entities.Clasificacion clasificacionPoblada = null;
+                    if (item.getClasificacion() != null) {
+                        Optional<com.microservicios.marketplace_ms.entities.Clasificacion> clasificacionOpt = 
+                            clasificacionService.getClasificacionById(item.getClasificacion().getId());
+                        if (clasificacionOpt.isPresent()) {
+                            clasificacionPoblada = clasificacionOpt.get();
+                        }
+                    }
+                    
+                    response.setClasificacionData(clasificacionMapper.toDTO(clasificacionPoblada));
                     return response;
                 })
                 .toList();
@@ -223,7 +245,18 @@ public class ItemService {
                     ItemDTO itemDTO = itemMapper.entityToDto(item);
                     ItemResponseDTO response = new ItemResponseDTO();
                     response.setItem(itemDTO);
-                    response.setClasificacionData(clasificacionMapper.toDTO(item.getClasificacion()));
+                    
+                    // Obtener la clasificación a través del ClasificacionService para poblar datos de país
+                    com.microservicios.marketplace_ms.entities.Clasificacion clasificacionPoblada = null;
+                    if (item.getClasificacion() != null) {
+                        Optional<com.microservicios.marketplace_ms.entities.Clasificacion> clasificacionOpt = 
+                            clasificacionService.getClasificacionById(item.getClasificacion().getId());
+                        if (clasificacionOpt.isPresent()) {
+                            clasificacionPoblada = clasificacionOpt.get();
+                        }
+                    }
+                    
+                    response.setClasificacionData(clasificacionMapper.toDTO(clasificacionPoblada));
                     return response;
                 })
                 .toList();

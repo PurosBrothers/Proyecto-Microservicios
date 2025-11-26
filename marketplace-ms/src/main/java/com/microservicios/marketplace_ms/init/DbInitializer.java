@@ -1,16 +1,20 @@
 package com.microservicios.marketplace_ms.init;
 
 import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import com.microservicios.marketplace_ms.entities.Alojamiento;
 import com.microservicios.marketplace_ms.entities.Alimentacion;
+import com.microservicios.marketplace_ms.entities.Clasificacion;
 import com.microservicios.marketplace_ms.entities.Calificacion;
 import com.microservicios.marketplace_ms.entities.Comentario;
 import com.microservicios.marketplace_ms.entities.Item;
@@ -84,17 +88,12 @@ public class DbInitializer implements CommandLineRunner {
     public void run(String... args) throws Exception {
         // Create test data
         createTestData();
+        // Fix existing classifications that have null tipo
+        fixExistingClasificaciones();
     }
 
     private void createTestData() {
-        /*
-         * UIDs de ejemplo para pruebas (simulando UUIDs de Keycloak):
-         * - "23ae7f4b-e507-4e9c-8ed6-dec20bf9d04a" = dickgrayson@gmail.com (token JWT real de prueba)
-         * - "b4c87f2e-9d15-4a3b-8f7e-1c2d3e4f5a6b" = usuario-ejemplo-2
-         * - "c5d87f3f-ae25-5b4c-9f8e-2d3e4f5a6b7c" = usuario-ejemplo-3
-         * 
-         * Nota: Los UIDs ahora son String (UUID) en lugar de Long para compatibilidad con Keycloak
-         */
+      
         // Create Alojamiento
         Alojamiento alojamiento = new Alojamiento();
         alojamiento.setLugarInicio("Bogota");
@@ -108,6 +107,7 @@ public class DbInitializer implements CommandLineRunner {
         alojamiento.setTipoInmueble("Hotel");
         alojamiento.setNumeroBanos(2);
         alojamiento.setNumeroHabitaciones(2);
+        alojamiento.setDireccion("Calle 93 #15-22, Zona Rosa, Bogotá");
         alojamiento.setLat(new BigDecimal("4.7110"));
         alojamiento.setLng(new BigDecimal("-74.0721"));
         
@@ -125,19 +125,23 @@ public class DbInitializer implements CommandLineRunner {
         alojamiento.setGini(51.3);
         alojamiento.setFifa("COL");
         
-        // Maps por defecto para Colombia
+        // Maps específicos usando dirección del alojamiento
         Maps mapsOriginal = new Maps();
-        mapsOriginal.setGoogleMaps("https://www.google.com/maps/search/?api=1&query=Bogota%2C+Colombia");
+        mapsOriginal.setGoogleMaps("https://www.google.com/maps/search/?api=1&query=Calle+93+%2315-22%2C+Zona+Rosa%2C+Bogot%C3%A1");
         mapsOriginal.setOpenStreetMaps(null);
         alojamiento.setMaps(mapsOriginal);
         
         alojamiento.setUsuarioId("proveedor-001"); // Usuario proveedor de ejemplo
+        alojamiento.setTipo("Alojamiento"); // Asegurar que el tipo esté establecido
 
+        System.out.println("Creando Alojamiento con tipo: " + alojamiento.getTipo());
         alojamiento = (Alojamiento) clasificacionRepository.save(alojamiento);
+        System.out.println("Alojamiento creado con ID: " + alojamiento.getId() + ", tipo: " + alojamiento.getTipo());
 
         // Create Alimentacion
         Alimentacion alimentacion = new Alimentacion();
         alimentacion.setLugarInicio("Medellin");
+        alimentacion.setPaisDestino("Colombia");
         alimentacion.setPrecio(new BigDecimal("25.00"));
         alimentacion.setFechaDisponibilidadInicio(LocalDateTime.now());
         alimentacion.setFechaDisponibilidadFin(LocalDateTime.now().plusDays(1));
@@ -149,12 +153,28 @@ public class DbInitializer implements CommandLineRunner {
         alimentacion.setLatitud(new BigDecimal("6.2442"));
         alimentacion.setLongitud(new BigDecimal("-75.5812"));
         alimentacion.setUsuarioId("proveedor-002"); // Usuario proveedor de ejemplo
+        alimentacion.setTipo("Alimentacion"); // Asegurar que el tipo esté establecido
+        
+        // Datos de país para Colombia
+        alimentacion.setFlag("🇨🇴");
+        alimentacion.setPopulation(53057212L);
+        alimentacion.setGini(51.3);
+        alimentacion.setFifa("COL");
+        
+        // Maps específicos usando ubicación del restaurante
+        Maps mapsAlimentacion = new Maps();
+        mapsAlimentacion.setGoogleMaps("https://www.google.com/maps/search/?api=1&query=Restaurante+El+Sabor+Medell%C3%ADn%2C+Antioquia%2C+Colombia");
+        mapsAlimentacion.setOpenStreetMaps(null);
+        alimentacion.setMaps(mapsAlimentacion);
 
+        System.out.println("Creando Alimentacion con tipo: " + alimentacion.getTipo());
         alimentacion = (Alimentacion) clasificacionRepository.save(alimentacion);
+        System.out.println("Alimentacion creada con ID: " + alimentacion.getId() + ", tipo: " + alimentacion.getTipo());
 
         // Create Transporte
         Transporte transporte = new Transporte();
         transporte.setLugarInicio("Cali");
+        transporte.setPaisDestino("Colombia");
         transporte.setPrecio(new BigDecimal("50.00"));
         transporte.setFechaDisponibilidadInicio(LocalDateTime.now());
         transporte.setFechaDisponibilidadFin(LocalDateTime.now().plusDays(1));
@@ -166,12 +186,28 @@ public class DbInitializer implements CommandLineRunner {
         transporte.setDuracionViaje(120);
         transporte.setRutaGps("Route 1");
         transporte.setUsuarioId("proveedor-003"); // Usuario proveedor de ejemplo
+        transporte.setTipo("Transporte"); // Asegurar que el tipo esté establecido
+        
+        // Datos de país para Colombia
+        transporte.setFlag("🇨🇴");
+        transporte.setPopulation(53057212L);
+        transporte.setGini(51.3);
+        transporte.setFifa("COL");
+        
+        // Maps específicos usando lugarDestino del transporte
+        Maps mapsTransporte = new Maps();
+        mapsTransporte.setGoogleMaps("https://www.google.com/maps/search/?api=1&query=Terminal+de+Transporte+Bogot%C3%A1%2C+Cundinamarca%2C+Colombia");
+        mapsTransporte.setOpenStreetMaps(null);
+        transporte.setMaps(mapsTransporte);
 
+        System.out.println("Creando Transporte con tipo: " + transporte.getTipo());
         transporte = (Transporte) clasificacionRepository.save(transporte);
+        System.out.println("Transporte creado con ID: " + transporte.getId() + ", tipo: " + transporte.getTipo());
 
         // Create PaseosEcologicos
         PaseosEcologicos paseos = new PaseosEcologicos();
         paseos.setLugarInicio("Cartagena");
+        paseos.setPaisDestino("Colombia");
         paseos.setPrecio(new BigDecimal("75.00"));
         paseos.setFechaDisponibilidadInicio(LocalDateTime.now());
         paseos.setFechaDisponibilidadFin(LocalDateTime.now().plusDays(3));
@@ -184,203 +220,33 @@ public class DbInitializer implements CommandLineRunner {
         paseos.setPuntoEncuentro("Central Park");
         paseos.setRutaEncuentro("Street 123");
         paseos.setUsuarioId("proveedor-004"); // Usuario proveedor de ejemplo
+        paseos.setTipo("PaseosEcologicos"); // Asegurar que el tipo esté establecido
+        
+        // Datos de país para Colombia
+        paseos.setFlag("🇨🇴");
+        paseos.setPopulation(53057212L);
+        paseos.setGini(51.3);
+        paseos.setFifa("COL");
+        
+        // Maps específicos usando puntoEncuentro del paseo ecológico
+        Maps mapsPaseos = new Maps();
+        mapsPaseos.setGoogleMaps("https://www.google.com/maps/search/?api=1&query=Central+Park+Cartagena%2C+Boluvar%2C+Cartagena+de+Indias%2C+Bol%C3%ADvar%2C+Colombia");
+        mapsPaseos.setOpenStreetMaps(null);
+        paseos.setMaps(mapsPaseos);
 
+        System.out.println("Creando PaseosEcologicos con tipo: " + paseos.getTipo());
         paseos = (PaseosEcologicos) clasificacionRepository.save(paseos);
+        System.out.println("PaseosEcologicos creado con ID: " + paseos.getId() + ", tipo: " + paseos.getTipo());
 
-        // Create Alojamiento con ciudadOrigen: Colombia y datos específicos
-        Alojamiento alojamientoColombia = new Alojamiento();
-        alojamientoColombia.setLugarInicio("Colombia");
-        alojamientoColombia.setPaisDestino("Colombia");
-        alojamientoColombia.setPrecio(new BigDecimal("200.00"));
-        alojamientoColombia.setFechaDisponibilidadInicio(LocalDateTime.now());
-        alojamientoColombia.setFechaDisponibilidadFin(LocalDateTime.now().plusDays(30));
-        alojamientoColombia.setCapacidadMaxima(4);
-        alojamientoColombia.setFechaCheckin(LocalDateTime.of(2025, 12, 1, 14, 0)); // 2025-12-01T14:00:00
-        alojamientoColombia.setFechaCheckout(LocalDateTime.of(2025, 12, 5, 11, 0)); // 2025-12-05T11:00:00
-        alojamientoColombia.setTipoInmueble("Apartamento");
-        alojamientoColombia.setNumeroBanos(2);
-        alojamientoColombia.setNumeroHabitaciones(3);
-        alojamientoColombia.setDireccion("Carrera 7 #23-45, Chapinero, Bogotá");
-        alojamientoColombia.setLat(new BigDecimal("4.7110"));
-        alojamientoColombia.setLng(new BigDecimal("-74.0721"));
-        
-        // Datos de clima para Bogotá (típicos de diciembre)
-        alojamientoColombia.setTemperaturaActual(15.5); // Temperatura promedio diciembre
-        alojamientoColombia.setViento(8.2); // Velocidad del viento km/h
-        alojamientoColombia.setCodigoClima(2); // Código para clima parcialmente nublado
-        alojamientoColombia.setLluvia(2.1); // Lluvia en mm
-        alojamientoColombia.setPrecipitacion(1.8); // Precipitación en mm
-        alojamientoColombia.setProbabilidadPrecipitacion(25); // 25% probabilidad de lluvia
-        
-        alojamientoColombia.setFlag("🇨🇴");
-        alojamientoColombia.setPopulation(53057212L);
-        alojamientoColombia.setGini(51.3);
-        alojamientoColombia.setFifa("COL");
-        
-        // Maps específicos
-        Maps mapsColombia = new Maps();
-        mapsColombia.setGoogleMaps("https://www.google.com/maps/search/?api=1&query=Carrera+7+%2323-45%2C+Chapinero%2C+Bogot%C3%A1");
-        mapsColombia.setOpenStreetMaps(null);
-        alojamientoColombia.setMaps(mapsColombia);
-        
-        alojamientoColombia.setUsuarioId("proveedor-colombia");
 
-        alojamientoColombia = (Alojamiento) clasificacionRepository.save(alojamientoColombia);
 
-        // Create Alimentacion con ciudadOrigen: Colombia
-        Alimentacion alimentacionColombia = new Alimentacion();
-        alimentacionColombia.setLugarInicio("Colombia");
-        alimentacionColombia.setPaisDestino("Colombia");
-        alimentacionColombia.setPrecio(new BigDecimal("35.00"));
-        alimentacionColombia.setFechaDisponibilidadInicio(LocalDateTime.now());
-        alimentacionColombia.setFechaDisponibilidadFin(LocalDateTime.now().plusDays(7));
-        alimentacionColombia.setCapacidadMaxima(60);
-        alimentacionColombia.setHoraInicio(LocalTime.of(11, 0));
-        alimentacionColombia.setHoraFinal(LocalTime.of(16, 0));
-        alimentacionColombia.setTipoComida("Almuerzo");
-        alimentacionColombia.setMenuIncluido("Sancocho, Arroz, Pollo, Ensalada");
-        alimentacionColombia.setLatitud(new BigDecimal("4.6097"));
-        alimentacionColombia.setLongitud(new BigDecimal("-74.0817"));
-        alimentacionColombia.setFlag("🇨🇴");
-        alimentacionColombia.setPopulation(53057212L);
-        alimentacionColombia.setGini(51.3);
-        alimentacionColombia.setFifa("COL");
-        
-        Maps mapsAlimentacionColombia = new Maps();
-        mapsAlimentacionColombia.setGoogleMaps("https://www.google.com/maps/search/?api=1&query=Carrera+7+%2323-45%2C+Chapinero%2C+Bogot%C3%A1");
-        mapsAlimentacionColombia.setOpenStreetMaps(null);
-        alimentacionColombia.setMaps(mapsAlimentacionColombia);
-        
-        alimentacionColombia.setUsuarioId("proveedor-colombia");
 
-        alimentacionColombia = (Alimentacion) clasificacionRepository.save(alimentacionColombia);
 
-        // Create Transporte con ciudadOrigen: Colombia  
-        Transporte transporteColombia = new Transporte();
-        transporteColombia.setLugarInicio("Colombia");
-        transporteColombia.setPaisDestino("Colombia");
-        transporteColombia.setPrecio(new BigDecimal("75.00"));
-        transporteColombia.setFechaDisponibilidadInicio(LocalDateTime.now());
-        transporteColombia.setFechaDisponibilidadFin(LocalDateTime.now().plusDays(14));
-        transporteColombia.setCapacidadMaxima(25);
-        transporteColombia.setLugarDestino("Cartagena");
-        transporteColombia.setHoraSalida(LocalDateTime.now().plusHours(24));
-        transporteColombia.setHoraLlegada(LocalDateTime.now().plusHours(28));
-        transporteColombia.setTipoTransporte("Bus");
-        transporteColombia.setDuracionViaje(240); // 4 horas
-        transporteColombia.setRutaGps("Ruta Bogotá-Cartagena");
-        transporteColombia.setFlag("🇨🇴");
-        transporteColombia.setPopulation(53057212L);
-        transporteColombia.setGini(51.3);
-        transporteColombia.setFifa("COL");
-        
-        Maps mapsTransporteColombia = new Maps();
-        mapsTransporteColombia.setGoogleMaps("https://www.google.com/maps/search/?api=1&query=Carrera+7+%2323-45%2C+Chapinero%2C+Bogot%C3%A1");
-        mapsTransporteColombia.setOpenStreetMaps(null);
-        transporteColombia.setMaps(mapsTransporteColombia);
-        
-        transporteColombia.setUsuarioId("proveedor-colombia");
 
-        transporteColombia = (Transporte) clasificacionRepository.save(transporteColombia);
 
-        // Create PaseosEcologicos con ciudadOrigen: Colombia
-        PaseosEcologicos paseosColombia = new PaseosEcologicos();
-        paseosColombia.setLugarInicio("Colombia");
-        paseosColombia.setPaisDestino("Colombia");
-        paseosColombia.setPrecio(new BigDecimal("120.00"));
-        paseosColombia.setFechaDisponibilidadInicio(LocalDateTime.now());
-        paseosColombia.setFechaDisponibilidadFin(LocalDateTime.now().plusDays(21));
-        paseosColombia.setCapacidadMaxima(12);
-        paseosColombia.setDuracionHoras(8);
-        paseosColombia.setNivelDificultad("Fácil");
-        paseosColombia.setEquipoIncluido(true);
-        paseosColombia.setGuiaIncluido(true);
-        paseosColombia.setEdadMinima(8);
-        paseosColombia.setPuntoEncuentro("Parque Simón Bolívar");
-        paseosColombia.setRutaEncuentro("Avenida 68 #45-12");
-        paseosColombia.setFlag("🇨🇴");
-        paseosColombia.setPopulation(53057212L);
-        paseosColombia.setGini(51.3);
-        paseosColombia.setFifa("COL");
-        
-        Maps mapsPaseosColombia = new Maps();
-        mapsPaseosColombia.setGoogleMaps("https://www.google.com/maps/search/?api=1&query=Carrera+7+%2323-45%2C+Chapinero%2C+Bogot%C3%A1");
-        mapsPaseosColombia.setOpenStreetMaps(null);
-        paseosColombia.setMaps(mapsPaseosColombia);
-        
-        paseosColombia.setUsuarioId("proveedor-colombia");
 
-        paseosColombia = (PaseosEcologicos) clasificacionRepository.save(paseosColombia);
 
-        // Now create Items para las clasificaciones colombianas
 
-        // Create Item con Alojamiento Colombia
-        Item itemAlojamientoColombia = new Item();
-        itemAlojamientoColombia.setTitulo("Apartamento en Bogotá, Colombia");
-        itemAlojamientoColombia.setDescripcion("Apartamento moderno en Chapinero, Bogotá. Datos de país completos: Colombia 🇨🇴");
-        itemAlojamientoColombia.setFechaPublicacion(LocalDate.now());
-        itemAlojamientoColombia.setStock(null); // Alojamiento no usa stock
-        itemAlojamientoColombia.setVisualizaciones(0);
-        itemAlojamientoColombia.setCalificacionPromedio(0L);
-        itemAlojamientoColombia.setLugarInicio(alojamientoColombia.getLugarInicio());
-        itemAlojamientoColombia.setPrecio(alojamientoColombia.getPrecio());
-        itemAlojamientoColombia.setFechaDisponibilidadInicio(alojamientoColombia.getFechaDisponibilidadInicio());
-        itemAlojamientoColombia.setFechaDisponibilidadFin(alojamientoColombia.getFechaDisponibilidadFin());
-        itemAlojamientoColombia.setCapacidadMaxima(alojamientoColombia.getCapacidadMaxima());
-        itemAlojamientoColombia.setClasificacion(alojamientoColombia);
-
-        itemAlojamientoColombia = itemRepository.save(itemAlojamientoColombia);
-
-        // Create Item con Alimentacion Colombia
-        Item itemAlimentacionColombia = new Item();
-        itemAlimentacionColombia.setTitulo("Almuerzo típico colombiano");
-        itemAlimentacionColombia.setDescripcion("Sancocho y platos típicos colombianos en el corazón de Bogotá");
-        itemAlimentacionColombia.setFechaPublicacion(LocalDate.now());
-        itemAlimentacionColombia.setStock(alimentacionColombia.getCapacidadMaxima()); // Stock = capacidadMaxima
-        itemAlimentacionColombia.setVisualizaciones(0);
-        itemAlimentacionColombia.setCalificacionPromedio(0L);
-        itemAlimentacionColombia.setLugarInicio(alimentacionColombia.getLugarInicio());
-        itemAlimentacionColombia.setPrecio(alimentacionColombia.getPrecio());
-        itemAlimentacionColombia.setFechaDisponibilidadInicio(alimentacionColombia.getFechaDisponibilidadInicio());
-        itemAlimentacionColombia.setFechaDisponibilidadFin(alimentacionColombia.getFechaDisponibilidadFin());
-        itemAlimentacionColombia.setCapacidadMaxima(alimentacionColombia.getCapacidadMaxima());
-        itemAlimentacionColombia.setClasificacion(alimentacionColombia);
-
-        itemAlimentacionColombia = itemRepository.save(itemAlimentacionColombia);
-
-        // Create Item con Transporte Colombia
-        Item itemTransporteColombia = new Item();
-        itemTransporteColombia.setTitulo("Bus Bogotá-Cartagena");
-        itemTransporteColombia.setDescripcion("Transporte cómodo de Bogotá a Cartagena con datos completos de Colombia");
-        itemTransporteColombia.setFechaPublicacion(LocalDate.now());
-        itemTransporteColombia.setStock(transporteColombia.getCapacidadMaxima()); // Stock = capacidadMaxima
-        itemTransporteColombia.setVisualizaciones(0);
-        itemTransporteColombia.setCalificacionPromedio(0L);
-        itemTransporteColombia.setLugarInicio(transporteColombia.getLugarInicio());
-        itemTransporteColombia.setPrecio(transporteColombia.getPrecio());
-        itemTransporteColombia.setFechaDisponibilidadInicio(transporteColombia.getFechaDisponibilidadInicio());
-        itemTransporteColombia.setFechaDisponibilidadFin(transporteColombia.getFechaDisponibilidadFin());
-        itemTransporteColombia.setCapacidadMaxima(transporteColombia.getCapacidadMaxima());
-        itemTransporteColombia.setClasificacion(transporteColombia);
-
-        itemTransporteColombia = itemRepository.save(itemTransporteColombia);
-
-        // Create Item con PaseosEcologicos Colombia
-        Item itemPaseosColombia = new Item();
-        itemPaseosColombia.setTitulo("Ecotour por Bogotá y alrededores");
-        itemPaseosColombia.setDescripcion("Tour ecológico con datos completos del país: Colombia 🇨🇴");
-        itemPaseosColombia.setFechaPublicacion(LocalDate.now());
-        itemPaseosColombia.setStock(paseosColombia.getCapacidadMaxima()); // Stock = capacidadMaxima
-        itemPaseosColombia.setVisualizaciones(0);
-        itemPaseosColombia.setCalificacionPromedio(0L);
-        itemPaseosColombia.setLugarInicio(paseosColombia.getLugarInicio());
-        itemPaseosColombia.setPrecio(paseosColombia.getPrecio());
-        itemPaseosColombia.setFechaDisponibilidadInicio(paseosColombia.getFechaDisponibilidadInicio());
-        itemPaseosColombia.setFechaDisponibilidadFin(paseosColombia.getFechaDisponibilidadFin());
-        itemPaseosColombia.setCapacidadMaxima(paseosColombia.getCapacidadMaxima());
-        itemPaseosColombia.setClasificacion(paseosColombia);
-
-        itemPaseosColombia = itemRepository.save(itemPaseosColombia);
 
         // Now create Items
 
@@ -662,5 +528,107 @@ public class DbInitializer implements CommandLineRunner {
         servicio2.setItem(itemAlojamiento);
 
         serviciosIncluidosRepository.saveAll(Arrays.asList(servicio1, servicio2));
+    }
+    
+    private void fixExistingClasificaciones() {
+        System.out.println("=== CORRIGIENDO CLASIFICACIONES EXISTENTES ===");
+        
+        // Buscar todas las clasificaciones
+        List<Clasificacion> todasClasificaciones = clasificacionRepository.findAll();
+        
+        for (Clasificacion clasificacion : todasClasificaciones) {
+            String tipoActual = clasificacion.getTipo();
+            System.out.println("Clasificación ID: " + clasificacion.getId() + 
+                             ", Tipo actual: '" + tipoActual + 
+                             "', Lugar: " + clasificacion.getLugarInicio());
+            
+            boolean necesitaGuardar = false;
+            
+            // Si el tipo es nulo, "Desconocido" o vacío, intentar corregirlo
+            if (tipoActual == null || tipoActual.equals("Desconocido") || tipoActual.trim().isEmpty()) {
+                
+                String nuevoTipo = null;
+                
+                // Determinar el tipo basado en la clase Java
+                if (clasificacion instanceof Alojamiento) {
+                    nuevoTipo = "Alojamiento";
+                } else if (clasificacion instanceof Alimentacion) {
+                    nuevoTipo = "Alimentacion";
+                } else if (clasificacion instanceof Transporte) {
+                    nuevoTipo = "Transporte";
+                } else if (clasificacion instanceof PaseosEcologicos) {
+                    nuevoTipo = "PaseosEcologicos";
+                }
+                
+                if (nuevoTipo != null) {
+                    clasificacion.setTipo(nuevoTipo);
+                    System.out.println("  ✓ CORREGIDO tipo a: '" + nuevoTipo + "'");
+                    necesitaGuardar = true;
+                } else {
+                    System.out.println("  ✗ No se pudo determinar el tipo");
+                }
+            } else {
+                System.out.println("  ✓ Tipo correcto: '" + tipoActual + "'");
+            }
+            
+            // Asegurar que tenga paisDestino si es Colombia
+            if (clasificacion.getPaisDestino() == null || clasificacion.getPaisDestino().trim().isEmpty()) {
+                clasificacion.setPaisDestino("Colombia");
+                System.out.println("  ✓ Agregado paisDestino: 'Colombia'");
+                necesitaGuardar = true;
+            }
+            
+            // Asegurar que tenga datos de país si es Colombia
+            if (clasificacion.getFlag() == null || clasificacion.getPopulation() == null || 
+                clasificacion.getFifa() == null || clasificacion.getGini() == null) {
+                
+                clasificacion.setFlag("🇨🇴");
+                clasificacion.setPopulation(53057212L);
+                clasificacion.setGini(51.3);
+                clasificacion.setFifa("COL");
+                System.out.println("  ✓ Agregados datos de país de Colombia");
+                necesitaGuardar = true;
+            }
+            
+            // Asegurar que tenga Maps específico según el tipo
+            if (clasificacion.getMaps() == null || clasificacion.getMaps().getGoogleMaps() == null) {
+                Maps maps = new Maps();
+                String googleMapsUrl = null;
+                
+                if (clasificacion instanceof Alojamiento) {
+                    Alojamiento alo = (Alojamiento) clasificacion;
+                    if (alo.getDireccion() != null) {
+                        googleMapsUrl = "https://www.google.com/maps/search/?api=1&query=" + 
+                                       URLEncoder.encode(alo.getDireccion(), StandardCharsets.UTF_8);
+                    }
+                } else if (clasificacion instanceof Transporte) {
+                    Transporte trans = (Transporte) clasificacion;
+                    if (trans.getLugarDestino() != null) {
+                        googleMapsUrl = "https://www.google.com/maps/search/?api=1&query=" + 
+                                       URLEncoder.encode("Terminal " + trans.getLugarDestino() + ", Colombia", StandardCharsets.UTF_8);
+                    }
+                } else if (clasificacion instanceof PaseosEcologicos) {
+                    PaseosEcologicos paseos = (PaseosEcologicos) clasificacion;
+                    if (paseos.getPuntoEncuentro() != null) {
+                        googleMapsUrl = "https://www.google.com/maps/search/?api=1&query=" + 
+                                       URLEncoder.encode(paseos.getPuntoEncuentro() + ", Colombia", StandardCharsets.UTF_8);
+                    }
+                }
+                
+                if (googleMapsUrl != null) {
+                    maps.setGoogleMaps(googleMapsUrl);
+                    maps.setOpenStreetMaps(null);
+                    clasificacion.setMaps(maps);
+                    System.out.println("  ✓ Agregado Maps específico");
+                    necesitaGuardar = true;
+                }
+            }
+            
+            if (necesitaGuardar) {
+                clasificacionRepository.save(clasificacion);
+            }
+        }
+        
+        System.out.println("=== CORRECCIÓN DE CLASIFICACIONES COMPLETADA ===");
     }
 }

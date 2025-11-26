@@ -41,15 +41,33 @@ public class ItemMapper {
         itemDTO.setVisualizaciones(item.getVisualizaciones());
         itemDTO.setCalificacionPromedio(item.getCalificacionPromedio());
         
-        // Mapear datos de clasificación al nuevo DTO
+        // Mapear datos propios del Item (incluyendo datos de país)
+        itemDTO.setLugarInicio(item.getLugarInicio());
+        itemDTO.setPrecio(item.getPrecio());
+        itemDTO.setFechaDisponibilidadInicio(item.getFechaDisponibilidadInicio());
+        itemDTO.setFechaDisponibilidadFin(item.getFechaDisponibilidadFin());
+        itemDTO.setCapacidadMaxima(item.getCapacidadMaxima());
+        
+        // Mapear datos de país del Item
+        itemDTO.setPaisDestino(item.getPaisDestino());
+        itemDTO.setFlag(item.getFlag());
+        itemDTO.setPopulation(item.getPopulation());
+        itemDTO.setGini(item.getGini());
+        itemDTO.setFifa(item.getFifa());
+        
+        // Mapear Maps si existe
+        if (item.getMaps() != null) {
+            itemDTO.setMaps(new com.microservicios.marketplace_ms.dtos.MapsDTO(
+                item.getMaps().getGoogleMaps(), 
+                item.getMaps().getOpenStreetMaps()
+            ));
+        }
+        
+        // Mapear datos de clasificación (para casos donde aún se use la relación)
         if (item.getClasificacion() != null) {
             itemDTO.setClasificacionId(item.getClasificacion().getId());
-            itemDTO.setLugarInicio(item.getClasificacion().getLugarInicio());
-            itemDTO.setPrecio(item.getClasificacion().getPrecio());
-            itemDTO.setFechaDisponibilidadInicio(item.getClasificacion().getFechaDisponibilidadInicio());
-            itemDTO.setFechaDisponibilidadFin(item.getClasificacion().getFechaDisponibilidadFin());
-            itemDTO.setCapacidadMaxima(item.getClasificacion().getCapacidadMaxima());
             itemDTO.setUsuarioId(item.getClasificacion().getUsuarioId());
+            itemDTO.setTipoClasificacion(item.getClasificacion().getTipo());
         }
         
         return itemDTO;

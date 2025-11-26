@@ -241,7 +241,7 @@ public class ClasificacionService {
         return address.trim();
     }
 
-    private void populateCountryDataIfMissing(Clasificacion clasificacion) {
+    public void populateCountryDataIfMissing(Clasificacion clasificacion) {
         // Verificar si faltan datos del país - verificar múltiples campos además de solo flag
         boolean missingCountryData = clasificacion.getFlag() == null 
                                    || clasificacion.getPopulation() == null 
@@ -711,5 +711,26 @@ public class ClasificacionService {
             return List.of();
         }
         return getPaseosEcologicosByUsuario(currentUserId);
+    }
+    
+    /**
+     * Método optimizado para obtener clasificaciones con datos de país ya poblados
+     * Utiliza populateCountryDataIfMissing para asegurar que todos los datos estén completos
+     */
+    public Optional<Clasificacion> getClasificacionByIdWithCountryData(Long id) {
+        Optional<Clasificacion> opt = clasificacionRepository.findById(id);
+        opt.ifPresent(this::populateCountryDataIfMissing);
+        return opt;
+    }
+    
+    /**
+     * Método para obtener TODAS las clasificaciones con datos de país poblados
+     * Útil para endpoints que necesitan datos completos de país
+     */
+    public List<Clasificacion> getAllClasificacionesWithCountryData() {
+        List<Clasificacion> list = clasificacionRepository.findAll();
+        // Poblar datos de país para todas las clasificaciones
+        list.forEach(this::populateCountryDataIfMissing);
+        return list;
     }
 }

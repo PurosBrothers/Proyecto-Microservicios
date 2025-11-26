@@ -1,6 +1,8 @@
 package com.microservicios.marketplace_ms.controllers;
 
 import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -31,9 +33,11 @@ import com.microservicios.marketplace_ms.dtos.ItemDTO;
 import com.microservicios.marketplace_ms.dtos.ItemResponseDTO;
 import com.microservicios.marketplace_ms.entities.Alojamiento;
 import com.microservicios.marketplace_ms.entities.Alimentacion;
+import com.microservicios.marketplace_ms.entities.Maps;
 import com.microservicios.marketplace_ms.entities.PaseosEcologicos;
 import com.microservicios.marketplace_ms.entities.Transporte;
 import com.microservicios.marketplace_ms.messagingrabbitmq.components.RabbitMQSender;
+import com.microservicios.marketplace_ms.services.ClasificacionService;
 import com.microservicios.marketplace_ms.services.ItemService;
 
 @RestController
@@ -42,6 +46,9 @@ public class ItemController {
 
     @Autowired
     private ItemService itemService;
+
+    @Autowired
+    private ClasificacionService clasificacionService;
 
     @Autowired
     private RabbitMQSender rabbitMQSender;
@@ -166,4 +173,5 @@ public class ItemController {
     public ResponseEntity<String> handleDeserializationExceptions(Exception ex) {
         return ResponseEntity.badRequest().body("Error al procesar la solicitud: " + ex.getMessage());
     }
+
 }

@@ -41,10 +41,19 @@ public class ItemDTO {
     @Min(value = 1, message = "La capacidad máxima debe ser al menos 1")
     private Integer capacidadMaxima;
     
+    // Campos de país (solo lectura en responses)
+    private String paisDestino;
+    private String flag;
+    private Long population;
+    private Double gini;
+    private String fifa;
+    private MapsDTO maps;
+    
     // Campos de solo lectura (responses)
     private Integer visualizaciones;
     private Long calificacionPromedio;
     private String usuarioId;
+    private String tipoClasificacion;
 
     // Getters and Setters
     public Long getId() {
@@ -157,5 +166,62 @@ public class ItemDTO {
 
     public void setUsuarioId(String usuarioId) {
         this.usuarioId = usuarioId;
+    }
+
+    public String getTipoClasificacion() {
+        return tipoClasificacion;
+    }
+
+    public void setTipoClasificacion(String tipoClasificacion) {
+        this.tipoClasificacion = tipoClasificacion;
+    }
+
+    // Getters and Setters para campos de país
+    public String getPaisDestino() {
+        return paisDestino;
+    }
+
+    public void setPaisDestino(String paisDestino) {
+        this.paisDestino = paisDestino;
+    }
+
+    public String getFlag() {
+        return flag;
+    }
+
+    public void setFlag(String flag) {
+        this.flag = flag;
+    }
+
+    public Long getPopulation() {
+        return population;
+    }
+
+    public void setPopulation(Long population) {
+        this.population = population;
+    }
+
+    public Double getGini() {
+        return gini;
+    }
+
+    public void setGini(Double gini) {
+        this.gini = gini;
+    }
+
+    public String getFifa() {
+        return fifa;
+    }
+
+    public void setFifa(String fifa) {
+        this.fifa = fifa;
+    }
+
+    public MapsDTO getMaps() {
+        return maps;
+    }
+
+    public void setMaps(MapsDTO maps) {
+        this.maps = maps;
     }
 }
