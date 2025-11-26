@@ -18,6 +18,9 @@ eureka:
   client:
     service-url:
       defaultZone: http://eureka-server:9989/eureka/
+  instance:
+    prefer-ip-address: true
+    hostname: marketplace-ms
 
 rabbitmq:
   host: rabbitmq

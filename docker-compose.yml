@@ -46,6 +46,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     networks:
       my_network:
         ipv4_address: 172.25.0.5
@@ -68,6 +69,64 @@ services:
     networks:
       my_network:
         ipv4_address: 172.25.0.6
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak_db
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: password
+      KC_HOSTNAME: localhost
+      KC_ADMIN: admin
+      KC_ADMIN_PASSWORD: admin
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    command: start-dev
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    restart: on-failure
+    networks:
+      my_network:
+        ipv4_address: 172.25.0.7
+
+  gateway-server:
+    build: ./gateway_server
+    container_name: gateway-server
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8082:8080"
+    depends_on:
+      - config-server
+      - eureka-server
+      - keycloak
+    restart: on-failure
+    networks:
+      my_network:
+        ipv4_address: 172.25.0.8
+
+  user-ms:
+    build: ./user-ms
+    container_name: user-ms
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_USERNAME: postgres
+      DB_PASSWORD: password
+    ports:
+      - "8083:8083"
+    depends_on:
+      - config-server
+      - eureka-server
+      - postgres
+      - keycloak
+    restart: on-failure
+    networks:
+      my_network:
+        ipv4_address: 172.25.0.9
 
 volumes:
   postgres_data:
