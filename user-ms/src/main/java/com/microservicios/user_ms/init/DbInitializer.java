@@ -34,9 +34,11 @@ public class DbInitializer implements CommandLineRunner {
 
         // Crear clientes de prueba con integración Keycloak
         createTestClientesWithKeycloak();
-        
+
         // Crear proveedores de prueba con integración Keycloak
         createTestProveedoresWithKeycloak();
+
+        log.info("✅ Inicialización completada - Usuarios de prueba creados exitosamente");
 
         log.info("Datos de prueba cargados exitosamente");
         log.info("Total de usuarios creados: {}", usuarioRepository.count());

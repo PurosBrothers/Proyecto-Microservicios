@@ -12,3 +12,13 @@ BEGIN
    END IF;
 END
 $$;
+
+-- Crear usuario para Keycloak si no existe
+DO $$
+BEGIN
+   IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'keycloak_user') THEN
+      CREATE ROLE keycloak_user LOGIN PASSWORD 'password';
+      GRANT ALL PRIVILEGES ON DATABASE keycloak_db TO keycloak_user;
+   END IF;
+END
+$$;
