@@ -24,7 +24,7 @@ public class Comentario {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private Long uid;
+    private String uid;
 
     private String titulo;
 
@@ -60,11 +60,11 @@ public class Comentario {
         this.id = id;
     }
 
-    public Long getUid() {
+    public String getUid() {
         return uid;
     }
 
-    public void setUid(Long uid) {
+    public void setUid(String uid) {
         this.uid = uid;
     }
 

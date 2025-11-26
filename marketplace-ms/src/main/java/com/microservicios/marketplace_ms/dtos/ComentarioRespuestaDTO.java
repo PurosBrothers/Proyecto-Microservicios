@@ -5,11 +5,9 @@ import jakarta.validation.constraints.NotNull;
 
 /**
  * DTO para responder a comentarios (sin calificación)
+ * El UID se extrae automáticamente del token JWT
  */
 public class ComentarioRespuestaDTO {
-    
-    @NotNull(message = "El UID del usuario es obligatorio")
-    private Long uid;
     
     private String titulo; // Opcional para respuestas
     
@@ -19,20 +17,12 @@ public class ComentarioRespuestaDTO {
     // Constructores
     public ComentarioRespuestaDTO() {}
 
-    public ComentarioRespuestaDTO(Long uid, String titulo, String cuerpo) {
-        this.uid = uid;
+    public ComentarioRespuestaDTO(String titulo, String cuerpo) {
         this.titulo = titulo;
         this.cuerpo = cuerpo;
     }
 
     // Getters y Setters
-    public Long getUid() {
-        return uid;
-    }
-
-    public void setUid(Long uid) {
-        this.uid = uid;
-    }
 
     public String getTitulo() {
         return titulo;

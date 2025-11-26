@@ -17,7 +17,7 @@ public interface ComentarioRepository extends JpaRepository<Comentario, Long> {
     List<Comentario> findByParentId(Long parentId);
     
     // Encontrar comentarios por usuario
-    List<Comentario> findByUid(Long uid);
+    List<Comentario> findByUid(String uid);
     
     // Encontrar comentarios padre con sus respuestas
     @Query("SELECT c FROM Comentario c LEFT JOIN FETCH c.replies WHERE c.item.id = :itemId AND c.parent IS NULL ORDER BY c.id DESC")

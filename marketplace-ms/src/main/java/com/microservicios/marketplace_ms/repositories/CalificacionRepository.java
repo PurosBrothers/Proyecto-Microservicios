@@ -14,10 +14,10 @@ public interface CalificacionRepository extends JpaRepository<Calificacion, Long
     List<Calificacion> findByItemId(Long itemId);
     
     // Encontrar calificaciones por usuario
-    List<Calificacion> findByUid(Long uid);
+    List<Calificacion> findByUid(String uid);
     
     // Verificar si un usuario ya calificó un item
-    boolean existsByItemIdAndUid(Long itemId, Long uid);
+    boolean existsByItemIdAndUid(Long itemId, String uid);
     
     // Obtener promedio de calificaciones de un item
     @Query("SELECT AVG(c.puntuacion) FROM Calificacion c WHERE c.item.id = :itemId")

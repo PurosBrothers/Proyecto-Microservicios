@@ -86,6 +86,14 @@ public class DbInitializer implements CommandLineRunner {
     }
 
     private void createTestData() {
+        /*
+         * UIDs de ejemplo para pruebas (simulando UUIDs de Keycloak):
+         * - "23ae7f4b-e507-4e9c-8ed6-dec20bf9d04a" = dickgrayson@gmail.com (token JWT real de prueba)
+         * - "b4c87f2e-9d15-4a3b-8f7e-1c2d3e4f5a6b" = usuario-ejemplo-2
+         * - "c5d87f3f-ae25-5b4c-9f8e-2d3e4f5a6b7c" = usuario-ejemplo-3
+         * 
+         * Nota: Los UIDs ahora son String (UUID) en lugar de Long para compatibilidad con Keycloak
+         */
         // Create Alojamiento
         Alojamiento alojamiento = new Alojamiento();
         alojamiento.setLugarInicio("Bogota");
@@ -316,7 +324,7 @@ public class DbInitializer implements CommandLineRunner {
 
         // Create Comentario PADRE con Calificación
         Comentario comentarioPadre = new Comentario();
-        comentarioPadre.setUid(1L);
+        comentarioPadre.setUid("23ae7f4b-e507-4e9c-8ed6-dec20bf9d04a"); // UUID de ejemplo simulando Keycloak
         comentarioPadre.setTitulo("Excelente experiencia");
         comentarioPadre.setCuerpo("El alojamiento superó mis expectativas. Muy recomendado!");
         comentarioPadre.setLikes(10);
@@ -327,7 +335,7 @@ public class DbInitializer implements CommandLineRunner {
 
         // Create Calificacion para el comentario padre
         Calificacion calificacion = new Calificacion();
-        calificacion.setUid(1L);
+        calificacion.setUid("23ae7f4b-e507-4e9c-8ed6-dec20bf9d04a"); // Mismo UID del comentario
         calificacion.setPuntuacion(5);
         calificacion.setComentario(comentarioPadre);
         calificacion.setFechaCalificacion(LocalDateTime.now());
@@ -341,7 +349,7 @@ public class DbInitializer implements CommandLineRunner {
 
         // Create respuesta al comentario (SIN calificación)
         Comentario respuesta1 = new Comentario();
-        respuesta1.setUid(2L);
+        respuesta1.setUid("b4c87f2e-9d15-4a3b-8f7e-1c2d3e4f5a6b"); // UUID de otro usuario
         respuesta1.setTitulo("Totalmente de acuerdo");
         respuesta1.setCuerpo("Yo también tuve una experiencia increíble allí. El servicio es de primera.");
         respuesta1.setLikes(3);
@@ -353,7 +361,7 @@ public class DbInitializer implements CommandLineRunner {
 
         // Create otra calificación padre para el mismo item
         Comentario comentarioPadre2 = new Comentario();
-        comentarioPadre2.setUid(3L);
+        comentarioPadre2.setUid("c5d87f3f-ae25-5b4c-9f8e-2d3e4f5a6b7c"); // UUID de tercer usuario
         comentarioPadre2.setTitulo("Buena relación calidad-precio");
         comentarioPadre2.setCuerpo("Aunque hay algunos detalles que mejorar, en general cumple con lo prometido.");
         comentarioPadre2.setLikes(5);
@@ -364,7 +372,7 @@ public class DbInitializer implements CommandLineRunner {
 
         // Calificación para el segundo comentario padre
         Calificacion calificacion2 = new Calificacion();
-        calificacion2.setUid(3L);
+        calificacion2.setUid("c5d87f3f-ae25-5b4c-9f8e-2d3e4f5a6b7c"); // Mismo UID del comentario
         calificacion2.setPuntuacion(4);
         calificacion2.setComentario(comentarioPadre2);
         calificacion2.setFechaCalificacion(LocalDateTime.now());
@@ -373,6 +381,30 @@ public class DbInitializer implements CommandLineRunner {
         calificacion2 = calificacionRepository.save(calificacion2);
         comentarioPadre2.setCalificacion(calificacion2);
         comentarioRepository.save(comentarioPadre2);
+
+        // Create comentario con UID real de token JWT para pruebas
+        // Este UID corresponde al token JWT de dickgrayson@gmail.com que aparece en los archivos de prueba
+        Comentario comentarioPruebaJWT = new Comentario();
+        comentarioPruebaJWT.setUid("23ae7f4b-e507-4e9c-8ed6-dec20bf9d04a"); // UID real del token JWT de prueba
+        comentarioPruebaJWT.setTitulo("Comentario de prueba JWT");
+        comentarioPruebaJWT.setCuerpo("Este comentario se puede editar/eliminar con el token JWT de dickgrayson@gmail.com");
+        comentarioPruebaJWT.setLikes(0);
+        comentarioPruebaJWT.setParent(null);
+        comentarioPruebaJWT.setItem(itemAlimentacion); // Asociar a otro item para variedad
+
+        comentarioPruebaJWT = comentarioRepository.save(comentarioPruebaJWT);
+
+        // Calificación para el comentario de prueba JWT
+        Calificacion calificacionPruebaJWT = new Calificacion();
+        calificacionPruebaJWT.setUid("23ae7f4b-e507-4e9c-8ed6-dec20bf9d04a"); // Mismo UID
+        calificacionPruebaJWT.setPuntuacion(4);
+        calificacionPruebaJWT.setComentario(comentarioPruebaJWT);
+        calificacionPruebaJWT.setFechaCalificacion(LocalDateTime.now());
+        calificacionPruebaJWT.setItem(itemAlimentacion);
+
+        calificacionPruebaJWT = calificacionRepository.save(calificacionPruebaJWT);
+        comentarioPruebaJWT.setCalificacion(calificacionPruebaJWT);
+        comentarioRepository.save(comentarioPruebaJWT);
 
         // Create ItemTag
         ItemTag tag = new ItemTag();

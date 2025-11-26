@@ -18,7 +18,7 @@ public class Calificacion {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private Long uid;
+    private String uid;
 
     private int puntuacion;
 
@@ -43,11 +43,11 @@ public class Calificacion {
         this.id = id;
     }
 
-    public Long getUid() {
+    public String getUid() {
         return uid;
     }
 
-    public void setUid(Long uid) {
+    public void setUid(String uid) {
         this.uid = uid;
     }
 

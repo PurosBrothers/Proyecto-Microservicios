@@ -7,11 +7,9 @@ import jakarta.validation.constraints.NotNull;
 
 /**
  * DTO para crear calificación + comentario (comentarios padre)
+ * El UID se extrae automáticamente del token JWT
  */
 public class CalificacionComentarioDTO {
-    
-    @NotNull(message = "El UID del usuario es obligatorio")
-    private Long uid;
     
     @NotNull(message = "La puntuación es obligatoria")
     @Min(value = 1, message = "La puntuación mínima es 1 estrella")
@@ -26,21 +24,13 @@ public class CalificacionComentarioDTO {
     // Constructores
     public CalificacionComentarioDTO() {}
 
-    public CalificacionComentarioDTO(Long uid, Integer puntuacion, String titulo, String comentario) {
-        this.uid = uid;
+    public CalificacionComentarioDTO(Integer puntuacion, String titulo, String comentario) {
         this.puntuacion = puntuacion;
         this.titulo = titulo;
         this.comentario = comentario;
     }
 
     // Getters y Setters
-    public Long getUid() {
-        return uid;
-    }
-
-    public void setUid(Long uid) {
-        this.uid = uid;
-    }
 
     public Integer getPuntuacion() {
         return puntuacion;

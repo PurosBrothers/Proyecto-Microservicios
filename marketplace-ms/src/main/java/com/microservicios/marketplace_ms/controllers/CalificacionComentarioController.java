@@ -25,6 +25,7 @@ import com.microservicios.marketplace_ms.entities.Item;
 import com.microservicios.marketplace_ms.repositories.CalificacionRepository;
 import com.microservicios.marketplace_ms.repositories.ComentarioRepository;
 import com.microservicios.marketplace_ms.repositories.ItemRepository;
+import com.microservicios.marketplace_ms.utils.JwtTokenUtil;
 
 import jakarta.validation.Valid;
 
@@ -40,6 +41,9 @@ public class CalificacionComentarioController {
 
     @Autowired
     private ItemRepository itemRepository;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     /**
      * Obtener todas las calificaciones con comentarios de un item
@@ -59,6 +63,13 @@ public class CalificacionComentarioController {
     public ResponseEntity<?> createReview(@PathVariable Long itemId, 
                                         @Valid @RequestBody CalificacionComentarioDTO reviewDTO) {
         
+        // Extraer UID del token JWT
+        String userUid = jwtTokenUtil.extractUidFromToken();
+        if (userUid == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Token JWT inválido o expirado");
+        }
+        
         // Verificar que el item existe
         Optional<Item> itemOpt = itemRepository.findById(itemId);
         if (!itemOpt.isPresent()) {
@@ -74,7 +85,7 @@ public class CalificacionComentarioController {
         try {
             // Crear comentario padre
             Comentario comentario = new Comentario();
-            comentario.setUid(reviewDTO.getUid());
+            comentario.setUid(userUid); // UID extraído del token
             comentario.setTitulo(reviewDTO.getTitulo());
             comentario.setCuerpo(reviewDTO.getComentario());
             comentario.setLikes(0);
@@ -86,7 +97,7 @@ public class CalificacionComentarioController {
 
             // Crear calificación asociada
             Calificacion calificacion = new Calificacion();
-            calificacion.setUid(reviewDTO.getUid());
+            calificacion.setUid(userUid); // UID extraído del token
             calificacion.setPuntuacion(reviewDTO.getPuntuacion());
             calificacion.setComentario(comentario);
             calificacion.setFechaCalificacion(LocalDateTime.now());
@@ -100,6 +111,9 @@ public class CalificacionComentarioController {
 
             return ResponseEntity.status(HttpStatus.CREATED).body(comentario);
 
+        } catch (NumberFormatException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("UID del token no tiene formato válido");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error al crear la calificación: " + e.getMessage());
@@ -114,6 +128,13 @@ public class CalificacionComentarioController {
     public ResponseEntity<?> replyToComment(@PathVariable Long itemId,
                                           @PathVariable Long comentarioPadreId,
                                           @Valid @RequestBody ComentarioRespuestaDTO replyDTO) {
+        
+        // Extraer UID del token JWT
+        String userUid = jwtTokenUtil.extractUidFromToken();
+        if (userUid == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Token JWT inválido o expirado");
+        }
         
         // Verificar que el comentario padre existe
         Optional<Comentario> comentarioPadreOpt = comentarioRepository.findById(comentarioPadreId);
@@ -131,7 +152,7 @@ public class CalificacionComentarioController {
         try {
             // Crear respuesta (sin calificación)
             Comentario respuesta = new Comentario();
-            respuesta.setUid(replyDTO.getUid());
+            respuesta.setUid(userUid); // UID extraído del token
             respuesta.setTitulo(replyDTO.getTitulo());
             respuesta.setCuerpo(replyDTO.getCuerpo());
             respuesta.setLikes(0);
@@ -143,6 +164,9 @@ public class CalificacionComentarioController {
 
             return ResponseEntity.status(HttpStatus.CREATED).body(respuesta);
 
+        } catch (NumberFormatException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("UID del token no tiene formato válido");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error al crear la respuesta: " + e.getMessage());
@@ -189,6 +213,13 @@ public class CalificacionComentarioController {
     @PreAuthorize("hasRole('TURISTA') or hasRole('PROVEEDOR') or hasAuthority('SCOPE_profile')")
     public ResponseEntity<?> deleteReview(@PathVariable Long itemId, @PathVariable Long comentarioId) {
         
+        // Extraer UID del token JWT
+        String userUid = jwtTokenUtil.extractUidFromToken();
+        if (userUid == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Token JWT inválido o expirado");
+        }
+        
         Optional<Comentario> comentarioOpt = comentarioRepository.findById(comentarioId);
         if (!comentarioOpt.isPresent()) {
             return ResponseEntity.notFound().build();
@@ -199,6 +230,12 @@ public class CalificacionComentarioController {
         // Verificar que es un comentario padre del item correcto
         if (!comentario.isComentarioPadre() || !comentario.getItem().getId().equals(itemId)) {
             return ResponseEntity.badRequest().body("Solo se pueden eliminar comentarios padre del item especificado");
+        }
+
+        // Verificar que el usuario actual es el propietario del comentario
+        if (!jwtTokenUtil.isResourceOwner(comentario.getUid())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Solo puedes eliminar tus propios comentarios");
         }
 
         try {
