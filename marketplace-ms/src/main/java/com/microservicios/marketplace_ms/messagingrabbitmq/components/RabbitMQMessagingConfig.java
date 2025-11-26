@@ -8,9 +8,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class RabbitMQConfig {
+public class RabbitMQMessagingConfig {
     public static final String TOPIC_EXCHANGE_NAME = "transaction-exchange";
-    public static final String QUEUE_UPDATE_ITEM = "marketplace.update-item";
+    public static final String QUEUE_UPDATE_ITEM = "update-item";
 
     @Bean
     TopicExchange exchange() {
@@ -24,6 +24,6 @@ public class RabbitMQConfig {
 
     @Bean
     Binding updateItemBinding(Queue updateItemQueue, TopicExchange exchange) {
-        return BindingBuilder.bind(updateItemQueue).to(exchange).with("marketplace.update-item");
+        return BindingBuilder.bind(updateItemQueue).to(exchange).with("update-item");
     }
 }

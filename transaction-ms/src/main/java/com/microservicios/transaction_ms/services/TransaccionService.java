@@ -81,7 +81,7 @@ public class TransaccionService {
         }
 
         // Validar stock/capacidad disponible para cada item
-        String baseUrl = "http://localhost:8080/marketplace-ms";
+        String baseUrl = "http://gateway-server:8080/marketplace-ms";
 
         for (ItemCarrito item : cartItems) {
             try {
@@ -235,7 +235,7 @@ public class TransaccionService {
             System.out.println("Transacción completada: " + id);
 
             // Usar Gateway para comunicación con marketplace-ms
-            String baseUrl = "http://localhost:8080/marketplace-ms";
+            String baseUrl = "http://gateway-server:8080/marketplace-ms";
 
             // Enviar updates a marketplace para cada item pagado
             for (ItemTransaccion item : trans.getItemsPagados()) {

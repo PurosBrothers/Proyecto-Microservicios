@@ -172,6 +172,12 @@ public class ItemService {
     public ResponseEntity<List<ItemResponseDTO>> getAllItems() {
         List<Item> allItems = itemRepository.findAll();
         List<ItemResponseDTO> results = allItems.stream()
+                .filter(item -> {
+                    // Filtrar items con stock = 0 o capacidad máxima = 0
+                    boolean tieneStock = item.getStock() == null || item.getStock() > 0;
+                    boolean tieneCapacidad = item.getCapacidadMaxima() == null || item.getCapacidadMaxima() > 0;
+                    return tieneStock && tieneCapacidad;
+                })
                 .map(item -> {
                     ItemDTO itemDTO = itemMapper.entityToDto(item);
                     ItemResponseDTO response = new ItemResponseDTO();
@@ -190,6 +196,12 @@ public class ItemService {
                         item.getDescripcion().toLowerCase().contains(query.toLowerCase()) ||
                         item.getTags().stream()
                                 .anyMatch(tag -> tag.getTag().toLowerCase().contains(query.toLowerCase())))
+                .filter(item -> {
+                    // Filtrar items con stock = 0 o capacidad máxima = 0
+                    boolean tieneStock = item.getStock() == null || item.getStock() > 0;
+                    boolean tieneCapacidad = item.getCapacidadMaxima() == null || item.getCapacidadMaxima() > 0;
+                    return tieneStock && tieneCapacidad;
+                })
                 .map(item -> {
                     ItemDTO itemDTO = itemMapper.entityToDto(item);
                     ItemResponseDTO response = new ItemResponseDTO();

@@ -16,7 +16,7 @@ public class UpdateItemReceiver {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @RabbitListener(queues = RabbitMQConfig.QUEUE_UPDATE_ITEM)
+    @RabbitListener(queues = "update-item")
     public void receiveUpdateItem(String message) {
         System.out.println("Mensaje update-item recibido: " + message);
         try {

@@ -13,6 +13,7 @@ public class RabbitMQConfig {
     public static final String QUEUE_PROCESS_PAYMENT = "process-payment";
     public static final String QUEUE_ADD_TO_CART = "add-to-cart";
     public static final String QUEUE_PAYMENT_CONFIRMATION = "payment-confirmation";
+    public static final String QUEUE_UPDATE_ITEM = "update-item";
 
     @Bean
     Queue processPaymentQueue() {
@@ -27,6 +28,11 @@ public class RabbitMQConfig {
     @Bean
     Queue addToCartQueue() {
         return new Queue(QUEUE_ADD_TO_CART, false);
+    }
+
+    @Bean
+    Queue updateItemQueue() {
+        return new Queue(QUEUE_UPDATE_ITEM, false);
     }
 
     @Bean
@@ -47,5 +53,10 @@ public class RabbitMQConfig {
     @Bean
     Binding bindingPaymentConfirmation(Queue paymentConfirmationQueue, TopicExchange exchange) {
         return BindingBuilder.bind(paymentConfirmationQueue).to(exchange).with("transaction.payment-confirmation");
+    }
+
+    @Bean
+    Binding bindingUpdateItem(Queue updateItemQueue, TopicExchange exchange) {
+        return BindingBuilder.bind(updateItemQueue).to(exchange).with("update-item");
     }
 }

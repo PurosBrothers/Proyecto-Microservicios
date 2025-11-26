@@ -1,0 +1,64 @@
+{
+    "realm": "proyect-ms-realm",
+    "enabled": true,
+    "displayName": "Proyecto Microservicios Realm",
+    "clients": [
+        {
+            "clientId": "user-ms-client",
+            "enabled": true,
+            "protocol": "openid-connect",
+            "publicClient": false,
+            "directAccessGrantsEnabled": true,
+            "serviceAccountsEnabled": true,
+            "implicitFlowEnabled": false,
+            "standardFlowEnabled": true,
+            "secret": "Aq3vK9EfTGwoWpK3j48RkN6Q0yCUZqGd",
+            "redirectUris": [
+                "http://localhost:8080/*",
+                "http://gateway-server:8080/*"
+            ],
+            "webOrigins": [
+                "http://localhost:8080",
+                "http://gateway-server:8080"
+            ]
+        }
+    ],
+    "users": [
+        {
+            "username": "admin",
+            "enabled": true,
+            "emailVerified": true,
+            "firstName": "Admin",
+            "lastName": "User",
+            "email": "admin@proyect-ms.com",
+            "credentials": [
+                {
+                    "type": "password",
+                    "value": "admin123",
+                    "temporary": false
+                }
+            ],
+            "realmRoles": [
+                "offline_access",
+                "uma_protection"
+            ],
+            "clientRoles": {
+                "realm-management": [
+                    "realm-admin"
+                ]
+            }
+        }
+    ],
+    "roles": {
+        "realm": [
+            {
+                "name": "CLIENTE",
+                "description": "Usuario que consume servicios"
+            },
+            {
+                "name": "PROVEEDOR",
+                "description": "Usuario que ofrece servicios"
+            }
+        ]
+    }
+}

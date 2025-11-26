@@ -1,12 +1,10 @@
-server:
-  port: 8082
-
+# Configuración para Docker con config-server
 spring:
-  application:
-    name: transaction-ms
+  config:
+    import: optional:configserver:http://config-server:8888
   cloud:
     config:
-      enabled: true
+      fail-fast: false
   datasource:
     url: jdbc:postgresql://postgres:5432/marketplace_db
     driver-class-name: org.postgresql.Driver
@@ -23,14 +21,10 @@ eureka:
   client:
     service-url:
       defaultZone: http://eureka-server:9989/eureka/
-  instance:
-    prefer-ip-address: true
-    hostname: transaction-ms
 
+# Configuración específica de RabbitMQ (forzada localmente)
 rabbitmq:
   host: rabbitmq
   port: 5672
   username: guest
   password: guest
-
-# Updated: Force config server reload

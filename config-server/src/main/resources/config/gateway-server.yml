@@ -61,7 +61,7 @@ spring:
 
 # Configuración de Keycloak para el gateway
 keycloak:
-  auth-server-url: http://localhost:8081
+  auth-server-url: http://keycloak:8080
   realm: proyect-ms-realm
   admin:
     username: admin
@@ -72,14 +72,14 @@ keycloak:
 
 # Configuración de user-ms para comunicación interna
 user-ms:
-  url: http://localhost:8083
+  url: http://user-ms:8083
 
 # Configuración OAuth2 para JWT
 security:
   oauth2:
     resourceserver:
       jwt:
-        issuer-uri: http://localhost:8081/realms/proyect-ms-realm
+        issuer-uri: http://keycloak:8080/realms/proyect-ms-realm
 
 # Configuración de Eureka
 eureka:
@@ -87,10 +87,10 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://localhost:9989/eureka/
+      defaultZone: http://eureka-server:9989/eureka/
   instance:
     prefer-ip-address: true
-    hostname: localhost
+    hostname: gateway-server
 
 # Configuración de logging
 logging:

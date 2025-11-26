@@ -34,9 +34,11 @@ public class DbInitializer implements CommandLineRunner {
 
         // Crear clientes de prueba con integración Keycloak
         createTestClientesWithKeycloak();
-        
+
         // Crear proveedores de prueba con integración Keycloak
         createTestProveedoresWithKeycloak();
+
+        log.info("✅ Inicialización completada - Usuarios de prueba creados exitosamente");
 
         log.info("Datos de prueba cargados exitosamente");
         log.info("Total de usuarios creados: {}", usuarioRepository.count());
@@ -285,7 +287,7 @@ public class DbInitializer implements CommandLineRunner {
         log.info("\n" +
                 "=============== INFORMACIÓN PARA PRUEBAS (KEYCLOAK CON ROLES) ===============\n" +
                 "USUARIOS DE PRUEBA CREADOS EN KEYCLOAK Y LOCAL CON ROLES AUTOMÁTICOS:\n" +
-                "   Consulta la base de datos H2 para ver los IDs reales generados por Keycloak\n" +
+                "   Consulta la base de datos PostgreSQL user_ms_db para ver los IDs reales generados por Keycloak\n" +
                 "\n" +
                 "CLIENTES (ROL: CLIENTE):\n" +
                 "   • Laura Martínez - Email: laura.martinez@gmail.com - Password: password123\n" +
@@ -319,11 +321,11 @@ public class DbInitializer implements CommandLineRunner {
                 "   Client Secret: Aq3vK9EfTGwoWpK3j48RkN6Q0yCUZqGd\n" +
                 "   Usuarios y contraseñas: Ver lista arriba\n" +
                 "\n" +
-                "BASE DE DATOS H2:\n" +
-                "   URL: http://localhost:8083/h2-console\n" +
-                "   JDBC URL: jdbc:h2:file:./data/testdb\n" +
-                "   Usuario: sa\n" +
-                "   Contraseña: (vacío)\n" +
+                "BASE DE DATOS POSTGRESQL:\n" +
+                "   Host: localhost:5432\n" +
+                "   Database: user_ms_db\n" +
+                "   Usuario: postgres\n" +
+                "   Contraseña: password\n" +
                 "\n" +
                 "CONSULTA SQL PARA VER DATOS COMPLETOS:\n" +
                 "   SELECT id, nombre, correo, tipo_usuario_enum, telefono, direccion FROM USUARIO;\n" +

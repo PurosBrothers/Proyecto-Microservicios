@@ -1,0 +1,188 @@
+version: "3.9"
+
+services:
+  config-server:
+    build: ./config-server
+    container_name: config-server
+    ports:
+      - "8888:8888"
+    restart: on-failure
+    networks:
+      my_network:
+        ipv4_address: 172.25.0.2
+
+  eureka-server:
+    build: ./eureka_server
+    container_name: eureka-server
+    ports:
+      - "9989:9989"
+    restart: on-failure
+    networks:
+      my_network:
+        ipv4_address: 172.25.0.3
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    restart: on-failure
+    networks:
+      my_network:
+        ipv4_address: 172.25.0.4
+
+  postgres:
+    image: postgres:15
+    container_name: postgres-db
+    environment:
+      POSTGRES_DB: marketplace_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      my_network:
+        ipv4_address: 172.25.0.5
+
+  marketplace-ms:
+    build: ./marketplace-ms
+    container_name: marketplace-ms
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_USERNAME: postgres
+      DB_PASSWORD: password
+    ports:
+      - "8084:8084"
+    depends_on:
+      - config-server
+      - eureka-server
+      - rabbitmq
+      - postgres
+    restart: on-failure
+    networks:
+      my_network:
+        ipv4_address: 172.25.0.6
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/postgres
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: password
+      KC_HOSTNAME: localhost
+      KC_ADMIN: admin
+      KC_ADMIN_PASSWORD: admin123
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin123
+      KC_IMPORT: /opt/keycloak/data/import/realm-config.json
+      KC_SPI_IMPORT_REALM_STRATEGY: OVERWRITE_EXISTING
+    command: start-dev --import-realm
+    volumes:
+      - ./keycloak-config:/opt/keycloak/data/import
+    ports:
+      - "8081:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: on-failure
+    networks:
+      my_network:
+        ipv4_address: 172.25.0.7
+
+  gateway-server:
+    build: ./gateway_server
+    container_name: gateway-server
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8080:8080"
+    depends_on:
+      - config-server
+      - eureka-server
+      - keycloak
+    restart: on-failure
+    networks:
+      my_network:
+        ipv4_address: 172.25.0.8
+
+  user-ms:
+    build: ./user-ms
+    container_name: user-ms
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_USERNAME: postgres
+      DB_PASSWORD: password
+    ports:
+      - "8083:8083"
+    depends_on:
+      - config-server
+      - eureka-server
+      - postgres
+      - rabbitmq
+      - keycloak
+    restart: on-failure
+    networks:
+      my_network:
+        ipv4_address: 172.25.0.9
+
+  payment-ms:
+    build: ./payment-ms
+    container_name: payment-ms
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_USERNAME: postgres
+      DB_PASSWORD: password
+    ports:
+      - "8085:8085"
+    depends_on:
+      - config-server
+      - eureka-server
+      - postgres
+      - rabbitmq
+    restart: on-failure
+    networks:
+      my_network:
+        ipv4_address: 172.25.0.10
+
+  transaction-ms:
+    build: ./transaction-ms
+    container_name: transaction-ms
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_USERNAME: postgres
+      DB_PASSWORD: password
+    ports:
+      - "8082:8082"
+    depends_on:
+      - config-server
+      - eureka-server
+      - postgres
+      - rabbitmq
+    restart: on-failure
+    networks:
+      my_network:
+        ipv4_address: 172.25.0.11
+
+volumes:
+  postgres_data:
+
+networks:
+  my_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16

@@ -46,11 +46,13 @@ public class SecurityConfig {
                 .requestMatchers("GET", "/transporte/{id}").permitAll()
                 .requestMatchers("GET", "/paseos-ecologicos").permitAll()
                 .requestMatchers("GET", "/paseos-ecologicos/{id}").permitAll()
-                
+            
                 // Endpoints de reviews y calificaciones - lectura pública
                 .requestMatchers("GET", "/items/*/reviews").permitAll()
                 .requestMatchers("GET", "/items/*/reviews/stats").permitAll()
                 .requestMatchers("GET", "/comentarios/*").permitAll()
+                // Endpoint para agregar al carrito - acceso público (UID viene en el body)
+                .requestMatchers("POST", "/items/*/add-to-cart").permitAll()
                 
                 // Endpoints de escritura - solo proveedores autenticados
                 .requestMatchers("POST", "/alojamiento").hasRole("PROVEEDOR")
