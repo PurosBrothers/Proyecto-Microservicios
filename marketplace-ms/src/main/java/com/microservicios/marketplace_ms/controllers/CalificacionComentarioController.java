@@ -59,7 +59,7 @@ public class CalificacionComentarioController {
      * Crear calificación + comentario (solo para comentarios padre)
      */
     @PostMapping
-    @PreAuthorize("hasRole('TURISTA') or hasRole('PROVEEDOR') or hasAuthority('SCOPE_profile')")
+    @PreAuthorize("hasRole('CLIENTE') or hasRole('PROVEEDOR') or hasAuthority('SCOPE_profile')")
     public ResponseEntity<?> createReview(@PathVariable Long itemId, 
                                         @Valid @RequestBody CalificacionComentarioDTO reviewDTO) {
         
@@ -124,7 +124,7 @@ public class CalificacionComentarioController {
      * Responder a un comentario (sin calificación)
      */
     @PostMapping("/{comentarioPadreId}/replies")
-    @PreAuthorize("hasRole('TURISTA') or hasRole('PROVEEDOR') or hasAuthority('SCOPE_profile')")
+    @PreAuthorize("hasRole('CLIENTE') or hasRole('PROVEEDOR') or hasAuthority('SCOPE_profile')")
     public ResponseEntity<?> replyToComment(@PathVariable Long itemId,
                                           @PathVariable Long comentarioPadreId,
                                           @Valid @RequestBody ComentarioRespuestaDTO replyDTO) {
@@ -210,7 +210,7 @@ public class CalificacionComentarioController {
      * Eliminar calificación completa (solo el autor)
      */
     @DeleteMapping("/{comentarioId}")
-    @PreAuthorize("hasRole('TURISTA') or hasRole('PROVEEDOR') or hasAuthority('SCOPE_profile')")
+    @PreAuthorize("hasRole('CLIENTE') or hasRole('PROVEEDOR') or hasAuthority('SCOPE_profile')")
     public ResponseEntity<?> deleteReview(@PathVariable Long itemId, @PathVariable Long comentarioId) {
         
         // Extraer UID del token JWT
